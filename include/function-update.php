@@ -188,6 +188,7 @@ function GetProducts($link)
     return $ArrayResult;
 }
 
+
 function GetLocations($link)
 {
 
@@ -229,8 +230,6 @@ function SaveLocation($link, $location_name, $is_active, $created_by, $UpdateKey
     }
     return json_encode($error);
 }
-
-
 
 function UpdateLocationStatus($link, $is_active, $created_by, $UpdateKey)
 {

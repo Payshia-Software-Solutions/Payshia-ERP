@@ -4,8 +4,11 @@ include '../../../include/function-update.php';
 
 $ActiveStatus = 0;
 $UpdateKey = $_POST['UpdateKey'];
-$Location = GetLocations($link)[$UpdateKey];
-$LocationName = $Location['location_name'];
+$LocationName = "";
+if ($UpdateKey > 0) {
+    $Location = GetLocations($link)[$UpdateKey];
+    $LocationName = $Location['location_name'];
+}
 ?>
 
 <div class="loading-popup-content">

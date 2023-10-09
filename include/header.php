@@ -1,7 +1,6 @@
 <?php
 require_once('./include/config.php');
 include './include/session.php';
-include './include/API.php';
 
 $company_id = 1452254565;
 $UserLevel = $session_user_level;

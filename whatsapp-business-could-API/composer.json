@@ -1,6 +1,0 @@
-{
-    "require": {
-        "netflie/whatsapp-cloud-api": "^2.0",
-        "php": ">=7.4"
-    }
-}

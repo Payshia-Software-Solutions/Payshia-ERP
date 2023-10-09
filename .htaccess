@@ -1,0 +1,12 @@
+RewriteEngine on 
+RewriteCond %{REQUEST_FILENAME} !-d 
+RewriteCond %{REQUEST_FILENAME}\.php -f 
+RewriteRule ^(.*)$ $1.php
+
+Options -Indexes
+
+php_value upload_max_filesize 20M
+
+ErrorDocument 404   http://localhost/uni-erp/web-admin/
+
+

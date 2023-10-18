@@ -3,22 +3,26 @@ require_once('../../../include/config.php');
 include '../../../include/function-update.php';
 
 $ActiveStatus = 0;
-$Products = GetProducts($link);
-$ProductsCount = count($Products);
+$Departments = GetDepartments($link);
+$ArrayCount = count($Departments);
 
-$ActiveProductsCount = $ProductsCount;
-$InactiveProductsCount = 0;
+$ActiveCount = $ArrayCount;
+$InactiveCount = 0;
+
+$Title = "Department";
+
+$Sections = GetSections($link);
 ?>
 
 <div class="row mt-5">
     <div class="col-md-3">
         <div class="card item-card">
             <div class="overlay-box">
-                <i class="fa-brands fa-product-hunt icon-card"></i>
+                <i class="fa-solid fa-location-dot icon-card"></i>
             </div>
             <div class="card-body">
-                <p>No of Products</p>
-                <h1><?= $ProductsCount ?></h1>
+                <p>No of <?= $Title ?>s</p>
+                <h1><?= $ArrayCount ?></h1>
             </div>
         </div>
     </div>
@@ -29,7 +33,7 @@ $InactiveProductsCount = 0;
             </div>
             <div class="card-body">
                 <p>Active</p>
-                <h1><?= $ActiveProductsCount ?></h1>
+                <h1><?= $ActiveCount ?></h1>
             </div>
         </div>
     </div>
@@ -40,61 +44,58 @@ $InactiveProductsCount = 0;
             </div>
             <div class="card-body">
                 <p>In-Active</p>
-                <h1><?= $InactiveProductsCount ?></h1>
+                <h1><?= $InactiveCount ?></h1>
             </div>
         </div>
     </div>
     <div class="col-md-3 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="AddProduct(1,0)"><i class="fa-solid fa-plus"></i> Add New Products</button>
+        <button class="btn btn-dark" type="button" onclick="AddNew(1,0)"><i class="fa-solid fa-plus"></i> Add <?= $Title ?></button>
     </div>
 </div>
 
 <div class="row mt-5">
+
     <div class="col-12">
-        <div class="table-title font-weight-bold mb-4 mt-0">Products</div>
+        <div class="table-title font-weight-bold mb-4 mt-0"><?= $Title ?>s</div>
     </div>
     <?php
-    if (!empty($Products)) {
-        foreach ($Products as $Product) {
-            $product_name = $Product['product_name'];
-            $display_name = $Product['display_name'];
-            $print_name = $Product['print_name'];
+    if (!empty($Departments)) {
+        foreach ($Departments as $SelectArray) {
             $active_status = "Deleted";
             $color = "warning";
-            if ($Product['active_status'] == 1) {
+            if ($SelectArray['is_active'] == 1) {
                 $active_status = "Active";
                 $color = "primary";
             }
 
-            if ($Product['image_path'] == 'no-image.png') {
-                $file_path = "./assets/images/products/no-image.png";
-            } else {
-                $file_path = "./pos-system/assets/images/products/" . $Product['product_id'] . "/" . $Product['image_path'];
-            }
+            $SectionName = $Sections[$SelectArray['section_id']]['section_name']
 
     ?>
             <div class="col-6 col-md-3 mb-3 d-flex">
                 <div class="card flex-fill">
                     <div class="card-body p-2 pb-2">
-                        <div class="card-back-image" style="background-image: url('<?= $file_path ?>');"></div>
                         <span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span>
-                        <h1 class="tutor-name mt-2"><?= $product_name ?></h1>
+                        <span class="badge text-dark mt-2 bg-light"><?= $SectionName ?></span>
+                        <h1 class="tutor-name mt-2"><?= $SelectArray['department_name'] ?></h1>
                         <div class="text-end mt-3">
-                            <button class="mt-0 mb-1 btn btn-sm btn-dark view-button" type="button" onclick="AddProduct (1, '<?= $Product['product_id'] ?>')"><i class="fa-solid fa-pen-to-square"></i> Update</button>
+                            <button class="mt-0 mb-1 btn btn-sm btn-dark view-button" type="button" onclick="AddNew (1, '<?= $SelectArray['id'] ?>')"><i class="fa-solid fa-pen-to-square"></i> Update</button>
 
                             <?php
-                            if ($Product['active_status'] == 1) {
+                            if ($SelectArray['is_active'] == 1) {
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Product['product_id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $SelectArray['id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
                             <?php
                             } else {
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-primary view-button" type="button" onclick="ChangeStatus(1, '<?= $Product['product_id'] ?>')"><i class="fa-solid fa-check"></i> Active</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-primary view-button" type="button" onclick="ChangeStatus(1, '<?= $SelectArray['id'] ?>')"><i class="fa-solid fa-check"></i> Active</button>
                             <?php
                             }
                             ?>
+
+
+
                         </div>
                     </div>
                 </div>

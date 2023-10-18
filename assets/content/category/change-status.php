@@ -4,8 +4,7 @@ include '../../../include/function-update.php';
 // Assuming you have received the necessary parameters for the plan
 $LoggedUser = $_POST["LoggedUser"];
 $UpdateKey = $_POST["UpdateKey"];
-$isActive = $_POST["IsActive"];
-$createdAt = date("Y-m-d H:i:s"); // You can set the creation date here
+$IsActive = $_POST["IsActive"];
 
-$result = UpdateProductStatus($link,  $isActive, $UpdateKey, $createdAt, $LoggedUser);
+$result = UpdateCategoryStatus($link, $IsActive, $LoggedUser, $UpdateKey);
 echo $result;

@@ -4,63 +4,75 @@ include '../../../include/function-update.php';
 
 mysqli_set_charset($link, "utf8mb4");
 
-// Parameters
+//Global  Parameters
 $UserLevel = $_POST["UserLevel"];
-$LoggedUser = $_POST["LoggedUser"];
+$created_by = $_POST["LoggedUser"];
 $error = $file_name = "";
 $item_image_tmp = "no-image.png";
 $today = date("Y-m-d H:i:s");
-$UpdateStatus = 0;
 
-if ($_POST['UpdateKey'] != 0) {
-    $destination_id = $_POST['UpdateKey'];
-    $UpdateStatus = 1;
-} else {
-    $sql = "SELECT `destination_id` FROM `destination`";
-    $result = $link->query($sql);
-    $accommodation_count = $result->num_rows;
-    $destination_id = $accommodation_count + 1;
+// Identical Parameters
+$active_status = $_POST['is_active'];
+$UpdateKey = $_POST['UpdateKey'];
+
+// Variable Parameters
+$product_code = "EDP" . time();
+$product_name = $_POST['product_name'];
+$print_name = $_POST['print_name'];
+$display_name = $_POST['display_name'];
+$section_id = $_POST['section_id'];
+$department_id = $_POST['department_id'];
+$category_id = $_POST['category_id'];
+$brand_id = ($_POST['brand_id'] !== '') ? $_POST['brand_id'] : null;
+$generic_id = ($_POST['generic_id'] !== '') ? $_POST['generic_id'] : null;
+$size_id = ($_POST['size_id'] !== '') ? $_POST['size_id'] : null;
+$color_id = ($_POST['color_id'] !== '') ? $_POST['color_id'] : null;
+$measurement = $_POST['product_unit'];
+$reorder_level = $_POST['reorder_level'];
+$lead_days = $_POST['lead_time'];
+$cost_price = $_POST['cost_price'];
+$selling_price = $_POST['selling_price'];
+$minimum_price = $_POST['min_price'];
+$wholesale_price = $_POST['wholesale_price'];
+$supplier_ids = $_POST['supplier_id']; // This is an array, so you'll need to handle it accordingly
+$item_type = $_POST['item_type'];
+$item_location = $_POST['item_location'];
+
+// Construct Supplier Array
+$supplier_list = implode(',', $supplier_ids);
+
+// The 'item_image' is a file upload, so you need to handle it as needed
+$product_description = $_POST['product_description'];
+$item_image_tmp = $_POST['item_image_tmp'];
+
+if (isset($_FILES['item_image'])) {
+    $file_name = $_FILES['item_image']['name'];
 }
 
-$is_active = $_POST['is_active'];
-$UpdateKey = $_POST['UpdateKey'];
-// Parameters
-$DestinationName = $_POST["DestinationName"];
-$CityID = $_POST["CityID"];
-$DistrictID = GetDistrictID($link, $CityID);
-$DestinationDescription = $_POST["description"];
-$CategoryID = $_POST["CategoryID"];
-$location_tag = $_POST["location_tag"];
+if ($file_name == "") {
+    $file_name = $item_image_tmp;
+}
 
-$dir = '../../../assets/images/destination/' . $destination_id;
-$cover_dir = '../../../assets/images/destination/' . $destination_id . '/cover/';
-$file = '../../../vendor/file-viewer/index.php';
+$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey);
+
+// Decode the JSON response
+$response = json_decode($QueryResult);
+$UpdateKey = $lastInsertedId = $response->last_inserted_id;
+
+// Image Upload
+$dir = '../../../pos-system/assets/images/products/' . $UpdateKey;
+
 if (!file_exists($dir)) {
     mkdir($dir, 0777, true);
 }
 
-if (!file_exists($cover_dir)) {
-    mkdir($cover_dir, 0777, true);
-}
+if (isset($_FILES['item_image'])) {
+    $file_name = $_FILES['item_image']['name'];
+    $file_size = $_FILES['item_image']['size'];
+    $file_tmp = $_FILES['item_image']['tmp_name'];
+    $file_type = $_FILES['item_image']['type'];
 
-// copy file to directory
-if (file_exists($file)) {
-    $new_file = $dir . '/' . basename($file);
-    copy($file, $new_file);
-}
-
-
-if (isset($_POST['item_image_tmp'])) {
-    $item_image_tmp = $_POST['item_image_tmp'];
-}
-if (isset($_FILES['FeaturedImage'])) {
-
-    $file_name = $_FILES['FeaturedImage']['name'];
-    $file_size = $_FILES['FeaturedImage']['size'];
-    $file_tmp = $_FILES['FeaturedImage']['tmp_name'];
-    $file_type = $_FILES['FeaturedImage']['type'];
-
-    $imagePath = "assets/images/destination/" . $destination_id . "/cover/" . $file_name;
+    $imagePath = "./pos-system/assets/images/products/" . $UpdateKey . "/" . $file_name;
     $file_parts = explode('.', $file_name);
     $file_ext = strtolower(end($file_parts));
     $expensions = array("jpeg", "jpg", "png", "webp");
@@ -72,8 +84,6 @@ if (isset($_FILES['FeaturedImage'])) {
     }
 }
 
-
-
 if ($file_name == "") {
     $file_name = $item_image_tmp;
 }
@@ -81,13 +91,8 @@ if ($file_name == "") {
 if (empty($errors) == true) {
     move_uploaded_file($file_tmp, "../../../" . $imagePath);
 } else {
-    // echo json_encode(array('status' => 'error', 'message' => $errors[0]));
+    echo json_encode(array('status' => 'error', 'message' => $errors[0]));
 }
 
-if (isset($_POST['tmp_hotel_photo'])) {
-    $tmp_hotel_photo = $_POST['tmp_hotel_photo'];
-}
-
-
-$QueryResult = SaveDestination($link, $DestinationName, $CategoryID, $CityID, $DistrictID, $LoggedUser, $file_name, $DestinationDescription, $location_tag, $UpdateKey, $is_active);
+// Return The JSON Output
 echo $QueryResult;

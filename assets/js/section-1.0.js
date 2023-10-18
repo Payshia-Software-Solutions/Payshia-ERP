@@ -6,14 +6,12 @@ $(document).ready(function () {
   OpenIndex()
 })
 
-var folder = 'product'
-
-// Take this
 function OpenIndex () {
   document.getElementById('index-content').innerHTML = InnerLoader
+  ClosePopUP()
   function fetch_data () {
     $.ajax({
-      url: 'assets/content/' + folder + '/index.php',
+      url: 'assets/content/section/index.php',
       method: 'POST',
       data: {
         LoggedUser: LoggedUser,
@@ -27,35 +25,34 @@ function OpenIndex () {
   fetch_data()
 }
 
-function AddProduct (is_active, updateKey) {
-  showOverlay()
-  document.getElementById('index-content').innerHTML = InnerLoader
+function LoadPopUPContent (UpdateKey) {
+  document.getElementById('loading-popup').innerHTML = InnerLoader
   function fetch_data () {
     $.ajax({
-      url: 'assets/content/' + folder + '/create.php',
+      url: 'assets/content/section/popup-content.php',
       method: 'POST',
       data: {
         LoggedUser: LoggedUser,
-        company_id: company_id,
-        is_active: is_active,
-        updateKey: updateKey,
-        UserLevel: UserLevel
+        UserLevel: UserLevel,
+        UpdateKey: UpdateKey
       },
       success: function (data) {
-        $('#index-content').html(data)
-        hideOverlay()
+        $('#loading-popup').html(data)
+        if (UpdateKey != -1) {
+          OpenPopup()
+        }
       }
     })
   }
   fetch_data()
 }
 
-function SaveProduct (is_active, UpdateKey) {
-  var checkboxes = document.querySelectorAll('input[type="checkbox"]')
-  var checked = false
+function AddNewSection (is_active, UpdateKey) {
+  LoadPopUPContent(UpdateKey)
+}
 
-  var form = document.getElementById('add-form')
-  var product_description = tinymce.get('product_description').getContent()
+function SaveSection (is_active, UpdateKey) {
+  var form = document.getElementById('location-form')
 
   if (form.checkValidity()) {
     showOverlay()
@@ -65,11 +62,10 @@ function SaveProduct (is_active, UpdateKey) {
     formData.append('company_id', company_id)
     formData.append('is_active', is_active)
     formData.append('UpdateKey', UpdateKey)
-    formData.append('product_description', product_description)
 
     function fetch_data () {
       $.ajax({
-        url: 'assets/content/' + folder + '/save.php',
+        url: 'assets/content/section/save.php',
         method: 'POST',
         data: formData,
         contentType: false,
@@ -88,28 +84,11 @@ function SaveProduct (is_active, UpdateKey) {
         }
       })
     }
-
-    for (var i = 0; i < checkboxes.length; i++) {
-      if (checkboxes[i].checked) {
-        checked = true
-        fetch_data()
-        hideOverlay()
-        break
-      }
-    }
-
-    if (!checked) {
-      result = 'Please select at least one Supplier'
-      OpenAlert('error', 'Oops!', result)
-      return false
-    }
+    fetch_data()
   } else {
-    form.reportValidity()
     result = 'Please Filled out All * marked Fields.'
     OpenAlert('error', 'Oops!', result)
   }
-
-  return true
 }
 
 function ChangeStatus (IsActive, UpdateKey) {
@@ -117,7 +96,7 @@ function ChangeStatus (IsActive, UpdateKey) {
   document.getElementById('index-content').innerHTML = InnerLoader
   function fetch_data () {
     $.ajax({
-      url: 'assets/content/' + folder + '/change-status.php',
+      url: 'assets/content/section/change-status.php',
       method: 'POST',
       data: {
         LoggedUser: LoggedUser,

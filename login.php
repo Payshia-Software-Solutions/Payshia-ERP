@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <?php
 require_once('./include/config.php');
-include './include/functions.php';
+include './include/function-update.php';
 
 $Cities = GetCities($link);
 date_default_timezone_set("Asia/Colombo");
 
 
-// Check if the user is already logged in, if yes then redirect him to welcome page
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location:       ");
-    exit;
-}
+// // Check if the user is already logged in, if yes then redirect him to welcome page
+// if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+//     // header("location:       ");
+//     exit;
+// }
 
 // Define variables and initialize with empty values
 $username = $password = $status = "";
@@ -115,12 +115,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Add Icons -->
     <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css' rel='stylesheet'>
 
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
 
     <!-- Favicons -->
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="icon">
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <title>Login | JLK Tours</title>
+    <title>Logssin | JLK Tours</title>
 </head>
 
 <body class="login">
@@ -291,6 +292,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <p class="mt-5 forget-text pb-2"><a href="#">Forget your password?</a></p>
                         <button class="btn btn-success sign-button" type="submit">SIGN IN</button>
+
+                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
                 </div>
                 </form>
 
@@ -365,6 +369,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         });
     </script>
 
+    <script>
+        gapi.load('auth2', function() {
+            gapi.auth2.init({
+                client_id: '307650998045-68dm3671rt8em8h2f57ru0tnq7u4ed0v.apps.googleusercontent.com'
+            });
+        });
+    </script>
 
 </body>
 

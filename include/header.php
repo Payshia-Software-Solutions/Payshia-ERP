@@ -189,6 +189,13 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                             </a>
                         </li>
 
+                        <li class="nav-item">
+                            <a class="nav-link submenu-item" href="./table">
+                                <i class="fa-solid  fa-weight-hanging menu-icon"></i>
+                                Tables
+                            </a>
+                        </li>
+
                     </ul>
                 </li>
             <?php } ?>

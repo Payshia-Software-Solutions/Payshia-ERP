@@ -177,7 +177,7 @@ function GetProducts($link)
 {
 
     $ArrayResult = array();
-    $sql = "SELECT `product_id`, `product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reoder_evel`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id` FROM `master_product` ORDER BY `product_id` DESC";
+    $sql = "SELECT `product_id`, `product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description` FROM `master_product` ORDER BY `active_status` DESC, `product_id` DESC";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -241,6 +241,511 @@ function UpdateLocationStatus($link, $is_active, $created_by, $UpdateKey)
         mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Location Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+
+//**********************************Rashmika***********************************
+
+//**************************** starting of supplier*************************** 
+function GetSupplier($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT  `supplier_id`, `supplier_name`, `opening_balance`, `is_active`, `created_by`, `created_at`, `email`, `contact_person`, `street_name`, `city`, `zip_code`, `telephone`, `fax` FROM `master_supplier` ORDER BY `supplier_id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['supplier_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function SaveSupplier($link, $supplier_name, $opening_balance, $contact_person, $email, $street_name, $city, $zip_code, $telephone, $fax, $is_active, $created_by, $UpdateKey)
+
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_supplier` ( `supplier_name`, `opening_balance`, `is_active`, `created_by`, `created_at`, `email`, `contact_person`, `street_name`, `city`, `zip_code`, `telephone`, `fax`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_supplier` SET `supplier_name` = ?, `opening_balance`=?, `is_active`=?, `created_by`=?, `created_at`=?, `email`=?, `contact_person`=?, `street_name`=?, `city`=?, `zip_code`=?, `telephone`=?, `fax`=? WHERE `supplier_id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssssssssssss", $supplier_name, $opening_balance, $is_active, $created_by, $current_time, $email, $contact_person, $street_name, $city, $zip_code, $telephone, $fax);
+
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Supplier saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+function UpdateSupplierStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_supplier` SET `is_active`=?, `created_by`=? WHERE `supplier_id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ss", $is_active, $current_time);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Supplier Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+//***************************************end of the supplier********************
+
+
+
+//***************************************start of the unit********************
+function GetUnit($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT `unit_id`, `unit_name`, `is_active`, `created_at`, `created_by` FROM `master_unit` ORDER BY `unit_id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['unit_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function SaveUnit($link, $unit_name, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_unit` (`unit_name`, `is_active`, `created_by`, `created_at`) VALUES (?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_unit` SET `unit_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `unit_id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssss", $unit_name, $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Unit saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function UpdateUnitStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_unit` SET `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `unit_id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Unit Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+//***************************************end of the unit*******************
+
+
+function GetSections($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `section_name`, `is_active`, `created_at`, `created_by` FROM `master_sections` ORDER BY `id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+// Section 
+function SaveSection($link, $section_name, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_sections` (`section_name`, `is_active`, `created_at`, `created_by`) VALUES (?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_sections` SET `section_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssss", $section_name, $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Section saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function UpdateSectionStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_sections` SET `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Section Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+// Departments
+
+function GetDepartments($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `section_id`, `department_name`, `is_active`, `created_at`, `created_by` FROM `master_departments` ORDER BY `id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function SaveDepartment($link, $department_name, $is_active, $created_by, $UpdateKey, $section_id)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_departments` (`section_id`, `department_name`, `is_active`, `created_at`, `created_by`) VALUES (?, ?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_departments` SET  `section_id` = ? ,`department_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssss", $section_id, $department_name, $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Department saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function UpdateDepartmentStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_departments` SET `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Department Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+
+// Categories
+
+function GetCategories($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `section_id`, `department_id`, `category_name`, `is_active`, `created_at`, `created_by` FROM `master_categories` ORDER BY `id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function SaveCategory($link, $category_name, $is_active, $created_by, $UpdateKey, $section_id, $department_id)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_categories` (`section_id`, `department_id`, `category_name`, `is_active`, `created_at`, `created_by`) VALUES (?, ?, ?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_categories` SET  `section_id` = ?, `department_id` = ? ,`category_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssssss", $section_id, $department_id, $category_name, $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Category saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function UpdateCategoryStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_categories` SET `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Category Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+function SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey)
+{
+    $error = array();
+    $created_at = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_product` (`product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_product` SET `product_code` = ?, `product_name` = ?, `display_name` = ?, `print_name` = ?, `section_id` = ?, `department_id` = ?, `category_id` = ?, `brand_id` = ?, `measurement` = ?, `reorder_level` = ?, `lead_days` = ?, `cost_price` = ?, `selling_price` = ?, `minimum_price` = ?, `wholesale_price` = ?, `item_type` = ?, `item_location` = ?, `image_path` = ?, `created_by` = ?, `created_at` = ?, `active_status` = ?, `generic_id` = ?, `supplier_list` = ?,  `size_id` = ?, `color_id`= ?, `product_description` = ? WHERE `product_id` = ?";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        if ($UpdateKey != 0) {
+            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey);
+        } else {
+            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description);
+        }
+
+        if (mysqli_stmt_execute($stmt_sql)) {
+            if ($UpdateKey == 0) {
+                $UpdateKey = mysqli_insert_id($link); // Get the last inserted ID
+            }
+            $error = array('status' => 'success', 'message' => 'Product saved successfully', 'last_inserted_id' => $UpdateKey);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later.' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. ' . $brand_id . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+
+function UpdateProductStatus($link, $is_active, $UpdateKey, $created_by)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_product` SET `active_status` = ?, `created_at` = ?, `created_by` = ? WHERE `product_id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Product Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+// Categories
+
+function GetTables($link)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `table_name`, `is_active`, `created_at`, `created_by`, `location_id` FROM `master_table` ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function SaveTable($link, $table_name, $is_active, $created_by, $UpdateKey, $location_id)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    if ($UpdateKey == 0) {
+        $sql = "INSERT INTO `master_table` (`table_name`, `is_active`, `created_at`, `created_by`, `location_id`) VALUES (?, ?, ?, ?, ?)";
+    } else {
+        $sql = "UPDATE `master_table` SET `table_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ?, `location_id` = ? WHERE `id` = '$UpdateKey'";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssss", $table_name, $is_active, $current_time, $created_by, $location_id);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Table saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function UpdateTableStatus($link, $is_active, $created_by, $UpdateKey)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $sql = "UPDATE `master_table` SET `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `id` = '$UpdateKey'";
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sss", $is_active, $current_time, $created_by);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Table Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+
+function GetCart($link, $UserName)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status` FROM `temp_order` WHERE `user_id` LIKE '$UserName' AND `hold_status` = 0 ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $is_active = 1;
+
+    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id` FROM `temp_order` WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID' ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        $sql = "UPDATE `temp_order` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ? WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID'";
+    } else {
+        $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Cart Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function RemoveFromCart($link, $ProductID, $UserName)
+{
+    $sql = "DELETE FROM `temp_order` WHERE `user_id` LIKE ? AND `product_id` LIKE ?";
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ss", $UserName, $ProductID);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Cart Updated successfully');
         } else {
             $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
         }

@@ -4,8 +4,6 @@ include '../../../include/function-update.php';
 $Students =  GetAccounts($link);
 $StudentsCount = count($Students);
 
-// `id`, `email`, `user_name`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path` FROM `user_accounts`
-
 $ActiveStudentCount = 0;
 $DeletedStudentCount = 0;
 if (!empty($Students)) {

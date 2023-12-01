@@ -11,7 +11,8 @@ $created_by = $_POST["LoggedUser"];
 // Form Parameters
 $UpdateKey = $_POST["UpdateKey"];
 $section_name = $_POST["section_name"];
+$pos_display = $_POST["pos_display"];
 $is_active = $_POST["is_active"];
 
-$QueryResult = SaveSection($link, $section_name, $is_active, $created_by, $UpdateKey);
+$QueryResult = SaveSection($link, $section_name, $is_active, $created_by, $UpdateKey, $pos_display);
 echo $QueryResult;

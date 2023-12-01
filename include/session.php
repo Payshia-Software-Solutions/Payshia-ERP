@@ -1,5 +1,35 @@
 <?php
+// Set session-related configurations before starting the session
+$expire = 365 * 24 * 3600; // 1 year in seconds
+
+// Set the session cookie lifetime
+ini_set('session.cookie_lifetime', $expire);
+
+// Set the session cache expire
+session_cache_expire($expire / 60); // session_cache_expire is in minutes
+
+
 session_start(); // Initialize the session
+
+
+// // Check if the session is active
+// if (isset($_SESSION['user_name'])) {
+//   // Session is active
+
+//   // Get the session cookie lifetime
+//   $cookieLifetime = ini_get('session.cookie_lifetime');
+
+//   if ($cookieLifetime == 0) {
+//     // The session cookie is set to expire when the browser is closed
+//     echo "Session cookie expires when the browser is closed.";
+//   } else {
+//     // The session cookie has a specific lifetime in seconds
+//     echo "Session cookie expires in {$cookieLifetime} seconds.";
+//   }
+// } else {
+//   // Session is not active
+//   echo "Session is not active.";
+// }
 
 if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION["user_name"])) {
   $session_id = $_SESSION["user_name"];

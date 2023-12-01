@@ -13,6 +13,7 @@ $UpdateKey = $_POST["UpdateKey"];
 $section_id = $_POST["section_id"];
 $department_name = $_POST["department_name"];
 $is_active = $_POST["is_active"];
+$pos_display = $_POST["pos_display"];
 
-$QueryResult = SaveDepartment($link, $department_name, $is_active, $created_by, $UpdateKey, $section_id);
+$QueryResult = SaveDepartment($link, $department_name, $is_active, $created_by, $UpdateKey, $section_id, $pos_display);
 echo $QueryResult;

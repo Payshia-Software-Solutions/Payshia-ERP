@@ -1,0 +1,14 @@
+{
+    "name": "Payshia POS",
+    "short_name": "Payshia",
+    "description": "#1 POS Solution in Sri Lanka",
+    "start_url": "/pos-system/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#333",
+    "icons": [{
+        "src": "./assets/images/pos-logo.png",
+        "sizes": "192x192",
+        "type": "image/png"
+    }]
+}

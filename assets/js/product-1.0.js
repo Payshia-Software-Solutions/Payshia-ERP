@@ -51,6 +51,7 @@ function AddProduct (is_active, updateKey) {
 }
 
 function SaveProduct (is_active, UpdateKey) {
+  showOverlay()
   var checkboxes = document.querySelectorAll('input[type="checkbox"]')
   var checked = false
 
@@ -93,13 +94,13 @@ function SaveProduct (is_active, UpdateKey) {
       if (checkboxes[i].checked) {
         checked = true
         fetch_data()
-        hideOverlay()
         break
       }
     }
 
     if (!checked) {
       result = 'Please select at least one Supplier'
+      hideOverlay()
       OpenAlert('error', 'Oops!', result)
       return false
     }
@@ -107,6 +108,7 @@ function SaveProduct (is_active, UpdateKey) {
     form.reportValidity()
     result = 'Please Filled out All * marked Fields.'
     OpenAlert('error', 'Oops!', result)
+    hideOverlay()
   }
 
   return true

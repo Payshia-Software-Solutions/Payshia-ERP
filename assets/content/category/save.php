@@ -14,6 +14,7 @@ $section_id = $_POST["section_id"];
 $department_id = $_POST["department_id"];
 $category_name = $_POST["category_name"];
 $is_active = $_POST["is_active"];
+$pos_display = $_POST['pos_display'];
 
-$QueryResult = SaveCategory($link, $category_name, $is_active, $created_by, $UpdateKey, $section_id, $department_id);
+$QueryResult = SaveCategory($link, $category_name, $is_active, $created_by, $UpdateKey, $section_id, $department_id, $pos_display);
 echo $QueryResult;

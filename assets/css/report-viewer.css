@@ -1,0 +1,205 @@
+html,
+body {
+    /* height: 297mm; */
+    width: 210mm;
+    margin: 0px
+}
+
+@media screen and (min-width: 768px) {
+    html,
+    body {
+        margin: 5px
+    }
+}
+
+@page {
+    size: A4;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Indie+Flower&family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+body {
+    font-family: 'Inter', sans-serif !important;
+}
+
+#container {
+    display: flex;
+    justify-content: space-between;
+}
+
+#left-section {
+    width: 40%;
+}
+
+#right-section {
+    width: 60%;
+    text-align: right;
+}
+
+table {
+    float: right;
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 4px;
+}
+
+th {
+    border: 0px;
+    text-align: end;
+}
+
+.company-title {
+    margin-top: 0px;
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.report-title {
+    margin-top: 0px;
+    font-size: 40px;
+    margin-bottom: 0px;
+    text-align: end;
+}
+
+.report-title-mini {
+    margin-top: 0px;
+    font-size: 30px;
+    margin-bottom: 0px;
+    text-align: end;
+}
+
+.text-end {
+    text-align: end !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-start {
+    text-align: start !important;
+}
+
+.text-bold {
+    font-weight: 500;
+}
+
+.text-bold-extra {
+    font-weight: 800;
+}
+
+p {
+    margin: 0px;
+}
+
+.section-2 {
+    margin-top: 25px;
+}
+
+.section-2 #right-section {
+    width: 40%;
+}
+
+.section-2 #right-section {
+    width: 40%;
+    text-align: left;
+}
+
+.sub-title {
+    padding: 5px 15px;
+    margin-top: 0px;
+    font-size: 22px;
+    margin-bottom: 5px;
+    background-color: #1b1b4b;
+    color: #f2f2f2;
+}
+
+.section-3 table {
+    margin-top: 25px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.section-3 table th {
+    background-color: #1b1b4b;
+    color: #f2f2f2;
+    border: 1px solid #1b1b4b !important;
+    text-align: start;
+}
+
+.section-3 table td {
+    border: 1px solid #1b1b4b !important;
+    text-align: start;
+}
+
+.section-4 table {
+    margin-top: 25px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.section-4 table th {
+    background-color: #1b1b4b;
+    color: #f2f2f2;
+    border: 1px solid #1b1b4b;
+    text-align: center;
+}
+
+.section-4 table td {
+    border-left: 1px solid #1b1b4b;
+    border-right: 1px solid #1b1b4b;
+    border-top: 1px solid #c6c6d8;
+    border-bottom: none;
+    text-align: start;
+}
+
+.add-theme {
+    background-color: #d0e4d0;
+    color: #000000;
+    font-weight: 600;
+    border: 1px solid #d0e4d0 !important;
+}
+
+.no-border {
+    border: 0px !important;
+}
+
+.total {
+    background-color: #dedef1;
+}
+
+.footer-border {
+    border: 1px solid #d8d8e7 !important;
+}
+
+.border-top-double {
+    border-top: 3px double #1b1b4b !important;
+    border-collapse: collapse;
+}
+
+.border-top {
+    border-top: 1px solid #1b1b4b !important;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #1b1b4b !important;
+}
+
+.align-top {
+    vertical-align: top;
+}
+
+.footer-content {
+    width: 100%;
+    margin-top: 65px;
+}
+
+.text-secondary {
+    color: #615454 !important;
+}

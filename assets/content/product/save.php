@@ -38,12 +38,21 @@ $supplier_ids = $_POST['supplier_id']; // This is an array, so you'll need to ha
 $item_type = $_POST['item_type'];
 $item_location = $_POST['item_location'];
 
+
+$name_si = $_POST['name_si'];
+$name_ti = $_POST['name_ti']; // This is an array, so you'll need to handle it accordingly
+$price_2 = $_POST['price_2'];
+$recipe_type = $_POST['recipe_type'];
+
 // Construct Supplier Array
 $supplier_list = implode(',', $supplier_ids);
 
 // The 'item_image' is a file upload, so you need to handle it as needed
 $product_description = $_POST['product_description'];
 $item_image_tmp = $_POST['item_image_tmp'];
+if ($item_image_tmp == "") {
+    $item_image_tmp = "no-image.png";
+}
 
 if (isset($_FILES['item_image'])) {
     $file_name = $_FILES['item_image']['name'];
@@ -53,7 +62,7 @@ if ($file_name == "") {
     $file_name = $item_image_tmp;
 }
 
-$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey);
+$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type);
 
 // Decode the JSON response
 $response = json_decode($QueryResult);
@@ -91,7 +100,7 @@ if ($file_name == "") {
 if (empty($errors) == true) {
     move_uploaded_file($file_tmp, "../../../" . $imagePath);
 } else {
-    echo json_encode(array('status' => 'error', 'message' => $errors[0]));
+    // echo json_encode(array('status' => 'error', 'message' => $errors[0]));
 }
 
 // Return The JSON Output

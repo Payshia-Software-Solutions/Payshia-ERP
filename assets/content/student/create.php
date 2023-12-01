@@ -156,10 +156,11 @@ if ($is_active == 1) {
                     <div class="form-group">
                         <label for="class-dates">User Type</label>
                         <select id="user_type" name="user_type" required>
-                            <option <?= ($user_type == 'Editor') ? 'selected' : '' ?> value="Editor">Editor</option>
+                            <option <?= ($user_type == 'Cashier') ? 'selected' : '' ?> value="Cashier">Cashier</option>
                             <option <?= ($user_type == 'Officer') ? 'selected' : '' ?> value="Officer">Officer</option>
                             <option <?= ($user_type == 'Admin') ? 'selected' : '' ?> value="Admin">Admin</option>
                             <option <?= ($user_type == 'Front-User') ? 'selected' : '' ?> value="Front-User">Front-User</option>
+                            <option <?= ($user_type == 'Steward') ? 'selected' : '' ?> value="Steward">Steward</option>
                         </select>
                     </div>
                 </div>

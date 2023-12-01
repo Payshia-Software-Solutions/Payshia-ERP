@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     if (mysqli_stmt_fetch($stmt)) {
 
                         if (password_verify($password, $hashed_password)) {
-                            if ($is_active == 1) {
+                            if ($is_active == 1 && $user_type != "Steward"  && $user_type != "Front-User") {
                                 // Password is correct, so start a new session
                                 session_start();
 
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 header("location: index?user=$email_address");
                             } else {
                                 // Display an error message if password is not valid
-                                $error = "Your Account is not Activated. Check Your Email";
+                                $error = "You are not Authorized";
                             }
                         } else {
                             // Display an error message if password is not valid
@@ -121,136 +121,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="icon">
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <title>Logssin | JLK Tours</title>
+    <title>Login | UniERP</title>
 </head>
 
 <body class="login">
     <div class="container-fluid login-container">
         <div class="row">
             <div class="col-md-8 text-center content-container">
-                <div class="signup-form d-none">
-                    <h2 class=" text-center mb-4">Create Account</h2>
-                    <i class="fa-brands fa-facebook menu-icon"></i>
-                    <i class="fa-brands fa-google-plus-g menu-icon"></i>
-                    <i class="fa-brands fa-linkedin-in menu-icon"></i>
-                    <p class="mt-4 text-secondary">Or use your email for registration!</p>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-container">
-                                <i class="fas fa-user icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="First Name">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="input-container">
-                                <i class="fas fa-user icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="Last Name">
-                            </div>
-                        </div>
 
-                        <div class="col-md-12 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-envelope icon"></i>
-                                <input type="email" class="form-control icon-input input-field" placeholder="Email Address">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-key icon"></i>
-                                <input type="password" class="form-control icon-input input-field" placeholder="Password">
-                            </div>
-                        </div>
-                        <div class="col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-key icon"></i>
-                                <input type="password" class="form-control icon-input input-field" placeholder="Confirm Password">
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="pb-1 border-bottom mt-3 text-secondary text-start">Personal Information</p>
-                    <div class="row">
-                        <div class="col-12 col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-phone icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="Phone Number">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-id-card icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="NIC Number">
-                            </div>
-                        </div>
-
-                    </div>
-
-
-                    <div class="row">
-                        <div class="col-12 col-md-4 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-location-crosshairs icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="Address Line 1">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-location-crosshairs icon"></i>
-                                <input type="text" class="form-control icon-input input-field" placeholder="Address Line 2">
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-4 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-city icon"></i>
-
-                                <select id="city_id" name="city_id" required>
-                                    <option value="">Select City</option>
-                                    <?php
-                                    if (!empty($Cities)) {
-                                        foreach ($Cities as $City) {
-                                    ?>
-                                            <option value="<?= $City['id'] ?>"><?= $City['name_en'] ?> - <?= $City['postcode'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6 col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fa-solid fa-person-breastfeeding icon"></i>
-                                <select required>
-                                    <option value="">Select Account Type</option>
-                                    <option value="Student">Student</option>
-                                    <option value="Parent">Parent</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-6 mt-3">
-                            <div class="input-container">
-                                <i class="fas fa-mars icon"></i>
-                                <select required>
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <button class="btn btn-success sign-button mt-5">SIGN UP</button>
-                </div>
 
                 <div class="signin-form d-block">
-                    <h2 class=" text-center mb-4">Sign in to JLK Tours</h2>
+                    <h2 class=" text-center mb-4">Sign in to Payshia</h2>
                     <i class="fa-brands fa-facebook menu-icon"></i>
                     <i class="fa-brands fa-google-plus-g menu-icon"></i>
                     <i class="fa-brands fa-linkedin-in menu-icon"></i>
@@ -260,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-12">
                                 <div class="input-container">
                                     <i class="fas fa-envelope icon"></i>
-                                    <input class="form-control icon-input input-field" name="username" id="username" placeholder="Email Address">
+                                    <input type="text" class="form-control icon-input input-field" name="username" id="username" placeholder="Email Address or User Name (Eg- PAXXXXX)">
                                 </div>
                             </div>
                             <div class="col-12 mt-3">
@@ -293,23 +174,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <p class="mt-5 forget-text pb-2"><a href="#">Forget your password?</a></p>
                         <button class="btn btn-success sign-button" type="submit">SIGN IN</button>
 
-                        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                        <!-- <div class="g-signin2" data-onsuccess="onSignIn"></div> -->
 
                 </div>
                 </form>
 
             </div>
             <div class="d-none d-md-inline col-md-4 p-5 text-center side-bar-color">
-                <div class="inner-content d-block signup-content">
-                    <h2 class="text-center">Hello, Friend!</h2>
-                    <p class="px-5">Enter your personal Details and start journey with us.</p>
-                    <button class="btn btn-success sign-button" id="signup-button">SIGN UP</button>
-                </div>
-
-                <div class="inner-content d-none  signin-content">
-                    <h2 class="text-center">Welcome Back!</h2>
+                <div class="inner-content d-block  signin-content">
+                    <img src="./pos-system/assets/images/payshia-logo-p.png" width="100px">
+                    <h2 class="text-center mt-2">Welcome Back!</h2>
                     <p class="px-5">To Keep Connected with us please login with your personal info.</p>
-                    <button class="btn btn-success sign-button" id="signin-button">SIGN IN</button>
                 </div>
             </div>
         </div>

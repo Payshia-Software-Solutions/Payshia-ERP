@@ -1,0 +1,152 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.inv {
+    width: 78mm !important;
+    /* border: 1px solid black; */
+    padding: 10px 5px 2px 5px;
+}
+
+.company {
+    margin: 0;
+    text-align: center;
+}
+
+.address {
+    margin: 0px;
+    text-align: center;
+}
+
+.telephone {
+    margin: 0px;
+    text-align: center;
+}
+
+.Customer {
+    font-size: 16px;
+}
+
+.date {
+    font-weight: 700;
+}
+
+.dateContainer {
+    font-size: 16px;
+}
+
+.logo-box {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.logo-image {
+    display: block;
+    /* Make the image a block-level element */
+    margin: 0 auto;
+    /* Center the block-level element horizontally */
+    max-width: 70%;
+    height: auto;
+}
+
+.cus_name {
+    font-weight: 700;
+}
+
+.InvoiceID {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.invoice_number {
+    font-weight: 700;
+}
+
+table {
+    width: 100%;
+}
+
+thead {
+    color: #000;
+    border-bottom: 2px solid #000;
+}
+
+th {
+    text-align: left;
+}
+
+.headerth {
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    border-bottom: 2px solid #000;
+}
+
+tr.selected {
+    border-bottom: 1px solid black;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.totals {
+    margin-top: 15px;
+}
+
+.bill-foooter {
+    font-family: 'Times New Roman', Times, serif;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.credits {
+    font-size: 12px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+hr {
+    border: 1px solid brown;
+    border-collapse: collapse;
+}
+
+.BillDisplay {
+    display: block
+}
+
+.card-title {
+    font-size: 20px
+}
+
+.card-description {
+    font-size: 14px
+}
+
+.table {
+    border-collapse: collapse
+}
+
+.table td,
+.table th {
+    border: 0px solid black padding: 8px
+}
+
+.table th {
+    text-align: left
+}
+
+@media print {
+    @page {
+        size: 78mm 154mm;
+        margin: 0;
+        /* Adjust margins as needed */
+    }
+    body {
+        margin: 0px;
+        padding: 2px;
+    }
+}

@@ -7,6 +7,5 @@ Options -Indexes
 
 php_value upload_max_filesize 20M
 
-ErrorDocument 404   http://localhost/uni-erp/web-admin/
 
 

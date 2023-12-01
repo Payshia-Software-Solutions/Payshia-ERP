@@ -11,6 +11,26 @@ body {
     background-color: #34343a;
 }
 
+.submenu {
+    margin-top: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.submenu::-webkit-scrollbar {
+    width: 7px;
+}
+
+.submenu::-webkit-scrollbar-thumb {
+    background-color: #796767;
+    border-radius: 6px;
+    /* Rounded corners for the thumb */
+}
+
+.submenu::-webkit-scrollbar-track {
+    background-color: #312828;
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -51,8 +71,8 @@ body {
 }
 
 
-
 /* Top Bar */
+
 .top-buttons {
     margin: 0px !important;
     padding: 0px !important;
@@ -88,27 +108,36 @@ body {
     box-shadow: none;
 }
 
+
 /* Scroll Bar */
+
 ::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
     height: 0px;
 }
 
+
 /* Track */
+
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
 
+
 /* Handle */
+
 ::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
 }
 
+
 /* Handle on hover */
+
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+
 
 /* breadcrumb */
 
@@ -117,7 +146,9 @@ body {
     color: #212529bf
 }
 
+
 /* Card */
+
 .card {
     border-radius: 15px;
     border: none;
@@ -189,6 +220,7 @@ body {
     border-radius: 8px;
 }
 
+
 /* profile-container */
 
 .profile-container,
@@ -212,7 +244,6 @@ body {
 .notification-container .nav-links li {
     border-bottom: 1px solid #34343a24;
     padding: 5px;
-
 }
 
 .notification-container .nav-links li:hover {
@@ -256,8 +287,6 @@ body {
 .nav-links li a:hover {
     color: #328bed;
 }
-
-
 
 .top-banner {
     width: 100%;
@@ -380,17 +409,17 @@ body {
         margin-top: 15px;
         transform: translate(0%, 0%);
     }
-
     .profile-content {
         margin-top: 10px;
     }
-
     .class-card {
         transform: translate(0%, -5%);
     }
 }
 
+
 /* Attendance Sheets */
+
 .table-title {
     margin-top: 20px;
     background-color: #0da5c6;
@@ -421,6 +450,7 @@ a {
     color: #34343a !important;
     text-decoration: none;
 }
+
 
 /* Login */
 
@@ -501,7 +531,9 @@ a {
     background-color: #46515c;
 }
 
+
 /* Pre Loader */
+
 #preloader {
     position: fixed;
     top: 0;
@@ -512,7 +544,9 @@ a {
     z-index: 9999;
 }
 
+
 /* Add styles for the progress bar */
+
 #filler {
     width: 0;
     height: 100%;
@@ -533,8 +567,6 @@ a {
     height: 5px;
     z-index: 9999;
 }
-
-
 
 .clas-image {
     font-size: 1px !important;
@@ -570,6 +602,7 @@ a {
 
 
 /* Add this CSS to your existing styles */
+
 .sidebar {
     position: relative;
 }
@@ -620,8 +653,6 @@ a {
     min-height: 100vh;
 }
 
-
-
 .login-container {
     filter: drop-shadow(5px 5px 10px #00000048);
     background-color: #ffffff;
@@ -641,14 +672,11 @@ a {
     background-color: #f4f9f6;
 }
 
-
-
 .content-container input:focus,
 .content-container select:focus {
     box-shadow: none;
     background-color: #f4f9f68d;
 }
-
 
 .content-container .forget-text {
     font-weight: 500;
@@ -698,15 +726,17 @@ a {
 }
 
 
-
 /* Styles for the input container */
+
 .input-container {
     position: relative;
     display: inline-block;
     width: 100%;
 }
 
+
 /* Styles for the icon */
+
 .icon {
     position: absolute;
     top: 50%;
@@ -720,9 +750,11 @@ a {
     padding-left: 50px;
 }
 
+
 /* Styles for the input field */
+
 .input-field {
-    padding-left: 50px;
+    padding-left: 50px !important;
 }
 
 .row {
@@ -747,36 +779,29 @@ a {
     .login {
         padding: 0px;
     }
-
     .content-container {
         padding: 30px !important;
     }
-
     .login-container {
         border-radius: 0px;
         min-height: 100vh;
         width: 100%;
     }
-
     .side-bar-color {
         height: 50vh;
         border-radius: 0px;
     }
-
     .content-container h2 {
         font-size: 1.5rem;
         color: #34343a;
         font-weight: 700;
     }
-
     .side-bar-color .inner-content h2 {
         font-size: 1.5rem;
     }
-
     .sign-button {
         padding: 0px 30px;
     }
-
     .row.swapped .side-bar-color {
         border-radius: 0px !important;
     }
@@ -786,46 +811,37 @@ a {
     .content-container {
         padding: 50px !important;
     }
-
     .content-container h2 {
         font-size: 1.9rem;
         color: #34343a;
         font-weight: 700;
     }
-
     .side-bar-color .inner-content h2 {
         font-size: 1.8rem;
     }
-
     .sign-button {
         padding: 0px 30px;
     }
-
     .side-bar-color {
         padding: 10px !important;
     }
 }
 
 @media (min-width: 1200px) {
-
     .content-container {
         padding: 80px !important;
     }
-
     .content-container h2 {
         font-size: 2.3rem;
         color: #34343a;
         font-weight: 700;
     }
-
     .side-bar-color .inner-content h2 {
         font-size: 2.3rem;
     }
-
     .sign-button {
         padding: 0px 30px;
     }
-
     .side-bar-color {
         padding: 10px !important;
     }
@@ -838,6 +854,7 @@ a {
     background-repeat: no-repeat;
     border-radius: 10px;
 }
+
 
 /* Booking - Taxi */
 
@@ -869,7 +886,6 @@ a {
 }
 
 .up_values {
-
     font-size: 30px;
     font-weight: 700;
 }
@@ -878,7 +894,9 @@ a {
     min-height: 80vh;
 }
 
+
 /* CSS for the black overlay */
+
 .overlay {
     position: fixed;
     top: 0;
@@ -898,7 +916,9 @@ a {
     transform: translate(-50%, -50%);
 }
 
+
 /* Loading popup styles */
+
 .loading-popup {
     display: none;
     position: fixed;
@@ -925,23 +945,22 @@ a {
     animation: popupFade 0.3s ease-in-out;
 }
 
+
 /* Keyframes for the popup animation */
+
 @keyframes popupFade {
     from {
         opacity: 0;
         transform: scale(0.7);
     }
-
     50% {
         transform: scale(1.1);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
     }
 }
-
 
 .form-check-input {
     width: auto !important;
@@ -960,4 +979,9 @@ a {
     box-shadow: none;
     outline: none;
     box-shadow: none;
+}
+
+.video-player {
+    height: 40vh;
+    width: 100%;
 }

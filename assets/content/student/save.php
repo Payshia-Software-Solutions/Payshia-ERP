@@ -14,7 +14,8 @@ $status = $_POST['status'];
 $first_name = $_POST['first_name'];
 $last_name = $_POST['last_name'];
 $nic = $_POST['nic_number'];
-$student_number = GenerateIndexNumber($link);
+$user_type = $_POST['user_type'];
+$student_number = GenerateIndexNumber($link, $user_type);
 $address_line_1 = $_POST['address_line1'];
 $address_line_2 = $_POST['address_line2'];
 $city = $_POST['city_id'];
@@ -24,7 +25,6 @@ $phone_number = $_POST['phone_number'];
 $email_address = $_POST['email_address'];
 $password = $_POST['password'];
 $c_password = $_POST['c_password'];
-$user_type = $_POST['user_type'];
 
 if (isset($_POST['img_tmp'])) {
     $cover_img_tmp = $_POST['img_tmp'];

@@ -86,19 +86,11 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.min.css">
-<!-- 
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" /> -->
-
-
-<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" /> -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+<link rel="stylesheet" href="./assets/css/select2.css">
 
-
-
-<!-- Favicons -->
-<link href="./assets/images/favicon/apple-touch-icon.png" rel="icon">
-<link href="./assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
+<script src="./node_modules/chart.js/dist/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <div class="overlay">
     <div class="overlay-content text-center">
         <div class="card-body p-5 my-5">
@@ -134,7 +126,7 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
     <!-- Sidebar content -->
     <div class="sidebar-content">
         <ul class="nav flex-column nav-menu">
-            <?php if ($UserLevel == "Admin" || $UserLevel == "Editor") { ?>
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
 
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
@@ -200,7 +192,7 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                 </li>
             <?php } ?>
 
-            <?php if ($UserLevel == "Admin" || $UserLevel == "Editor") { ?>
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
 
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
@@ -225,76 +217,141 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                         </li>
 
                         <li class="nav-item">
+                            <a class="nav-link submenu-item" href="./recipe">
+                                <i class="fa-solid fa-right-left menu-icon"></i>
+                                Recipe
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link submenu-item" href="./invoice">
-                                <i class="fa-solid fa-newspaper menu-icon"></i>
+                                <i class="fa-solid fa-file-invoice menu-icon"></i>
                                 Invoice
                             </a>
                         </li>
 
+
                         <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./stock-transfer">
-                                <i class="fa-solid fa-newspaper menu-icon"></i>
-                                Stock Transfer
+                            <a class="nav-link submenu-item" href="./invoice">
+                                <i class="fa-solid fa-receipt menu-icon"></i>
+                                Quotation
                             </a>
                         </li>
+
 
                         <li class="nav-item">
                             <a class="nav-link submenu-item" href="./production-note">
-                                <i class="fa-solid fa-newspaper menu-icon"></i>
+
+                                <i class="fa-solid  fa-tarp-droplet menu-icon"></i>
                                 Production Note
                             </a>
                         </li>
-
                     </ul>
                 </li>
             <?php } ?>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
-                    <i class="fa-solid fa-user-group menu-icon"></i>
-                    Pay Roll
-                    <i class="fas fa-chevron-right collapse-icon"></i>
-                </a>
-                <ul class="submenu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="./employee-registration">
-                            <i class="fa-solid fa-user menu-icon"></i>
-                            Employee Registration
-                        </a>
-                    </li>
-                </ul>
-            </li>
 
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
-                    <i class="fa-solid fa-users-gear menu-icon"></i>
-                    User Maintenance
-                    <i class="fas fa-chevron-right collapse-icon"></i>
-                </a>
-                <ul class="submenu">
-                    <?php if ($UserLevel == "Admin" || $UserLevel == "Editor") { ?>
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-landmark menu-icon"></i>
+                        Accounts
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-chart-bar menu-icon"></i>
+                                Chart of Accounts
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            <?php } ?>
+
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-file-lines menu-icon"></i>
+                        Reports
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="./reports">
+                                <i class="fa-solid fa-file menu-icon"></i>
+                                All Reports
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            <?php } ?>
+
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-tags menu-icon"></i>
+                        Barcode Printing
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="./print-labels">
+                                <i class="fa-solid fa-user menu-icon"></i>
+                                Print Labels
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-gear menu-icon"></i>
+                        Administration
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="./cancellation">
+                                <i class="fa-solid fa-wrench menu-icon"></i>
+                                Cancellation
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+
+            <?php if ($UserLevel == "Admin") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-users-gear menu-icon"></i>
+                        User Maintenance
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
                         <li class="nav-item">
                             <a class="nav-link" href="./user-maintenance">
                                 <i class="fa-solid fa-children menu-icon"></i>
                                 Users
                             </a>
                         </li>
-                    <?php } ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./profile">
-                            <i class="fa-solid fa-user menu-icon"></i>
-                            Profile
-                        </a>
-                    </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="./reset-password">
-                            <i class="fa-solid fa-key menu-icon"></i>
-                            Reset Password
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./change-privileges">
+                                <i class="fa-solid fa-pen-nib menu-icon"></i>
+                                Change Privileges
+                            </a>
+                        </li>
 
-                </ul>
-            </li>
+                    </ul>
+                </li>
+
+            <?php } ?>
         </ul>
 
 

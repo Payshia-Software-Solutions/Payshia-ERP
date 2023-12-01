@@ -53,6 +53,9 @@ $InactiveProductsCount = 0;
     <div class="col-12">
         <div class="table-title font-weight-bold mb-4 mt-0">Products</div>
     </div>
+    <div class="col-12 col-md-6 offset-md-6 col-lg-4 offset-lg-8 mb-2">
+        <input type="text" class="form-control mb-2 p-2 border-2" placeholder="Search Product" id="search-key" onclick="this.select()">
+    </div>
     <?php
     if (!empty($Products)) {
         foreach ($Products as $Product) {
@@ -73,7 +76,7 @@ $InactiveProductsCount = 0;
             }
 
     ?>
-            <div class="col-6 col-md-3 mb-3 d-flex">
+            <div class="col-6 col-md-3 col-lg-2 mb-3 d-flex product-column">
                 <div class="card flex-fill">
                     <div class="card-body p-2 pb-2">
                         <div class="card-back-image" style="background-image: url('<?= $file_path ?>');"></div>
@@ -87,7 +90,7 @@ $InactiveProductsCount = 0;
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Product['product_id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Product['product_id'] ?>')"><i class="fa-solid fa-trash"></i> In-Active</button>
                             <?php
                             } else {
                             ?>
@@ -114,3 +117,22 @@ $InactiveProductsCount = 0;
     }
     ?>
 </div>
+
+<script>
+    document.getElementById("search-key").addEventListener("input", function() {
+        const searchText = this.value.toLowerCase();
+        const productColumns = document.querySelectorAll(".product-column");
+
+        productColumns.forEach(function(productColumn) {
+            const productName = productColumn.querySelector(".tutor-name").textContent.toLowerCase();
+
+            if (productName.includes(searchText)) {
+                productColumn.classList.remove("d-none");
+                productColumn.classList.add("d-block");
+            } else {
+                productColumn.classList.remove("d-block");
+                productColumn.classList.add("d-none");
+            }
+        });
+    });
+</script>

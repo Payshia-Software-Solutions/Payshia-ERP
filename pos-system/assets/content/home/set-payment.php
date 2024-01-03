@@ -66,7 +66,7 @@ $GrandTotal = $_POST['GrandTotal'];
 </style>
 <input type="hidden" id="GrandTotal" value="<?= $GrandTotal ?>">
 <div class="row">
-    <div class="col-5 text-center mb-3">
+    <div class="col-md-5 text-center mb-3">
         <p class="mb-0">Due Payment</p>
         <h1 class="my-0">LKR <?= number_format($GrandTotal, 2) ?></h1>
         <button class="btn btn-sm btn-success mt-1" onclick="ResetValue()">Reset Value</button>
@@ -79,8 +79,13 @@ $GrandTotal = $_POST['GrandTotal'];
             </div>
             <div class="col-12">
                 <button class="w-100 payment-button" onclick="changeClass(this,  '1')" data-value="credit_card"><i class="fa-brands fa-cc-visa btn-icon"></i> Visa/Master</button>
-
                 <input type="hidden" class="form-control" name="card-number" id="card-number" placeholder="Card Number">
+            </div>
+
+
+            <div class="col-12 mt-4">
+                <div class="border-top mb-3"></div>
+                <button class="w-100 payment-button" onclick="changeClass(this, '-1')" data-value="credit"><i class="fa-solid fa-face-sad-tear btn-icon"></i> Credit</button>
             </div>
         </div>
 

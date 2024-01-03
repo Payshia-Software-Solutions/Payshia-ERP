@@ -3,7 +3,7 @@
 
  <!-- Add CSS -->
  <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css" />
- <link rel="stylesheet" href="./assets/css/styles-1.0.css" />
+ <link rel="stylesheet" href="./assets/css/styles-1.1.css" />
  <link rel="stylesheet" href="./assets/css/loader.css" />
  <link rel="manifest" href="./manifest.json">
 
@@ -13,7 +13,7 @@
  <link rel="manifest" href="./assets/images/favicon/site.webmanifest">
 
  <!-- Add Icons -->
- <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css' rel='stylesheet'>
+ <link href='./vendor/font-awesome/css/all.min.css' rel='stylesheet'>
 
 
  <title><?= $pageTitle ?> | <?= $SiteTitle ?></title>

@@ -1,6 +1,7 @@
 <?php
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
+include '../../../../include/settings_functions.php';
 
 $Suppliers =  GetSupplier($link);
 $Locations = GetLocations($link);
@@ -15,6 +16,7 @@ $po_number = 0;
 $ClearResult = ClearTempPO($link, $LoggedUser);
 // echo ($ClearResult);
 
+$location_id = GetUserDefaultValue($link, $LoggedUser, 'defaultLocation');
 $TempOrder =  GetTempPO($link, $LoggedUser);
 if (!empty($TempOrder)) {
     $order_date = date('Y-m-d');
@@ -24,12 +26,7 @@ if (!empty($TempOrder)) {
     $supplier_id = $TempOrder[0]['supplier_id'];
     $location_id = $TempOrder[0]['location_id'];
 }
-$PaymentTypes = [
-    ["id" => "0", "text" => "Cash"],
-    ["id" => "1", "text" => "Visa/Master"],
-    ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
-];
+
 ?>
 <div class="row my-4">
     <div class="col-12">
@@ -90,14 +87,10 @@ $PaymentTypes = [
 
 
                         <div class="col-4 col-md-2 mt-3 mt-md-0">
-                            <label class="form-label text-md-end">Tax Type</label>
+                            <label class="form-label  text-md-end">Due Date</label>
                         </div>
                         <div class="col-8 col-md-3 mt-3 mt-md-0">
-                            <select class="form-select" name="tax_type" id="tax_type" required autocomplete="off">
-                                <option <?= ($SelectedArray['location_id'] == 'Non-VAT') ? 'selected' : '' ?>value="Non-VAT">Non-VAT</option>
-                                <option <?= ($SelectedArray['location_id'] == 'VAT') ? 'selected' : '' ?>value="VAT">VAT</option>
-                                <option <?= ($SelectedArray['location_id'] == 'sVAT') ? 'selected' : '' ?> value="sVAT">sVAT</option>
-                            </select>
+                            <input type="date" class="form-control" id="po-date" name="po-date" value="<?= $order_date ?>">
                         </div>
                     </div>
 
@@ -110,63 +103,20 @@ $PaymentTypes = [
                                 <option value="">Select Customer</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="form-label">Select Product</label>
-                                <select class="form-control" name="select_product" id="select_product" required autocomplete="off" onchange="GetProductInfo(this.value)">
-                                    <option value="">Select Product</option>
-                                    <?php
-                                    if (!empty($Products)) {
-                                        foreach ($Products as $SelectedArray) {
-                                            if ($SelectedArray['active_status'] != 1) {
-                                                continue;
-                                            }
-
-                                            if ($SelectedArray['item_type'] == "Raw") {
-                                                // continue;
-                                            }
-                                    ?>
-                                            <option value="<?= $SelectedArray['product_id'] ?>"><?= $SelectedArray['product_name'] ?> - <?= $SelectedArray['cost_price'] ?> - <?= $SelectedArray['product_code'] ?></option>
-                                    <?php
-                                        }
-                                    }
-                                    ?>
-                                </select>
-                            </div>
 
 
-
-                            <div class="col-6 col-md-1">
-                                <label class="form-label">Stock</label>
-                                <input type="number" step="0.01" min='0' class="form-control text-end" readonly name="stockBalance" id="stockBalance" placeholder="0.0">
-                            </div>
-                            <div class="col-6 col-md-1">
-                                <label class="form-label">Unit</label>
-                                <input type="text" class="form-control text-center" name="order_Unit" id="order_Unit" readonly placeholder="Nos">
-                            </div>
-
-                            <div class="col-6 col-md-2">
-                                <label class="form-label">Rate</label>
-                                <input readonly type="number" step="0.01" min='0' class="form-control text-end" name="new_rate" id="new_rate" onclick="this.select()" placeholder="0.0">
-                            </div>
-
-
-                            <div class="col-6 col-md-2">
-                                <label class="form-label">Quantity</label>
-                                <input type="number" oninput="validateInput(this)" step="0.001" min='0' class="form-control text-end" name="new_quantity" onclick="this.select()" id="new_quantity" placeholder="0.0">
-                            </div>
-
-
-                            <div class="col-md-2">
-                                <label class="form-label">Action</label>
-                                <button type="button" onclick="AddToPO()" class="btn btn-dark w-100" style="height: 44px;"><i class="fa-solid fa-plus"></i></button>
-                            </div>
-
+                        <div class="col-4 col-md-2 mt-3 mt-md-0">
+                            <label class="form-label  text-md-end">Invoice Type</label>
+                        </div>
+                        <div class="col-8 col-md-3 mt-3 mt-md-0">
+                            <select class="form-control" name="invoice_type" id="invoice_type" required autocomplete="off">
+                                <option value="-1">Retail</option>
+                                <option value="-2">Delivery</option>
+                            </select>
                         </div>
                     </div>
+
+                    <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector"></div>
                 </form>
 
 
@@ -207,6 +157,8 @@ $PaymentTypes = [
                                     </tr>
 
 
+                                    <input type="hidden" id="tax_rate_hidden" value="0">
+                                    <input type="hidden" id="tax_amount_hidden" value="0">
                                     <input type="hidden" id="sub_total_hidden" value="">
                                     <input type="hidden" id="discount_percentage_hidden" value="">
                                     <input type="hidden" id="discount_value_hidden" value="">
@@ -217,40 +169,6 @@ $PaymentTypes = [
                     </div>
                 </div>
 
-                <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Select Payment Method</label>
-                            <select class="form-control" name="select_product" id="select_product" required autocomplete="off">
-                                <option value="">Select Payment Method</option>
-                                <?php
-                                if (!empty($PaymentTypes)) {
-                                    foreach ($PaymentTypes as $SelectedArray) {
-
-                                ?>
-                                        <option value="<?= $SelectedArray['id'] ?>"><?= $SelectedArray['text'] ?></option>
-                                <?php
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-
-
-
-                        <div class="col-6 col-md-4">
-                            <label class="form-label">Amount</label>
-                            <input type="number" step="0.01" min='0' class="form-control text-end" readonly name="payment_amount" id="payment_amount" placeholder="0.0">
-                        </div>
-
-
-                        <div class="col-md-2">
-                            <label class="form-label">Action</label>
-                            <button type="button" onclick="AddToPO()" class="btn btn-dark w-100" style="height: 44px;"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-
-                    </div>
-                </div>
 
                 <div class="row mb-3 mt-3">
                     <div class="col-4 col-md-2 mt-3 mt-md-0">
@@ -265,7 +183,7 @@ $PaymentTypes = [
 
             <div class="row mb-3 mt-5">
                 <div class="col-12 text-end">
-                    <button class="mt-0 mb-1 btn  btn-success view-button" type="button" onclick="ProcessInvoice(0,2)"><i class="fa-solid fa-check"></i> Process</button>
+                    <button class="mt-0 mb-1 btn  btn-success view-button" type="button" onclick="CreateReceipt(0,2)"><i class="fa-solid fa-check"></i> Proceed to Payment</button>
                 </div>
             </div>
 
@@ -275,9 +193,7 @@ $PaymentTypes = [
 </div>
 <script>
     $(document).ready(function() {
-        $('#select_product').select2({
-            width: 'resolve'
-        });
+
 
         $('#location_id').select2({
             width: 'resolve'
@@ -296,7 +212,7 @@ $PaymentTypes = [
     var rowCount = 1;
 
     // Function to add a new row to the table
-    function AddToPO() {
+    function AddToInvoice() {
         // Get selected product details
         var selectedProduct = document.getElementById('select_product');
         var productID = selectedProduct.value
@@ -305,12 +221,20 @@ $PaymentTypes = [
         // Get other input values
         var quantity = document.getElementById('new_quantity').value;
         var unit = document.getElementById('order_Unit').value;
-        var rate = document.getElementById('new_rate').value;
-        var stockBalance = document.getElementById('stockBalance').value;
+        var rate = parseFloat(document.getElementById('new_rate').value);
+        var stockBalance = parseFloat(document.getElementById('stockBalance').value);
+
 
         // Validate input
-        if (selectedProduct.value === '' || quantity === '' || rate === '') {
-            alert('Please fill in all fields.');
+        if (selectedProduct.value === '' || quantity === "" || rate === '') {
+            OpenAlert('error', 'Error!', 'Please fill in all fields.')
+            return;
+        }
+        quantity = parseFloat(quantity)
+
+
+        if (stockBalance < quantity) {
+            OpenAlert('error', 'Error!', 'Insufficient Stock Balance')
             return;
         }
 
@@ -325,11 +249,11 @@ $PaymentTypes = [
 
         if (existingRow) {
             // Update quantity and amount for existing row
-            var existingQuantity = parseFloat(existingRow.cells[4].innerHTML);
-            var existingAmount = parseFloat(existingRow.cells[6].innerHTML);
+            var existingQuantity = parseFloat(existingRow.cells[2].innerHTML);
+            var existingAmount = parseFloat(existingRow.cells[5].innerHTML);
 
-            existingRow.cells[4].innerHTML = (existingQuantity + parseFloat(quantity)).toFixed(3);
-            existingRow.cells[6].innerHTML = (existingAmount + parseFloat(amount)).toFixed(2);
+            existingRow.cells[2].innerHTML = (parseFloat(quantity)).toFixed(3);
+            existingRow.cells[5].innerHTML = (parseFloat(amount)).toFixed(2);
         } else {
             // Create a new row
             var newRow = tableBody.insertRow(tableBody.rows.length);
@@ -362,7 +286,7 @@ $PaymentTypes = [
 
             var cellAction = newRow.insertCell(6);
             cellAction.classList.add("text-center"); // Add the "text-center" and "col-md-1" classes to the cell
-            cellAction.innerHTML = '<button type="button" class="btn btn-danger btn-sm" onclick="RemoveRow(this)">Remove</button>';
+            cellAction.innerHTML = '<button type="button" class="btn btn-danger btn-sm" onclick="RemoveRow(this)"><i class="fa-solid fa-trash"></i></button>';
 
             // Increment the row count
             rowCount++;
@@ -375,6 +299,9 @@ $PaymentTypes = [
         document.getElementById('new_rate').value = '';
         document.getElementById('stockBalance').value = '';
         document.getElementById('order_Unit').value = '';
+
+
+        getProductSelector()
 
     }
 
@@ -456,17 +383,10 @@ $PaymentTypes = [
             document.getElementById('discount_value_hidden').value = discountAmount
             document.getElementById('discount_percentage_hidden').value = disPercentage
             document.getElementById('grand_total_hidden').value = grandTotal
-            document.getElementById('payment_amount').value = grandTotal
         }
     }
 
-    // Function to format a number as currency
-    function formatCurrencyLKR(value) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'LKR'
-        }).format(value);
-    }
+
 
     // Function to format a number without currency symbol
     function formatCurrency(value) {

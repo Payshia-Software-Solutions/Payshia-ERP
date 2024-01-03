@@ -94,6 +94,26 @@ function getReceiptsByDateAll($link, $date)
     return $ArrayResult;
 }
 
+function getReceiptsByDateAllFilterDated($link, $date)
+{
+    $ArrayResult = 0;
+
+    // Format the date in the same format as stored in the database
+    $formattedDate = date('Y-m-d', strtotime($date));
+
+    $sql = "SELECT SUM(`amount`) as total_amount FROM `transaction_receipt` WHERE DATE(`current_time`) = '$formattedDate' AND `is_active` = 1 AND `today_invoice` = 1";
+
+    $result = $link->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = ($row['total_amount'] !== null) ? $row['total_amount'] : 0;
+        }
+    }
+
+    return $ArrayResult;
+}
+
 function getInvoicesByDateRangeAll($link, $fromDate, $toDate, $location_id)
 {
     $ArrayResult = array(); // Initialize an empty array
@@ -211,4 +231,109 @@ function GetReceiptsByLocation($link, $fromDate, $toDate, $location_id)
     }
 
     return $ArrayResult;
+}
+
+
+function getChargeInvoicesByDateRangeAll($link, $fromDate, $toDate, $location_id)
+{
+    $ArrayResult = array(); // Initialize an empty array
+
+    // Format the dates in the same format as stored in the database
+    $fromDate = date('Y-m-d', strtotime($fromDate));
+    $toDate = date('Y-m-d', strtotime($toDate));
+
+    // Use prepared statements to prevent SQL injection
+    $sql = "SELECT `steward_id`, SUM(service_charge) AS `chargeAmount`, SUM(`inv_amount`) AS `TotalInvoice`, COUNT(`id`) AS `BillCount` FROM `transaction_invoice` WHERE DATE(`current_time`) BETWEEN ? AND ? AND `is_active` = 1 AND `location_id` = ? AND `invoice_status` = '2' GROUP BY `steward_id`";
+
+    $stmt = $link->prepare($sql);
+    $stmt->bind_param("sss", $fromDate, $toDate, $location_id);
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['steward_id']] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+
+
+
+function GetStockBalanceByProductByLocationToDate($link, $product_code, $location_id, $toDate)
+{
+    $ArrayResult = 0;
+    $sql = "SELECT SUM(`quantity`) AS `credit_count` FROM `transaction_stock_entry` WHERE `location_id` LIKE '$location_id' AND `product_id` LIKE '$product_code' AND `type` LIKE 'CREDIT' AND `is_active` LIKE 1 AND DATE(`created_at`) <= '$toDate'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $credit_count = $row['credit_count'];
+        }
+    }
+
+    $sql = "SELECT SUM(`quantity`) AS `debit_count` FROM `transaction_stock_entry` WHERE `location_id` LIKE '$location_id' AND `product_id` LIKE '$product_code' AND `type` LIKE 'DEBIT'  AND `is_active` LIKE 1 AND DATE(`created_at`) <= '$toDate'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $debit_count = $row['debit_count'];
+        }
+    }
+
+    $ArrayResult = $debit_count - $credit_count;
+
+    return $ArrayResult;
+}
+
+function getReceiptsByDateRangeAllFilterDated($link, $startDate, $endDate)
+{
+    $totalAmount = 0;
+
+    // Format the dates in the same format as stored in the database
+    $formattedStartDate = date('Y-m-d', strtotime($startDate));
+    $formattedEndDate = date('Y-m-d', strtotime($endDate));
+
+    $sql = "SELECT SUM(`amount`) as total_amount FROM `transaction_receipt` WHERE DATE(`current_time`) BETWEEN ? AND ? AND `is_active` = 1 AND `today_invoice` = 1";
+
+    $stmt = $link->prepare($sql);
+    $stmt->bind_param("ss", $formattedStartDate, $formattedEndDate);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $totalAmount = ($row['total_amount'] !== null) ? $row['total_amount'] : 0;
+        }
+    }
+
+    return $totalAmount;
+}
+
+function getInvoicesByDateRangeAllLatest($link, $fromDate, $toDate, $location_id)
+{
+    $invoiceData = array(); // Initialize an empty array
+
+    // Format the dates in the same format as stored in the database
+    $formattedFromDate = date('Y-m-d', strtotime($fromDate));
+    $formattedToDate = date('Y-m-d', strtotime($toDate));
+
+    // Use prepared statements to prevent SQL injection
+    $sql = "SELECT * FROM `transaction_invoice` WHERE DATE(`current_time`) BETWEEN ? AND ? AND `is_active` = 1 AND `location_id` = ? AND `invoice_status` = '2' ORDER BY `id`";
+
+    $stmt = $link->prepare($sql);
+    $stmt->bind_param("sss", $formattedFromDate, $formattedToDate, $location_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $invoiceData[$row['invoice_number']] = $row;
+        }
+    }
+
+    return $invoiceData;
 }

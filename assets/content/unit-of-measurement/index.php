@@ -6,6 +6,7 @@ $ActiveStatus = 0;
 $Unit = GetUnit($link);
 $ArrayCount = count($Unit);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ActiveCount = $ArrayCount;
 $InactiveCount = 0;
 ?>
@@ -39,14 +40,29 @@ $InactiveCount = 0;
                 <i class="fa-solid fa-star-of-life icon-card"></i>
             </div>
             <div class="card-body">
-                <p>In-Active</p>
+                <p>Disabled</p>
                 <h1><?= $InactiveCount ?></h1>
             </div>
         </div>
     </div>
-    <div class="col-md-3 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="AddNewUnit(1,0)"><i class="fa-solid fa-plus"></i> Add Unit</button>
-    </div>
+    <?php
+    $pageID = 8;
+    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
+
+    if (!empty($userPrivilege)) {
+        $readAccess = $userPrivilege[$LoggedUser]['read'];
+        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+        if ($writeAccess == 1) {
+    ?>
+            <div class="col-md-3 text-end mt-4 mt-md-0">
+                <button class="btn btn-dark" type="button" onclick="AddNewUnit(1,0)"><i class="fa-solid fa-plus"></i> Add Unit</button>
+            </div>
+    <?php
+        }
+    }
+    ?>
 </div>
 
 <div class="row mt-5">
@@ -58,8 +74,8 @@ $InactiveCount = 0;
     if (!empty($Unit)) {
         foreach ($Unit as $Unit) {
             $unit_name = $Unit['unit_name'];
-            $active_status = "Deleted";
-            $color = "warning";
+            $active_status = "Disabled";
+            $color = "secondary";
             if ($Unit['is_active'] == 1) {
                 $active_status = "Active";
                 $color = "primary";
@@ -79,7 +95,7 @@ $InactiveCount = 0;
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Unit['unit_id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-secondary view-button" type="button" onclick="ChangeStatus(0, '<?= $Unit['unit_id'] ?>')"><i class="fa-solid fa-ban"></i> Disable</button>
                             <?php
                             } else {
                             ?>

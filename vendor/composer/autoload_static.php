@@ -6,27 +6,61 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3
 {
+    public static $files = array (
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
+        'l' => 
+        array (
+            'libphonenumber\\' => 15,
+        ),
+        'S' => 
+        array (
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+        ),
         'P' => 
         array (
             'Picqer\\Barcode\\' => 15,
         ),
+        'G' => 
+        array (
+            'Giggsey\\Locale\\' => 15,
+        ),
+        'D' => 
+        array (
+            'DASPRiD\\Enum\\' => 13,
+        ),
+        'B' => 
+        array (
+            'BaconQrCode\\' => 12,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'libphonenumber\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/giggsey/libphonenumber-for-php/src',
+        ),
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
         'Picqer\\Barcode\\' => 
         array (
             0 => __DIR__ . '/..' . '/picqer/php-barcode-generator/src',
         ),
-    );
-
-    public static $prefixesPsr0 = array (
-        'B' => 
+        'Giggsey\\Locale\\' => 
         array (
-            'BaconQrCode' => 
-            array (
-                0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
-            ),
+            0 => __DIR__ . '/..' . '/giggsey/locale/src',
+        ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
@@ -39,7 +73,6 @@ class ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitd92c14b089d5a4ff8269af69aa05f3b3::$classMap;
 
         }, null, ClassLoader::class);

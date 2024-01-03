@@ -66,7 +66,16 @@ if ($tendered_amount < $grand_total) {
     $tendered_amount = 0;
 }
 
+if ($close_type == -1) {
+    $paymentMethod = "Credit";
+    $tendered_amount = 0;
+} else {
+    $paymentMethod =  $PaymentTypes[$close_type]['text'];
+}
+
 $change_amount = max($tendered_amount - $grand_total, 0);
+
+
 ?>
 
 <style>
@@ -112,19 +121,25 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
 ?>
 
 
-<div class="row mt-3 mt-md-0">
-    <div class="col-6 d-flex" style="padding-right: 0px;">
-        <button onclick="ProcessInvoice('<?= $invoice_number ?>', '1', '<?= $kotPrintStatus ?>')" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
+<div class="row mt-0 g-1 mt-md-0">
+    <div class="col-6 d-flex">
+        <button onclick="ProcessInvoice('<?= $invoice_number ?>', '1' , '<?= $kotPrintStatus ?>' )" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
     </div>
     <div class="col-6 d-flex">
         <?php
-        if ($tendered_amount < $grand_total) {
+        if ($tendered_amount < $grand_total && $close_type != -1) {
         ?>
-            <button onclick="SetPayment()" class="text-white flex-fill w-100 btn btn-dark hold-button btn-lg action-button"><i class="fa-solid fa-money-bill btn-icon p-3"></i> Add Payment</button>
+            <button onclick="SetPayment()" class="text-white flex-fill w-100 btn btn-dark hold-button btn-lg action-button"><i class="fa-solid fa-money-bill btn-icon p-md-3"></i> Payment</button>
         <?php } else { ?>
-            <button onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
+            <button onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
         <?php } ?>
     </div>
+    <?php
+    if ($invoice_number != '0') { ?>
+        <div class="col-12 d-flex">
+            <button onclick="PrintGuestReceipt('<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', 1)" class=" flex-fill text-white w-100 btn btn-secondary hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-receipt btn-icon"></i> Guest Receipt</button>
+        </div>
+    <?php } ?>
 </div>
 
 <div class="card mt-2">
@@ -145,8 +160,14 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
             </div>
             <div class="col-6">
                 <label class="button-labels">Hold List</label>
-                <button type="button" id="hold-list" class="flex-fill w-100 btn btn-light button-text" onclick="GetHoldInvoices ('<?= $LocationID ?>')">
+                <button type="button" id="hold-list" class="flex-fill w-100 btn btn-light button-text" onclick="GetHoldInvoices ('<?= $LocationID ?>', 1)">
                     Holds </button>
+            </div>
+        </div>
+
+        <div class="row d-block d-md-none mt-3">
+            <div class="col-12 d-flex">
+                <button class="btn btn-dark w-100 p-2" onclick="OpenProductSelector(0, 'not-set')"> <i class="fa-solid fa-plus"></i> Add Product</button>
             </div>
         </div>
     </div>
@@ -164,21 +185,26 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
                     $product_id = $SelectRecord['product_id'];
 
                     $line_total = ($selling_price - $item_discount) * $item_quantity;
+                    $totalItemDiscount = $item_discount * $item_quantity;
             ?>
                     <div class="p-1 bg-light">
                         <div class="card">
                             <div class="card-body">
                                 <div class="row">
-                                    <div class="col-2">
-                                        <h4 class="product-price"><?= $item_quantity ?></h4>
+                                    <div class="col-4 col-md-2">
+                                        <h4 class="product-price m-0"><?= $item_quantity ?><br><span class="product-title m-0"><?= $item_unit ?></span></h4>
                                     </div>
-                                    <div class="col-6">
-                                        <h4 class="product-title"><?= $display_name ?><br><?= $CurrencySelected ?> <?= number_format($selling_price, 2) ?></h4>
+                                    <div class="col-8 col-md-6">
+                                        <h4 class="product-title"><?= $display_name ?>
+                                            <br>Price -<?= $CurrencySelected ?> <?= number_format($selling_price, 2) ?>
+                                            <br> <span class="product-title">Discount - LKR <?= number_format($item_discount, 2) ?></span>
+                                        </h4>
                                     </div>
-                                    <div class="col-3 text-end">
-                                        <h4 class="product-price"><?= number_format($line_total, 2) ?><br><span class="product-title"><?= $item_unit ?></span></h4>
+                                    <div class="col-8 col-md-3 mt-2 mt-md-0 text-start">
+                                        <h4 class="product-price"><?= number_format($line_total, 2) ?></h4>
+                                        <span class="product-title text-danger">(<?= number_format($totalItemDiscount, 2) ?>)</span>
                                     </div>
-                                    <div class="col-1"><i class="fa-solid fa-trash text-danger clickable" onclick="OpenRemoval('<?= $product_id ?>', '<?= $invoice_number ?>')"></i></div>
+                                    <div class="col-4 col-md-1 mt-2 mt-md-0 text-end"><i class="fa-solid fa-trash text-danger clickable" onclick="OpenRemoval('<?= $product_id ?>', '<?= $invoice_number ?>')"></i></div>
                                 </div>
                             </div>
                         </div>
@@ -208,11 +234,11 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
     <div class="bg-light p-3" style="z-index: 2;">
         <div class="row">
             <div class="col-4">
-                <span class="mb-0 text-end text-dark px-2" style="font-size: 20px; font-weight:700"><?= count($CartProducts) ?> Item(s)</span>
+                <span class="mb-0 text-end text-dark px-2" style="font-size: 15px; font-weight:700"><?= count($CartProducts) ?> Item(s)</span>
             </div>
             <div class="col-8 text-end">
                 <button class="btn btn-light" onclick="SetDiscount()">
-                    <span class="mb-0 text-end text-warning px-2" style="font-size: 20px;">Discount (<?= $discount_rate ?>%)</span>
+                    <span class="mb-0 text-end text-warning px-2" style="font-size: 20px;">Bill Discount (<?= $discount_rate ?>%)</span>
                 </button>
             </div>
         </div>
@@ -221,38 +247,37 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
 </div>
 
 <?php
-
 ?>
 
 <div class="card bg-white shadow-sm mt-2">
     <div class="card-body">
         <div class="bg-light p-2">
             <div class="row">
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Sub</span>
                     <h6><?= number_format($total, 2) ?></h6>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Discount</span>
                     <h6><?= number_format($discount_amount, 2) ?></h6>
                 </div>
 
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Total</span>
                     <h6><?= number_format($sub_total, 2) ?></h6>
                 </div>
 
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Service</span>
                     <h6><?= number_format($taxAmount, 2) ?></h6>
                 </div>
             </div>
 
             <div class="row">
-                <div class="col-4 text-start" style="display:flex;align-items: center;justify-content: left;">
-                    <button class="btn service-charge-button <?= ($ServiceChargeStatus == 1) ? "active-charge-button " : "" ?>" id="charge-button"><?= ($ServiceChargeStatus == 1) ? "Charged" : "Not Charged" ?></button>
+                <div class="col-md-4 text-start" style="display:flex;align-items: center;justify-content: left;">
+                    <button class="mt-2 btn service-charge-button <?= ($ServiceChargeStatus == 1) ? "active-charge-button " : "" ?>" id="charge-button"><?= ($ServiceChargeStatus == 1) ? "Charged" : "Not Charged" ?></button>
                 </div>
-                <div class="col-8 text-end">
+                <div class="col-md-8 mt-2 mt-md-0 text-end">
                     <div class="border-top"></div>
                     <span class="mb-0 px-2 payable-amount">Payable</span>
                     <span class="mb-0 px-2 payable-value" style="font-size: 35px; font-weight:700"><?= number_format($grand_total, 2) ?></span>
@@ -263,30 +288,26 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
     </div>
 </div>
 
-
-
-
-
 <div class="card shadow-sm mt-2">
     <div class="card-body">
         <div class="bg-light p-2">
 
             <div class="row">
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Type</span>
-                    <h6><?= $PaymentTypes[$close_type]['text'] ?></h6>
+                    <h6><?= $paymentMethod ?></h6>
                 </div>
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Due</span>
                     <h6><?= number_format($grand_total, 2) ?></h6>
                 </div>
 
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Tendered</span>
                     <h6><?= number_format($tendered_amount, 2) ?></h6>
                 </div>
 
-                <div class="col-3 text-center">
+                <div class="col-6 col-md-3 text-center">
                     <span class="mb-0 text-end text-secondary px-2">Change</span>
                     <h6><?= number_format($change_amount, 2) ?></h6>
                 </div>

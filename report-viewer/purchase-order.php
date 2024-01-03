@@ -64,7 +64,7 @@ $formattedDate = $dateTime->format('d/m/Y H:i:s');
             </div>
 
             <div id="right-section">
-                <h2 class="report-title"><?= strtoupper($reportTitle) ?></h2>
+                <h2 class="report-title-mini"><?= strtoupper($reportTitle) ?></h2>
                 <table>
                     <tr>
                         <th>Date</th>
@@ -152,7 +152,7 @@ $formattedDate = $dateTime->format('d/m/Y H:i:s');
                     ?>
                             <tr>
                                 <td class="text-center"><?= $rawNumber ?></td>
-                                <td><?= $productName ?></td>
+                                <td><?= MakeFormatProductCode($ProductID) ?> - <?= $productName ?></td>
                                 <td class="text-center"><?= $OrderUnit ?></td>
                                 <td class="text-center"><?= number_format($OrderQuantity, 2) ?></td>
                                 <td class="text-end"><?= number_format($PerRate, 2) ?></td>

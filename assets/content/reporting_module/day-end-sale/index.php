@@ -19,9 +19,9 @@ $Locations = GetLocations($link);
             <input type="date" class="form-control" name="date-input" id="date-input" value="<?= date('Y-m-d') ?>">
         </div>
         <div class="col-6 col-md-4">
-            <label>Select Location</label>
+            <label>Select Branch</label>
             <select class="form-control" name="location_id" id="location_id" required autocomplete="off">
-                <option value="">Select Location</option>
+                <option value="">Select Branch</option>
                 <?php
                 if (!empty($Locations)) {
                     foreach ($Locations as $SelectedArray) {

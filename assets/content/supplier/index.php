@@ -6,6 +6,7 @@ $ActiveStatus = 0;
 $Supplier = GetSupplier($link);
 $ArrayCount = count($Supplier);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ActiveCount = $ArrayCount;
 $InactiveCount = 0;
 ?>
@@ -39,14 +40,29 @@ $InactiveCount = 0;
                 <i class="fa-solid fa-star-of-life icon-card"></i>
             </div>
             <div class="card-body">
-                <p>In-Active</p>
+                <p>Disabled</p>
                 <h1><?= $InactiveCount ?></h1>
             </div>
         </div>
-    </div> 
-    <div class="col-md-3 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="AddNewSupplier(1,0)"><i class="fa-solid fa-plus"></i> Add Supplier</button>
-    </div>                                                       
+    </div>
+    <?php
+    $pageID = 4;
+    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
+
+    if (!empty($userPrivilege)) {
+        $readAccess = $userPrivilege[$LoggedUser]['read'];
+        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+        if ($writeAccess == 1) {
+    ?>
+            <div class="col-md-3 text-end mt-4 mt-md-0">
+                <button class="btn btn-dark" type="button" onclick="AddNewSupplier(1,0)"><i class="fa-solid fa-plus"></i> Add Supplier</button>
+            </div>
+    <?php
+        }
+    }
+    ?>
 </div>
 
 <div class="row mt-5">
@@ -58,8 +74,8 @@ $InactiveCount = 0;
     if (!empty($Supplier)) {
         foreach ($Supplier as $Supplier) {
             $supplier_name = $Supplier['supplier_name'];
-            $active_status = "Deleted";
-            $color = "warning";
+            $active_status = "Disabled";
+            $color = "secondary";
             if ($Supplier['is_active'] == 1) {
                 $active_status = "Active";
                 $color = "primary";
@@ -79,7 +95,7 @@ $InactiveCount = 0;
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Supplier['supplier_id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-secondary view-button" type="button" onclick="ChangeStatus(0, '<?= $Supplier['supplier_id'] ?>')"><i class="fa-solid fa-ban"></i> Disable</button>
                             <?php
                             } else {
                             ?>

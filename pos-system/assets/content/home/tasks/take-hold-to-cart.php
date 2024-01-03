@@ -4,9 +4,10 @@ include '../../../../../include/function-update.php';
 
 $invoice_number = $_POST['invoice_number'];
 $LoggedUser = $_POST['LoggedUser'];
+$LocationID = $_POST['LocationID'];
 
 $Invoices = GetInvoices($link);
-$CartProducts = GetInvoiceItems($link, $invoice_number);
+$CartProducts = GetInvoiceItemsPrint($link, $invoice_number);
 $deleteResult = deleteRecordsWithHoldStatusNotHold($link, $LoggedUser);
 
 $CustomerID = $Invoices[$invoice_number]['customer_code'];
@@ -18,9 +19,9 @@ if (!empty($CartProducts)) {
         $item_quantity = $SelectRecord['quantity'];
         $item_discount = $SelectRecord['item_discount'];
         $product_id = $SelectRecord['product_id'];
+        $printedStatus =  $SelectRecord['printed_status'];
 
-
-        $result = AddToCart($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID);
+        $result = AddToCart($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $printedStatus, $LocationID);
     }
 }
 echo $result;

@@ -7,6 +7,7 @@ $Locations = GetLocations($link);
 $PurchaseOrders = GetPurchaseOrders($link);
 $ArrayCount = count($PurchaseOrders);
 
+$LoggedUser = $_POST['LoggedUser'];
 $GRNList = GetGRNList($link);
 
 $ActiveCount = $ArrayCount;
@@ -68,6 +69,8 @@ $InactiveCount = 0;
                                             if ($selectedArray['is_active'] == 1) {
                                                 $active_status = "Active";
                                                 $color = "primary";
+                                            } else {
+                                                continue;
                                             }
                                             $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
                                             $OrderDate = $selectedArray['created_at'];
@@ -114,7 +117,22 @@ $InactiveCount = 0;
                                                 <th class="text-end"><?= number_format($subTotal, 2) ?></th>
                                                 <td class="text-end"><span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span></td>
                                                 <td class="text-end">
-                                                    <button class="mt-0 btn btn-sm btn-success view-button" type="button" onclick="OpenGRN ('<?= $PONUmber ?>')"><i class="fa-solid fa-cubes"></i> GRN</button>
+                                                    <?php
+                                                    $pageID = 11;
+                                                    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
+
+                                                    if (!empty($userPrivilege)) {
+                                                        $readAccess = $userPrivilege[$LoggedUser]['read'];
+                                                        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+                                                        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+                                                        if ($writeAccess == 1) {
+                                                    ?>
+                                                            <button class="mt-0 btn btn-sm btn-success view-button" type="button" onclick="OpenGRN ('<?= $PONUmber ?>')"><i class="fa-solid fa-cubes"></i> GRN</button>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
                                                     <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="OpenPOPrint ('<?= $PONUmber ?>')"><i class="fa-solid fa-print"></i> Print</button>
                                                 </td>
                                             </tr>
@@ -161,6 +179,8 @@ $InactiveCount = 0;
                                             if ($selectedArray['is_active'] == 1) {
                                                 $active_status = "Active";
                                                 $color = "primary";
+                                            } else {
+                                                continue;
                                             }
                                             $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
                                             $OrderDate = $selectedArray['created_at'];

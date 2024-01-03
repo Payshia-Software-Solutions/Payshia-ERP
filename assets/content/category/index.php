@@ -7,6 +7,7 @@ $Sections = GetSections($link);
 $Departments = GetDepartments($link);
 $Categories = GetCategories($link);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ArrayCount = count($Categories);
 
 $ActiveCount = $ArrayCount;
@@ -44,14 +45,29 @@ $Title = "Category";
                 <i class="fa-solid fa-star-of-life icon-card"></i>
             </div>
             <div class="card-body">
-                <p>In-Active</p>
+                <p>Disabled</p>
                 <h1><?= $InactiveCount ?></h1>
             </div>
         </div>
     </div>
-    <div class="col-md-3 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="AddNew(1,0)"><i class="fa-solid fa-plus"></i> Add <?= $Title ?></button>
-    </div>
+    <?php
+    $pageID = 7;
+    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
+
+    if (!empty($userPrivilege)) {
+        $readAccess = $userPrivilege[$LoggedUser]['read'];
+        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+        if ($writeAccess == 1) {
+    ?>
+            <div class="col-md-3 text-end mt-4 mt-md-0">
+                <button class="btn btn-dark" type="button" onclick="AddNew(1,0)"><i class="fa-solid fa-plus"></i> Add <?= $Title ?></button>
+            </div>
+    <?php
+        }
+    }
+    ?>
 </div>
 
 <div class="row mt-5">
@@ -68,7 +84,6 @@ $Title = "Category";
                 $active_status = "Active";
                 $color = "primary";
             }
-
 
             $DepartmentName = $Departments[$SelectArray['department_id']]['department_name'];
             $SectionName = $Sections[$SelectArray['section_id']]['section_name'];
@@ -89,7 +104,7 @@ $Title = "Category";
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $SelectArray['id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-secondary view-button" type="button" onclick="ChangeStatus(0, '<?= $SelectArray['id'] ?>')"><i class="fa-solid fa-ban"></i> Disable</button>
                             <?php
                             } else {
                             ?>

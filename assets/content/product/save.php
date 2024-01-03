@@ -35,8 +35,10 @@ $selling_price = $_POST['selling_price'];
 $minimum_price = $_POST['min_price'];
 $wholesale_price = $_POST['wholesale_price'];
 $supplier_ids = $_POST['supplier_id']; // This is an array, so you'll need to handle it accordingly
+$availableLocations = $_POST['availableLocation']; // This is an array, so you'll need to handle it accordingly
 $item_type = $_POST['item_type'];
 $item_location = $_POST['item_location'];
+$barcode = $_POST['productBarcode'];
 
 
 $name_si = $_POST['name_si'];
@@ -46,6 +48,7 @@ $recipe_type = $_POST['recipe_type'];
 
 // Construct Supplier Array
 $supplier_list = implode(',', $supplier_ids);
+$location_list = implode(',', $availableLocations);
 
 // The 'item_image' is a file upload, so you need to handle it as needed
 $product_description = $_POST['product_description'];
@@ -62,7 +65,7 @@ if ($file_name == "") {
     $file_name = $item_image_tmp;
 }
 
-$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type);
+$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $location_list);
 
 // Decode the JSON response
 $response = json_decode($QueryResult);

@@ -52,14 +52,10 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
 </style>
 
 <div id="page-content-wrapper"><!-- Your Page Content Goes Here -->
-    <div class="row">
-        <div class="col-md-8 px-1">
-            <div class="row">
-                <div class="col-md-9" style="padding-right: 0px;">
-                    <div class="mt-1">
-                        <input type="text" class="form-control mb-2 p-2 border-2" placeholder="Search Product" id="search-key" onclick="this.select()">
-                    </div>
-
+    <div class="row g-2">
+        <div class="col-md-8">
+            <div class="row g-2">
+                <div class="col-md-9 d-none d-md-block">
                     <?php
                     if ($brandFilter == 1) { ?>
                         <div class="row">
@@ -81,7 +77,7 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
 
                     <div class="item-container" id="item-container"></div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 d-none d-md-block">
                     <div class="card w-100 category-card filter-content shadow-sm">
                         <div class="card-body">
                             <h5 class="text-center">Filter</h5>
@@ -133,48 +129,8 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
 
             </div>
         </div>
-        <div class="col-md-4  px-1" id="bill-container"></div>
+        <div class="col-md-4" id="bill-container"></div>
     </div>
 
 
 </div>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Get the input element by its ID
-        var inputBox = document.getElementById("search-key");
-        var programmaticFocus = true; // Flag to track programmatic focus
-
-        // Set up a focus event listener
-        inputBox.addEventListener("focus", function() {
-            if (programmaticFocus) {
-                this.select(); // Select the text when the input box is focused programmatically
-            }
-        });
-
-        // Set focus on the input box
-        inputBox.focus();
-
-        // Set the flag to false when the input box is clicked
-        inputBox.addEventListener("click", function() {
-            programmaticFocus = false;
-        });
-    });
-</script>
-<script>
-    document.getElementById("search-key").addEventListener("input", function() {
-        const searchText = this.value.toLowerCase();
-        const productColumns = document.querySelectorAll(".product-column");
-
-        productColumns.forEach(function(productColumn) {
-            const productName = productColumn.querySelector(".card-title").textContent.toLowerCase();
-
-            if (productName.includes(searchText)) {
-                productColumn.classList.remove("d-none");
-                productColumn.classList.add("d-block");
-            } else {
-                productColumn.classList.remove("d-block");
-                productColumn.classList.add("d-none");
-            }
-        });
-    });
-</script>

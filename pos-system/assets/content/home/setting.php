@@ -19,7 +19,7 @@ $Cities = GetCities($link);
         <hr>
     </div>
 
-    <div class="col-6">
+    <div class="col-12 col-md-6">
         <!-- Item Image setting -->
         <?php
         $IconMode = GetSetting($link, $LocationID, 'itemImage');
@@ -30,7 +30,7 @@ $Cities = GetCities($link);
         </div>
     </div>
 
-    <div class="col-6">
+    <div class="col-12 col-md-6">
         <!-- Item Image setting -->
         <?php
         $brandFilter = GetSetting($link, $LocationID, 'brandFilter');

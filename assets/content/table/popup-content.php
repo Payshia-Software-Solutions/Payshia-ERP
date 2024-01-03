@@ -30,9 +30,9 @@ if ($UpdateKey > 0) {
 
 
                     <div class="col-6 mb-2">
-                        <label class="">Item Location</label>
+                        <label class="">Select Branch</label>
                         <select class="form-control form-control-sm" name="location_id" id="location_id" required>
-                            <option value="">Select Location</option>
+                            <option value="">Select Branch</option>
                             <?php
                             if (!empty($Locations)) {
                                 foreach ($Locations as $selected_array) {

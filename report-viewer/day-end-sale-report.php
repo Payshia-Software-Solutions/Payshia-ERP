@@ -85,6 +85,10 @@ $location_name = $Locations[$location_id]['location_name'];
                         <th>Date</th>
                         <td class="text-end"><?= $formattedDate ?></td>
                     </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td class="text-end"><?= $location_name ?></td>
+                    </tr>
                 </table>
             </div>
 

@@ -7,6 +7,7 @@ $Locations = GetLocations($link);
 $Products = GetProducts($link);
 $ArrayCount = count($Products);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ActiveCount = $ArrayCount;
 $InactiveCount = 0;
 ?>
@@ -92,7 +93,22 @@ $InactiveCount = 0;
                                                 <td><?= $profitRatio ?></td>
                                                 <td class="text-center"><span class="badge mt-2 bg-<?= $color ?>"><?= $recipeDisplay ?></span></td>
                                                 <td class="text-end">
-                                                    <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="OpenRecipe('<?= $selectedArray['product_id'] ?>', '<?= $recipeType ?>')"><i class="fa-solid fa-right-left"></i> Recipe</button>
+                                                    <?php
+                                                    $pageID = 12;
+                                                    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
+
+                                                    if (!empty($userPrivilege)) {
+                                                        $readAccess = $userPrivilege[$LoggedUser]['read'];
+                                                        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+                                                        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+                                                        if ($writeAccess == 1) {
+                                                    ?>
+                                                            <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="OpenRecipe('<?= $selectedArray['product_id'] ?>', '<?= $recipeType ?>')"><i class="fa-solid fa-right-left"></i> BOM</button>
+                                                    <?php
+                                                        }
+                                                    }
+                                                    ?>
                                                 </td>
                                             </tr>
                                     <?php
@@ -111,7 +127,7 @@ $InactiveCount = 0;
 
     <div class="col-md-5 mb-3">
 
-        <div class="table-title font-weight-bold mb-4 mt-0">Recipe</div>
+        <div class="table-title font-weight-bold mb-4 mt-0">Bill of Materials</div>
         <div class="card>
             <div class=" card-body" id="selected-product">
             <div class="row">

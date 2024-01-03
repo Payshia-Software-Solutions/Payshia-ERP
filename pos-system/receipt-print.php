@@ -40,9 +40,15 @@ if (!empty($created_by)) {
     $LoggedName = "Unknown";
 }
 
-
 $selectedLocation =  GetLocations($link)[$location_id];
 $CustomerName = GetCustomerName($link, $customer_code);
+
+
+if ($selectedLocation['logo_path'] == 'no-image.png') {
+    $file_path = "./assets/images/pos-logo.png";
+} else {
+    $file_path = "./assets/images/location/" . $selectedLocation['location_id'] . "/" . $selectedLocation['logo_path'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,7 +66,7 @@ $CustomerName = GetCustomerName($link, $customer_code);
 
     <div class="inv" id="inv">
         <div class="logo-box" style="margin-bottom: 20px;">
-            <img class="logo-image" src="./assets/images/<?= $selectedLocation['logo_path'] ?>">
+            <img class="logo-image" src="<?= $file_path ?>">
         </div>
 
         <p class="address">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
@@ -93,9 +99,10 @@ $CustomerName = GetCustomerName($link, $customer_code);
         </table>
         <hr />
         <div class="bill-foooter">Thank You..! Come Again</div>
-        <div class="credits" style="margin-top:10px">Software by Payshia </div>
-        <img class="logo-image" src="./assets/images/pos-logo.png" style="width: 25mm; margin-top:10px;">
-        <div class="credits">0770481363 | www.payshia.com</div>
+        <div class="credits" style="margin-top:10px">Software by UniERP </div>
+        <img class="logo-image" src="./assets/images/pos-logo-line.png" style="width: 25mm; margin-top:10px;">
+        <div class="credits">0770481363 | www.unierp.com</div>
+
     </div>
 
     <script>

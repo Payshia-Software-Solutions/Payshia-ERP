@@ -3,7 +3,8 @@ require_once('../include/config.php');
 include '../include/function-update.php';
 
 include '../include/settings_functions.php';
-
+$displayStatus = $fontClass = "";
+$LanguageMode = "EN";
 $netTotal = $total = 0;
 $invoice_number = $_GET['invoice_number'];
 $PrinterName = $_GET['PrinterName'];
@@ -15,7 +16,7 @@ if ($reprintStatus == 1) {
 }
 
 $SelectedArray = GetInvoices($link)[$invoice_number];
-$InvProducts = GetInvoiceItems($link, $invoice_number);
+$InvProducts = GetInvoiceItemsPrint($link, $invoice_number);
 $Products = GetProducts($link);
 $Units = GetUnit($link);
 
@@ -35,7 +36,7 @@ $textArray = [
     "payable_amount" => ["EN" => "Payable Amount", "SI" => "ගෙවිය යුතු මුදල"],
     "change" => ["EN" => "Change", "SI" => "ඉතිරි මුදල"],
     "qty" => ["EN" => "Qty", "SI" => "ප්‍රමාණය"],
-    "unit_price" => ["EN" => "Unit Price", "SI" => "එකක මිල"],
+    "unit_price" => ["EN" => "Price", "SI" => "එකක මිල"],
     "amount" => ["EN" => "Amount", "SI" => "මුදල"],
     "greeting" => ["EN" => "Thank You..! Come Again", "SI" => "ස්තූතියි! නැවත එන්න.."]
 ];
@@ -43,16 +44,17 @@ $textArray = [
 
 $inv_time = date("Y-m-d H:i:s", strtotime($SelectedArray['current_time']));
 $TableID = $SelectedArray['table_id'];
+
 if ($TableID == 0) {
     $TableName = "Take Away";
-}
-if ($TableID == -1) {
+} else if ($TableID == -1) {
     $TableName = "Retail";
 } else if ($TableID == -2) {
     $TableName = "Delivery";
 } else if ($TableID == -3) {
     $TableName = "Delivery";
 } else {
+    // $displayStatus = "d-none";
     $TableName = GetTables($link)[$SelectedArray['table_id']]['table_name'];
 }
 
@@ -65,6 +67,24 @@ $LocationName = GetLocations($link)[$SelectedArray['location_id']]['location_nam
 $invAmount = $SelectedArray['inv_amount'];
 $grand_total = $SelectedArray['grand_total'];
 $invAmount = $SelectedArray['inv_amount'];
+$ref_hold = $SelectedArray['ref_hold'];
+
+if ($ref_hold == '0') {
+    // $referenceText = "Take Away";
+    $referenceText = "Direct";
+} else if ($ref_hold == '-1') {
+    // $referenceText = "Retail";
+    $referenceText = "Direct";
+} else if ($ref_hold == '-2') {
+    // $referenceText = "Delivery";
+    $referenceText = "Direct";
+} else if ($ref_hold == "") {
+    // $referenceText = "None";
+    $referenceText = "Direct";
+} else {
+    $referenceText = $ref_hold;
+}
+
 // echo $invAmount;
 $customer_code = $SelectedArray['customer_code'];
 $invoice_status = $SelectedArray['invoice_status'];
@@ -80,6 +100,12 @@ $PaymentTypes = [
 ];
 $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
 
+if ($close_type == -1) {
+    $paymentMethod = "Credit";
+    $tendered_amount = 0;
+} else {
+    $paymentMethod =  $PaymentTypes[$close_type]['text'];
+}
 
 $created_by =  $SelectedArray['created_by'];
 if (!empty($created_by)) {
@@ -90,10 +116,20 @@ if (!empty($created_by)) {
 }
 
 $LanguageMode = GetSetting($link, $SelectedArray['location_id'], 'invoiceLang');
+if ($LanguageMode == "" || isset($LanguageMode)) {
+    $LanguageMode = "EN";
+}
 if ($LanguageMode == "EN") {
     $fontClass = '';
 } else if ($LanguageMode == "SI") {
     $fontClass = 'style=" font-family: \'Noto Serif Sinhala\', serif !important; font-weight:700;"';
+}
+
+
+if ($selectedLocation['logo_path'] == 'no-image.png') {
+    $file_path = "./assets/images/pos-logo.png";
+} else {
+    $file_path = "./assets/images/location/" . $selectedLocation['location_id'] . "/" . $selectedLocation['logo_path'];
 }
 
 
@@ -108,6 +144,10 @@ if ($LanguageMode == "EN") {
     <title><?= $InvoiceNumber ?></title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@200;300&display=swap');
+
+        .d-none {
+            display: none !important;
+        }
     </style>
 
 </head>
@@ -117,22 +157,24 @@ if ($LanguageMode == "EN") {
 
     <div class="inv" id="inv">
         <div class="logo-box" style="margin-bottom: 20px;">
-            <img class="logo-image" src="./assets/images/<?= $selectedLocation['logo_path'] ?>">
+            <img class="logo-image <?= $displayStatus ?>" src="<?= $file_path ?>" onerror="this.src='./assets/images/pos-logo.png';">
         </div>
 
-        <p class="address">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
-        <p class="telephone">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
-        <p class="telephone">Email : info@transitaradhana.com</p>
-        <hr />
-
+        <p class="address <?= $displayStatus ?>">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Email : info@transitaradhana.com</p>
+        <hr class="<?= $displayStatus ?>" />
 
         <h2 class="company" <?= $fontClass ?>><?= $textArray['invoice'][$LanguageMode] ?><?= $titleSuffix ?></h2>
 
         <div class="InvoiceID" <?= $fontClass ?>><?= $textArray['invoice_number'][$LanguageMode] ?> : <span class="invoice_number"><?php echo $InvoiceNumber; ?></span></div>
+        <div class="Customer" <?= $fontClass ?>>REF : <span class=""><?php echo $referenceText; ?></span></div>
         <div class="Customer" <?= $fontClass ?>><?= $textArray['customer'][$LanguageMode] ?> : <span class="cus_name"><?php echo $CustomerName; ?></span></div>
         <div class="dateContainer" <?= $fontClass ?>><?= $textArray['date'][$LanguageMode] ?> : <span class="date"><?php echo $inv_time; ?></span></div>
         <div class="Customer" <?= $fontClass ?>><?= $textArray['cashier'][$LanguageMode] ?> : <span class="cus_name"><?= $LoggedName ?></span></div>
         <div class="Customer" <?= $fontClass ?>><?= $textArray['table'][$LanguageMode] ?> : <span class="cus_name"><?= $TableName ?></span></div>
+
+
         <hr />
 
         <table>
@@ -140,6 +182,7 @@ if ($LanguageMode == "EN") {
                 <tr>
                     <th class="headerth" <?= $fontClass ?>><?= $textArray['qty'][$LanguageMode] ?></th>
                     <th class="headerth" <?= $fontClass ?>><?= $textArray['unit_price'][$LanguageMode] ?></th>
+                    <th class="headerth" <?= $fontClass ?>>Discount</th>
                     <th class="headerth" <?= $fontClass ?>><?= $textArray['amount'][$LanguageMode] ?></th>
                 </tr>
             </thead>
@@ -157,6 +200,7 @@ if ($LanguageMode == "EN") {
                         $product_id = $SelectRecord['product_id'];
 
                         $line_total = ($selling_price - $item_discount) * $item_quantity;
+                        $totalItemDiscount = $item_discount * $item_quantity;
                         $total += $line_total;
 
                         if ($LanguageMode == "SI") {
@@ -164,11 +208,12 @@ if ($LanguageMode == "EN") {
                         }
                 ?>
                         <tr>
-                            <td colspan="3" <?= $fontClass ?>><?= $print_name; ?></td>
+                            <td colspan="4" <?= $fontClass ?>><?= $print_name; ?> - <?php echo number_format($selling_price, 2); ?></td>
                         </tr>
                         <tr class="selected" <?= $fontClass ?>>
                             <td <?= $fontClass ?>><?php echo $item_quantity; ?></td>
-                            <td class="text-right" <?= $fontClass ?>><?php echo number_format($selling_price, 2); ?></td>
+                            <td class="text-right" <?= $fontClass ?>><?php echo number_format($selling_price - $item_discount, 2); ?></td>
+                            <td class="text-right" <?= $fontClass ?>><?php echo number_format($item_discount, 2); ?></td>
                             <td class="text-right" <?= $fontClass ?>><?php echo number_format($line_total, 2); ?></td>
                         </tr>
 
@@ -181,6 +226,15 @@ if ($LanguageMode == "EN") {
             </tbody>
         </table>
         <hr />
+
+        <?php
+
+        if ($close_type == -1) {
+            $change_amount = 0;
+        } else {
+            $change_amount = $tendered_amount - $netTotal;
+        }
+        ?>
         <table class="totals">
             <tr>
                 <th colspan="2" <?= $fontClass ?>><?= $textArray['no_of_items'][$LanguageMode] ?></th>
@@ -216,19 +270,19 @@ if ($LanguageMode == "EN") {
 
         <table class="totals">
             <tr>
-                <th colspan="2" <?= $fontClass ?>><?= $PaymentTypes[$close_type]['text'] ?></th>
+                <th colspan="2" <?= $fontClass ?>><?= $paymentMethod ?></th>
                 <th class="text-right" <?= $fontClass ?>><?php echo number_format($tendered_amount, 2); ?></th>
             </tr>
             <tr>
                 <th colspan="2" <?= $fontClass ?>><?= $textArray['change'][$LanguageMode] ?></th>
-                <th class="text-right" <?= $fontClass ?>><?php echo number_format($tendered_amount - $netTotal, 2); ?></th>
+                <th class="text-right" <?= $fontClass ?>><?php echo number_format($change_amount, 2); ?></th>
             </tr>
         </table>
         <hr />
         <div class="bill-foooter" <?= $fontClass ?>><?= $textArray['greeting'][$LanguageMode] ?></div>
-        <div class="credits" style="margin-top:10px">Software by Payshia </div>
-        <img class="logo-image" src="./assets/images/pos-logo.png" style="width: 25mm; margin-top:10px;">
-        <div class="credits">0770481363 | www.payshia.com</div>
+        <div class="credits <?= $displayStatus ?>" style="margin-top:10px">Software by Payshia </div>
+        <img class="logo-image <?= $displayStatus ?>" src="./assets/images/payshia-logo-p.png" style="width: 8mm; margin-top:10px;">
+        <div class="credits <?= $displayStatus ?>">0770481363 | www.payshia.com</div>
 
     </div>
 

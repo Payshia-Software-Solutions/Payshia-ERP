@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <?php
+session_start();
 require_once('../include/config.php');
 include '../include/function-update.php';
 
@@ -8,11 +9,11 @@ date_default_timezone_set("Asia/Colombo");
 
 $scaleFactor = 100;
 
-// // Check if the user is already logged in, if yes then redirect him to welcome page
-// if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-//     // header("location:       ");
-//     exit;
-// }
+// Check if the user is already logged in, if yes then redirect him to welcome page
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    header("location:./");
+    exit;
+}
 
 // Define variables and initialize with empty values
 $username = $password = $status = "";
@@ -122,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="../assets/images/favicon/apple-touch-icon.png" rel="icon">
     <link href="../assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <title>Login | Payshia POS Solution</title>
+    <title>Login | UniERP POS Solution</title>
 </head>
 
 <body class="login">
@@ -132,8 +133,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
                 <div class="signin-form d-block">
-                    <img src="./assets/images/payshia-logo.png" width="180px">
-                    <h2 class=" text-center my-4 border-top pt-3">Sign in to Payshia POS Solution</h2>
+                    <img class="" src="./assets/images/unierp.png" width="150px">
+                    <h2 class=" text-center my-4 border-top pt-3">Sign in to UniERP POS Solution</h2>
                     <p class=" text-secondary">Use your email account or User Name!</p>
                     <form class="" action="" method="post">
                         <div class="row">
@@ -180,7 +181,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="d-none d-md-inline col-md-4 p-5 text-center side-bar-color">
                 <div class="inner-content d-block  signin-content">
-                    <img src="./assets/images/payshia-logo-p.png" width="100px">
+                    <img class="bg-light p-3 rounded-4" src="./assets/images/unierp.png" width="150px">
                     <h2 class="text-center mt-2">Welcome Back!</h2>
                     <p class="px-5">To Keep Connected with us please login with your personal info.</p>
                 </div>

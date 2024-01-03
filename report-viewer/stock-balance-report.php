@@ -16,6 +16,7 @@ $location_name = $Locations[$location_id]['location_name'];
 $section_id = isset($_GET['section_id']) && $_GET['section_id'] !== '' ? $_GET['section_id'] : null;
 $department_id = isset($_GET['department_id']) && $_GET['department_id'] !== '' ? $_GET['department_id'] : null;
 $category_id = isset($_GET['category_id']) && $_GET['category_id'] !== '' ? $_GET['category_id'] : null;
+$dateInput = isset($_GET['queryDate']) && $_GET['queryDate'] !== '' ? $_GET['queryDate'] : null;
 
 // Check if the required parameters are not set or have empty values
 if ($section_id === null || $department_id === null || $category_id === null) {
@@ -94,7 +95,7 @@ $reportTitle = "Stock Balance Report";
                         $totalStockValue = $totalSellingValue = 0;
                         foreach ($Products as $selectedArray) {
                             $product_id = $selectedArray['product_id'];
-                            $stockBalance = GetStockBalanceByProductByLocation($link, $product_id, $location_id);
+                            $stockBalance = GetStockBalanceByProductByLocationToDate($link, $product_id, $location_id, $dateInput);
                             $costPrice = GetCostPrice($link, $product_id);
                             $sellingPrice = GetSellingPrice($link, $product_id);
                             $stockValue = $stockBalance * $costPrice;

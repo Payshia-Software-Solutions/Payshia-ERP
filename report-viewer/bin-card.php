@@ -31,8 +31,8 @@ $product_code = $Products[$select_product]['product_code'];
 $forwardBalances = getCumulativeBinCardTotals($link, $fromDate, $select_product, $location_id);
 $bfDebitBalance = $bfCreditBalance = 0;
 if (!empty($forwardBalances)) {
-    $bfDebitBalance = $forwardBalances['DEBIT']['cumulative_total'];
-    $bfCreditBalance = $forwardBalances['CREDIT']['cumulative_total'];
+    $bfDebitBalance = (isset($forwardBalances['DEBIT'])) ? $forwardBalances['DEBIT']['cumulative_total'] : 0;
+    $bfCreditBalance = (isset($forwardBalances['CREDIT'])) ? $forwardBalances['CREDIT']['cumulative_total'] : 0;
 }
 // var_dump($forwardBalances);
 
@@ -95,6 +95,14 @@ $reportTitle = "Bin Card";
                     <tr>
                         <th>To Date</th>
                         <td class="text-end"><?= $formattedToQueryDate ?></td>
+                    </tr>
+                    <tr>
+                        <th>Code</th>
+                        <td class="text-end"><?= $product_code ?></td>
+                    </tr>
+                    <tr>
+                        <th>Product</th>
+                        <td class="text-end"><?= $product_name ?></td>
                     </tr>
                 </table>
             </div>

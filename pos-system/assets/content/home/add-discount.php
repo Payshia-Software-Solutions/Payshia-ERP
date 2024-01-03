@@ -71,7 +71,7 @@ $total = $_POST['total'];
 <input type="hidden" id="total" value="<?= $total ?>">
 
 <div class="row">
-    <div class="col-5 text-center mb-3">
+    <div class="col-md-5 text-center mb-3">
         <p class="mb-0">Bill Amount</p>
         <h1 class="my-0">LKR <?= number_format($total, 2) ?></h1>
     </div>

@@ -5,10 +5,16 @@ include '../../../include/function-update.php';
 $ActiveStatus = 0;
 $UpdateKey = $_POST['UpdateKey'];
 $Cities = GetCities($link);
-$LocationName = "";
+$LocationName = $logo_path = $address_line1 = $address_line2 = $city = $phone_1 = $phone_2 = "";
 if ($UpdateKey > 0) {
     $Location = GetLocations($link)[$UpdateKey];
     $LocationName = $Location['location_name'];
+    $logo_path = $Location['logo_path'];
+    $address_line1 = $Location['address_line1'];
+    $address_line2 = $Location['address_line2'];
+    $city = $Location['city'];
+    $phone_1 = $Location['phone_1'];
+    $phone_2 = $Location['phone_2'];
 }
 ?>
 
@@ -32,7 +38,8 @@ if ($UpdateKey > 0) {
 
                     <div class="col-md-6 mb-2">
                         <h6 class="taxi-label">Logo</h6>
-                        <input type="file" class="form-control" id="location_image" name="location_image" required>
+                        <input type="file" class="form-control" id="location_image" name="location_image">
+                        <input type="hidden" name="item_image_tmp" id="item_image_tmp" value="<?= $logo_path ?>">
                     </div>
                 </div>
 
@@ -42,7 +49,7 @@ if ($UpdateKey > 0) {
                         $labelText = "Address Line 1";
                         ?>
                         <h6 class="taxi-label"><?= $labelText ?></h6>
-                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required>
+                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" value="<?= $address_line1 ?>">
 
                     </div>
 
@@ -51,7 +58,7 @@ if ($UpdateKey > 0) {
                         $labelText = "Address Line 2";
                         ?>
                         <h6 class="taxi-label"><?= $labelText ?></h6>
-                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required>
+                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" value="<?= $address_line2 ?>">
 
                     </div>
                     <div class="col-md-4 mb-2">
@@ -59,7 +66,7 @@ if ($UpdateKey > 0) {
                         $labelText = "City Name";
                         ?>
                         <h6 class="taxi-label"><?= $labelText ?></h6>
-                        <select class="form-control" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required>
+                        <select class="form-control" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>">
                             <?php
 
                             if (!empty($Cities)) {
@@ -71,7 +78,7 @@ if ($UpdateKey > 0) {
                                     $postcode = $SelectedArray['postcode'];
                                     $name_si = $SelectedArray['name_si'];
                             ?>
-                                    <option value="<?= $city_id ?>"><?= $city_name ?> - <?= $postcode ?></option>
+                                    <option <?= ($city == $city_name) ? 'selected' : '' ?> value="<?= $city_name ?>"><?= $city_name ?> - <?= $postcode ?></option>
                             <?php
                                 }
                             }
@@ -84,7 +91,7 @@ if ($UpdateKey > 0) {
                         $labelText = "Phone Number 1";
                         ?>
                         <h6 class="taxi-label"><?= $labelText ?></h6>
-                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required>
+                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required value="<?= $phone_1 ?>">
 
                     </div>
 
@@ -93,7 +100,7 @@ if ($UpdateKey > 0) {
                         $labelText = "Phone Number 2";
                         ?>
                         <h6 class="taxi-label"><?= $labelText ?></h6>
-                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" required>
+                        <input type="text" class="form-control" placeholder="Enter <?= $labelText ?>" id="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" name="<?= strtolower(str_replace(' ', '_', $labelText)) ?>" value="<?= $phone_2 ?>">
 
                     </div>
 

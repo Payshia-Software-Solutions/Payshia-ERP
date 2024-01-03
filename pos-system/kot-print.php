@@ -8,12 +8,21 @@ $SelectedArray = GetInvoices($link)[$invoice_number];
 $InvProducts = GetInvoiceItems($link, $invoice_number);
 $Products = GetProducts($link);
 $Units = GetUnit($link);
+$stewards = GetStewards($link);
 $PrinterName = $_GET['PrinterName'];
+$forceStatus = $_GET['forceStatus'];
 
 $reprintStatus = $_GET['reprintStatus'];
 $titleSuffix = "";
 if ($reprintStatus == 1) {
     $titleSuffix = " - REPRINT";
+}
+
+$stewardId = $SelectedArray['steward_id'];
+if ($stewardId === "0") {
+    $stewardName = "Default";
+} else {
+    $stewardName = $stewards[$stewardId]['first_name'] . " " . $stewards[$stewardId]['last_name'];
 }
 
 
@@ -50,6 +59,16 @@ if (!empty($created_by)) {
 }
 
 $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
+
+$CustomerName = GetCustomerName($link, $customer_code);
+
+if ($selectedLocation['logo_path'] == 'no-image.png') {
+    $file_path = "./assets/images/pos-logo.png";
+} else {
+    $file_path = "./assets/images/location/" . $selectedLocation['location_id'] . "/" . $selectedLocation['logo_path'];
+}
+
+$displayStatus = "d-none";
 ?>
 <!DOCTYPE html>
 <html lang="en" style="margin: 0; padding:0">
@@ -59,26 +78,31 @@ $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/print-invoice-1.0.css" />
     <title><?= $InvoiceNumber ?></title>
-    <style></style>
+    <style>
+        .d-none {
+            display: none !important;
+        }
+    </style>
+
 </head>
 
 <body id="body" style="margin: 0; padding:0">
-
-
     <div class="inv" id="inv">
-        <div class="logo-box" style="margin-bottom: 20px;">
-            <img class="logo-image" src="./assets/images/<?= $selectedLocation['logo_path'] ?>">
+        <div class="logo-box <?= $displayStatus ?>" style="margin-bottom: 20px;">
+            <img class="logo-image" src="<?= $file_path ?>">
         </div>
 
-        <p class="address">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
-        <p class="telephone">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
-        <p class="telephone">Email : info@transitaradhana.com</p>
-        <hr />
+        <p class="address <?= $displayStatus ?>">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Email : info@transitaradhana.com</p>
+        <hr class="<?= $displayStatus ?>" />
 
         <h2 class="company">KOT <?= $titleSuffix ?></h2>
-        <div class="InvoiceID">Invoice # : <span class="invoice_number" style="font-weight: 800;"><?php echo $InvoiceNumber; ?></span></div>
-        <div class="Customer">Customer : <span class="cus_name"><?php echo $customer_code; ?></span></div>
+        <div class="InvoiceID">KOT # : <span class="invoice_number" style="font-weight: 800;"><?php echo $InvoiceNumber; ?></span></div>
+        <div class="Customer">Table : <span class="cus_name"><?= $TableName ?></span></div>
+        <div class="Customer">Customer : <span class="cus_name"><?php echo $CustomerName; ?></span></div>
         <div class="dateContainer">Date : <span class="date"><?php echo $inv_time; ?></span></div>
+        <div class="Customer">Steward : <span class="cus_name"><?= $stewardName ?></span></div>
         <div class="Customer">Cashier : <span class="cus_name"><?= $LoggedName ?></span></div>
         <hr />
 
@@ -94,6 +118,11 @@ $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
                 <?php
                 if (!empty($InvProducts)) {
                     foreach ($InvProducts as $SelectRecord) {
+
+                        $printed_status = $SelectRecord['printed_status'];
+                        if ($printed_status == 1 && $invoice_status == 1 && $forceStatus != 1) {
+                            continue;
+                        }
                         $display_name = $Products[$SelectRecord['product_id']]['display_name'];
                         $print_name = $Products[$SelectRecord['product_id']]['print_name'];
                         $item_unit = $Units[$Products[$SelectRecord['product_id']]['measurement']]['unit_name'];
@@ -106,11 +135,11 @@ $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
                         $total += $line_total;
                 ?>
                         <tr>
-                            <td colspan="3"><?php echo $print_name; ?></td>
+                            <td colspan="4"><?php echo $print_name; ?></td>
                         </tr>
                         <tr class="selected">
                             <td><?php echo $item_quantity; ?></td>
-                            <td class="text-right"><?php echo number_format($selling_price, 2); ?></td>
+                            <td class="text-right"><?php echo number_format($selling_price - $item_discount, 2); ?></td>
                             <td class="text-right"><?php echo number_format($line_total, 2); ?></td>
                         </tr>
 
@@ -123,11 +152,17 @@ $selectedLocation =  GetLocations($link)[$SelectedArray['location_id']];
             </tbody>
         </table>
         <hr />
-        <div class="bill-foooter">Thank You..! Come Again</div>
-        <div class="credits" style="margin-top:10px">Software by Payshia </div>
-        <img class="logo-image" src="./assets/images/pos-logo.png" style="width: 25mm; margin-top:10px;">
-        <div class="credits">0770481363 | www.payshia.com</div>
+        <div class="bill-foooter <?= $displayStatus ?>">Thank You..! Come Again</div>
+        <div class="credits <?= $displayStatus ?>" style="margin-top:10px">Software by <?= $SiteTitle ?> </div>
+        <img class="logo-image <?= $displayStatus ?>" src="./assets/images/pos-logo-line.png" style="width: 25mm; margin-top:10px;">
+        <div class="credits">077 0 481 363 | www.payshia.com</div>
+
     </div>
+
+    <?php
+    $printStatus = 1;
+    $updatePrintedStatus = UpdatePrintedStatus($link, $invoice_number, $printStatus);
+    ?>
 
     <script>
         function calculateFilledHeightInMillimeters(element) {

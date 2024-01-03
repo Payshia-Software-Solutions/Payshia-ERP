@@ -25,6 +25,8 @@ if (isset($receipts[1])) {
 $creditSales = $invoiceSales - $cashReceipts - $creditCardReceipts;
 $cashInHand = $cashReceipts - $refundAmount;
 $location_name = $Locations[$location_id]['location_name'];
+
+
 ?>
 
 <div class="table-responsive">

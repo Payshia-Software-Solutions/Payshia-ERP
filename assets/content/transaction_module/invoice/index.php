@@ -4,9 +4,10 @@ include '../../../../include/function-update.php';
 
 $ActiveStatus = 0;
 $Locations = GetLocations($link);
-$PurchaseOrders = GetPurchaseOrders($link);
-$ArrayCount = count($PurchaseOrders);
+$Invoices = GetInvoices($link);
+$ArrayCount = count($Invoices);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ActiveCount = $ArrayCount;
 $InactiveCount = 0;
 ?>
@@ -23,10 +24,24 @@ $InactiveCount = 0;
             </div>
         </div>
     </div>
+    <?php
+    $pageID = 13;
+    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
 
-    <div class="col-md-9 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="NewInvoice()"><i class="fa-solid fa-plus"></i> New Invoice</button>
-    </div>
+    if (!empty($userPrivilege)) {
+        $readAccess = $userPrivilege[$LoggedUser]['read'];
+        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+        if ($writeAccess == 1) {
+    ?>
+            <div class="col-md-9 text-end mt-4 mt-md-0">
+                <button class="btn btn-dark" type="button" onclick="NewInvoice()"><i class="fa-solid fa-plus"></i> New Invoice</button>
+            </div>
+    <?php
+        }
+    }
+    ?>
 </div>
 <style>
     #order-table tr {
@@ -41,7 +56,7 @@ $InactiveCount = 0;
 
 <div class="row mt-5">
     <div class="col-md-8">
-        <div class="table-title font-weight-bold mb-4 mt-0">Purchase Orders</div>
+        <div class="table-title font-weight-bold mb-4 mt-0">Invoices</div>
 
         <div class="row">
             <div class="col-12 mb-3 d-flex">
@@ -50,10 +65,9 @@ $InactiveCount = 0;
                         <table class="table table-striped table-hover" id="purchase-order-table">
                             <thead>
                                 <tr>
-                                    <th scope="col">PO #</th>
+                                    <th scope="col">Invoice #</th>
                                     <th scope="col">Location</th>
-                                    <th scope="col">Supplier</th>
-                                    <th scope="col">Date</th>
+                                    <th scope="col">Customer</th>
                                     <th scope="col">Value</th>
                                     <th scope="col">Status</th>
                                     <th scope="col">Action</th>
@@ -61,9 +75,9 @@ $InactiveCount = 0;
                             </thead>
                             <tbody>
                                 <?php
-                                if (!empty($PurchaseOrders)) {
+                                if (!empty($Invoices)) {
                                     $RowNumber = 0;
-                                    foreach ($PurchaseOrders as $selectedArray) {
+                                    foreach ($Invoices as $selectedArray) {
                                         $active_status = "Deleted";
                                         $color = "warning";
                                         if ($selectedArray['is_active'] == 1) {
@@ -71,24 +85,24 @@ $InactiveCount = 0;
                                             $color = "primary";
                                         }
                                         $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
-                                        $OrderDate = $selectedArray['created_at'];
-                                        $POValue = $selectedArray['sub_total'];
+                                        $invoice_date = $selectedArray['invoice_date'];
 
-                                        $PONUmber = $selectedArray['po_number'];
-
-                                        $VendorID = $selectedArray['supplier_id'];
-                                        $Supplier = GetSupplier($link)[$VendorID];
+                                        $invoice_number = $selectedArray['invoice_number'];
+                                        $CustomerID = $selectedArray['customer_code'];
+                                        $invoiceValue = $selectedArray['grand_total'];
+                                        $customerName =  GetCustomerName($link, $CustomerID);
                                         $RowNumber++;
                                 ?>
                                         <tr>
-                                            <th><?= $PONUmber ?></th>
+                                            <th><?= $invoice_number ?></th>
                                             <td><?= $LocationName ?></td>
-                                            <td><?= $Supplier['supplier_name'] ?></td>
-                                            <td><?= $OrderDate ?></td>
-                                            <th class="text-end"><?= number_format($POValue, 2) ?></th>
+                                            <td><?= $customerName ?></td>
+                                            <th class="text-end"><?= number_format($invoiceValue, 2) ?></th>
                                             <td class="text-end"><span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span></td>
                                             <td class="text-end">
-                                                <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="OpenPOPrint ('<?= $PONUmber ?>')"><i class="fa-solid fa-print"></i> Print</button>
+
+                                                <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="PrintInvoice ('<?= $invoice_number ?>')"><i class="fa-solid fa-print"></i> Print</button>
+
                                             </td>
                                         </tr>
                                 <?php

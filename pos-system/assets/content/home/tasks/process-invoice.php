@@ -61,12 +61,13 @@ if ($invoice_number) {
             $item_quantity = $SelectRecord['quantity'];
             $item_discount = $SelectRecord['item_discount'];
             $product_id = $SelectRecord['product_id'];
+            $printed_status = $SelectRecord['printed_status'];
             $total_cost += GetCostPrice($link, $product_id) * $item_quantity;
 
             $line_total = ($selling_price - $item_discount) * $item_quantity;
             $sub_total += $line_total;
 
-            $insert_result = AddToInvoice($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $invoice_number);
+            $insert_result = AddToInvoice($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $invoice_number, $printed_status);
 
             if ($invoice_status == 2) {
                 $recipe_type = $Products[$product_id]['recipe_type'];
@@ -84,15 +85,13 @@ if ($invoice_number) {
 
                 $stock_result = CreateStockEntry($link, $stock_type, $item_quantity, $product_id, $reference, $location_id, $LoggedUser, 1, $invoice_number);
 
-
-
-
+                $orderQuantity = $item_quantity;
                 $ProductRecipe = GetItemRecipe($link, $product_id);
                 $product_name = $Products[$product_id]['product_name'];
                 if (!empty($ProductRecipe)) {
                     foreach ($ProductRecipe as $SelectedArray) {
                         $product_id = $SelectedArray['recipe_product'];
-                        $item_quantity = $item_quantity * $SelectedArray['qty'];
+                        $item_quantity = $orderQuantity * $SelectedArray['qty'];
 
                         $sub_product_name = $Products[$product_id]['product_name'];
                         $stock_type = "CREDIT";
@@ -105,12 +104,12 @@ if ($invoice_number) {
     }
 
     $service_charge = $tax_amount;
-    $result = CreateInvoice($link, $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_rate, $CustomerID, $service_charge, $tendered_amount, $close_type, $invoice_status, $location_id, $TableID, $LoggedUser, $is_active, $stewardId, $total_cost);
+    $result = CreateInvoice($link, $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_rate, $CustomerID, $service_charge, $tendered_amount, $close_type, $invoice_status, $location_id, $TableID, $LoggedUser, $is_active, $stewardId, $total_cost, $pre_invoice_number);
 
-    if ($invoice_status == 2) {
+    if ($invoice_status == 2 && $close_type != -1) {
         $rec_prefix = "REC";
         $rec_number = generateRecNumber($link, $rec_prefix);
-        $receipt_result = CreateReceipt($link, $rec_number, $close_type, 1, $invoice_date, $grand_total, $LoggedUser, $invoice_number, $location_id, $CustomerID);
+        $receipt_result = CreateReceipt($link, $rec_number, $close_type, 1, $invoice_date, $grand_total, $LoggedUser, $invoice_number, $location_id, $CustomerID, 1);
 
         // $PaymentTypes = [
         //     ["id" => "0", "text" => "Cash"],

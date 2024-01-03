@@ -17,7 +17,7 @@ $InactiveCount = 0;
                 <i class="fa-solid fa-location-dot icon-card"></i>
             </div>
             <div class="card-body">
-                <p>No of Location</p>
+                <p>No of Locations</p>
                 <h1><?= $ArrayCount ?></h1>
             </div>
         </div>
@@ -39,7 +39,7 @@ $InactiveCount = 0;
                 <i class="fa-solid fa-star-of-life icon-card"></i>
             </div>
             <div class="card-body">
-                <p>In-Active</p>
+                <p>Disabled</p>
                 <h1><?= $InactiveCount ?></h1>
             </div>
         </div>
@@ -79,7 +79,7 @@ $InactiveCount = 0;
                                 $active_status = "Active";
                                 $color = "primary";
                             ?>
-                                <button class="mt-0 mb-1 btn btn-sm btn-danger view-button" type="button" onclick="ChangeStatus(0, '<?= $Location['location_id'] ?>')"><i class="fa-solid fa-trash"></i> Delete</button>
+                                <button class="mt-0 mb-1 btn btn-sm btn-secondary view-button" type="button" onclick="ChangeStatus(0, '<?= $Location['location_id'] ?>')"><i class="fa-solid fa-ban"></i> Disable</button>
                             <?php
                             } else {
                             ?>

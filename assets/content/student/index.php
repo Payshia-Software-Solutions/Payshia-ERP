@@ -91,6 +91,10 @@ $Cities = GetCities($link);
                                     $color = "warning";
                                     $type_color = "primary";
 
+                                    if ($Student['user_name'] == "Admin") {
+                                        continue;
+                                    }
+
                                     if ($Student['user_status'] == 1) {
                                         $active_status = "Active";
                                         $color = "info";

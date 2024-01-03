@@ -44,8 +44,8 @@ $generateDAte = new DateTime();
 $reportDate = $generateDAte->format('d/m/Y H:i:s');
 $LocationName = $Locations[$LocationID]['location_name'];
 
-$pageTitle = "Sale Summary Report - " . $fromQueryDate . " - " . $toQueryDate;
-$reportTitle = "Sale Summary Report";
+$pageTitle = "Receipt Report - " . $fromQueryDate . " - " . $toQueryDate;
+$reportTitle = "Receipt Report";
 
 $subTotal = $discountAmount = $serviceCharge = $grandTotal  = 0;
 
@@ -92,6 +92,10 @@ $location_name = $Locations[$location_id]['location_name'];
                         <th>To Date</th>
                         <td class="text-end"><?= $formattedToQueryDate ?></td>
                     </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td class="text-end"><?= $location_name ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -104,9 +108,9 @@ $location_name = $Locations[$location_id]['location_name'];
             <table>
                 <thead>
                     <tr>
+                        <th scope="col">REC #</th>
                         <th scope="col">Date</th>
                         <th scope="col">Type</th>
-                        <th scope="col">REC #</th>
                         <th scope="col">Ref</th>
                         <th scope="col">Customer</th>
                         <th scope="col">Amount</th>
@@ -114,10 +118,10 @@ $location_name = $Locations[$location_id]['location_name'];
                 </thead>
                 <tbody>
                     <?php
+                    $totalRecValue = $cashTotal = $visaTotal = 0;
                     if (!empty($receipts)) {
-                        $totalRecValue = $cashTotal = $visaTotal = 0;
                         foreach ($receipts as $selectedArray) {
-                            $rec_date = date("Y-m-d", strtotime($selectedArray['date']));
+                            $rec_date = date("Y-m-d  H:i", strtotime($selectedArray['current_time']));
 
                             $ref_id = $selectedArray['ref_id'];
                             $rec_number = $selectedArray['rec_number'];
@@ -135,9 +139,9 @@ $location_name = $Locations[$location_id]['location_name'];
                             $customerName = GetCustomerName($link, $customer_id);
                     ?>
                             <tr>
+                                <td><?= $rec_number ?></td>
                                 <td><?= $rec_date ?></td>
                                 <td><?= $PaymentTypes[$recType]['text'] ?></td>
-                                <td><?= $rec_number ?></td>
                                 <td><?= $ref_id ?></td>
                                 <td><?= $customer_id ?> - <?= $customerName ?></td>
                                 <td class="text-end"><?= formatAccountBalance($rec_amount) ?></td>

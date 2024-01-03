@@ -3,12 +3,36 @@ require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
 $LocationID = $_POST['LocationID'];
 $LoggedUser = $_POST['LoggedUser'];
-$Invoices = GetHoldInvoicesByLocationUser($link, $LocationID, $LoggedUser);
-$stewards = GetStewards($link);
 
+if ($LoggedUser == "Admin") {
+    $Invoices = GetHoldInvoicesByLocation($link, $LocationID);
+} else {
+    $Invoices = GetHoldInvoicesByLocationUser($link, $LocationID, $LoggedUser);
+}
+$stewards = GetStewards($link);
+$closeButtonStatus = $_POST['closeButtonStatus'];
+
+$Accounts = GetAccounts($link);
+if ($closeButtonStatus == 0) {
 ?>
+    <style>
+        .x-button {
+            display: none;
+        }
+    </style>
+<?php
+}
+?>
+
+
 <div class="card">
     <div class="card-body">
+        <div class="row">
+            <div class="col-12 text-end">
+                <button type="button" onclick="OpenIndex()" class="btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+            </div>
+        </div>
+
         <div class="row mt-2">
             <!-- <div class="col-12 mb-3">
                 <button type="button" onclick="OpenIndex()" class="w-100 btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate btn-icon"></i> Return</button>
@@ -23,7 +47,6 @@ $stewards = GetStewards($link);
                     if ($SelectedArray['is_active'] != 1) {
                         continue;
                     }
-
 
                     $stewardName = "Default";
                     if ($SelectedArray['invoice_status'] != 1) {
@@ -61,18 +84,19 @@ $stewards = GetStewards($link);
                     $tendered_amount = $SelectedArray['tendered_amount'];
                     $invoice_number = $SelectedArray['invoice_number'];
                     $CustomerID = $SelectedArray['customer_code'];
-
+                    $created_by =  $SelectedArray['created_by'];
 
                     if ($service_charge > 0) {
                         $charge_status = 1;
                     }
 
-
+                    $createdAccount = $Accounts[$created_by];
+                    $createdAccountName = $createdAccount['first_name'] . " " . $createdAccount['last_name'];
                     $CustomerName = GetCustomerName($link, $CustomerID);
 
             ?>
 
-                    <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
+                    <div class="col-12 col-md-6 col-xl-4 mb-3 d-flex">
                         <div class="card table-card flex-fill shadow-sm clickable" onclick="TakeHoldToCart('<?= $TableName ?>', '<?= $TableID ?>', '<?= $charge_status ?>', '<?= $discount_rate ?>', '<?= $close_type ?>', '<?= $tendered_amount ?>', '<?= $invoice_number ?>', '<?= $CustomerID ?>', '<?= $stewardName ?>', '<?= $stewardId ?>')">
                             <div class="card-body p-2 pb-2">
 
@@ -82,6 +106,13 @@ $stewards = GetStewards($link);
                                 <h2 class="tutor-name mb-0"><?= number_format($SelectedArray['inv_amount'], 2) ?></h2>
                                 <span class="badge text-light mt-2 bg-success"><?= $invoice_date ?></span>
                                 <span class="badge text-light mt-2 bg-danger"><?= $stewardName ?></span>
+                                <?php
+                                if ($LoggedUser == "Admin") {
+                                ?>
+                                    <span class="badge text-light mt-2 bg-info"><?= $createdAccountName ?></span>
+                                <?php
+                                }
+                                ?>
 
                             </div>
                         </div>
@@ -101,6 +132,8 @@ $stewards = GetStewards($link);
             <?php
             }
             ?>
+
         </div>
+
     </div>
 </div>

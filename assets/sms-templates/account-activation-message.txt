@@ -1,0 +1,6 @@
+{{FIRST_NAME}},
+
+You have successfully enrolled in the {{COURSE_NAME}}. 
+Index number is {{GENERATED_USER_NAME}}.
+
+Ceylon Pharma College, www.pharmacollege.lk

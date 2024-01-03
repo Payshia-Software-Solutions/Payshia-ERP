@@ -19,7 +19,6 @@ $PaymentTypes = [
     ["id" => "2", "text" => "Cheque"],
     ["id" => "3", "text" => "GV"]
 ];
-// var_dump($invoiceSales);
 ?>
 
 <div class="table-responsive">
@@ -39,7 +38,7 @@ $PaymentTypes = [
             if (!empty($receipts)) {
                 $totalRecValue = 0;
                 foreach ($receipts as $selectedArray) {
-                    $rec_date = date("Y-m-d", strtotime($selectedArray['date']));
+                    $rec_date = date("Y-m-d H:i", strtotime($selectedArray['current_time']));
 
                     $ref_id = $selectedArray['ref_id'];
                     $rec_number = $selectedArray['rec_number'];

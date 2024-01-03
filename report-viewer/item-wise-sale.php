@@ -113,24 +113,25 @@ if (!empty($invoiceSales)) {
                 </thead>
                 <tbody>
                     <?php
+                    $totalSale = $totalDiscount = $rowCount = $totalCostValue = 0;
                     if (!empty($itemWiseSale)) {
-                        $totalSale = $totalDiscount = 0;
                         foreach ($itemWiseSale as $selectedArray) {
                             $product_name = $Products[$selectedArray['product_id']]['product_name'];
-
                             $quantity = $selectedArray['total_quantity'];
                             $costPrice = $selectedArray['cost_price'];
                             $itemPrice = $selectedArray['item_price'];
                             $itemDiscount = $selectedArray['total_discounts'];
                             $totalValue = $quantity * $itemPrice;
+                            $totalCostValue += $quantity * $costPrice;
 
                             // Total
                             $totalSale += $totalValue;
                             $totalDiscount += $itemDiscount;
+                            $rowCount++;
                     ?>
                             <tr>
-                                <td class=""><?= $selectedArray['product_id'] ?></td>
-                                <td class=""><?= $product_name ?></td>
+                                <td class=""><?= $rowCount ?></td>
+                                <td class=""><?= MakeFormatProductCode($selectedArray['product_id']) ?> - <?= $product_name ?></td>
                                 <td class="" style="max-width: 200px;"><?= $quantity ?></td>
                                 <td class="text-end"><?= number_format($itemPrice, 3) ?></td>
                                 <td class="text-end"><?= number_format($itemDiscount, 3) ?></td>
@@ -141,8 +142,10 @@ if (!empty($invoiceSales)) {
 
                         }
                     }
-                    ?>
 
+                    $grandTotalSale = $totalSale - $discountAmount + $serviceCharge;
+                    $profitValue = $grandTotalSale - ($totalCostValue + $discountAmount + $serviceCharge * 0.8);
+                    ?>
 
                     <tr>
                         <td scope="col" class="text-end border-bottom text-bold-extra" colspan="4">Total</td>
@@ -161,9 +164,20 @@ if (!empty($invoiceSales)) {
                     </tr>
 
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Sale</td>
-                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalSale - $discountAmount + $serviceCharge) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Total Sale</td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($grandTotalSale) ?></td>
                     </tr>
+
+                    <tr>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Total Cost</td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalCostValue) ?></td>
+                    </tr>
+
+                    <tr>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Profit</td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($profitValue) ?></td>
+                    </tr>
+
 
                 </tbody>
             </table>

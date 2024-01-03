@@ -1,6 +1,7 @@
 {
     "require": {
         "picqer/php-barcode-generator": "^0.3.0",
-        "bacon/bacon-qr-code": "^1.0"
+        "bacon/bacon-qr-code": "^2.0",
+        "giggsey/libphonenumber-for-php": "^8.13"
     }
 }

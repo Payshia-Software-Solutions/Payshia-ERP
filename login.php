@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <?php
+session_start();
 require_once('./include/config.php');
 include './include/function-update.php';
 
 $Cities = GetCities($link);
 date_default_timezone_set("Asia/Colombo");
 
-
-// // Check if the user is already logged in, if yes then redirect him to welcome page
-// if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-//     // header("location:       ");
-//     exit;
-// }
+// Check if the user is already logged in, if yes then redirect him to welcome page
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    header("location:./");
+    exit;
+}
 
 // Define variables and initialize with empty values
 $username = $password = $status = "";
@@ -121,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="icon">
     <link href="./assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <title>Login | UniERP</title>
+    <title>Login | <?= $SiteTitle ?></title>
 </head>
 
 <body class="login">
@@ -131,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
                 <div class="signin-form d-block">
-                    <h2 class=" text-center mb-4">Sign in to Payshia</h2>
+                    <h2 class=" text-center mb-4">Sign in to <?= $SiteTitle ?></h2>
                     <i class="fa-brands fa-facebook menu-icon"></i>
                     <i class="fa-brands fa-google-plus-g menu-icon"></i>
                     <i class="fa-brands fa-linkedin-in menu-icon"></i>
@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="col-12">
                                 <div class="input-container">
                                     <i class="fas fa-envelope icon"></i>
-                                    <input type="text" class="form-control icon-input input-field" name="username" id="username" placeholder="Email Address or User Name (Eg- PAXXXXX)">
+                                    <input type="text" class="form-control icon-input input-field" name="username" id="username" placeholder="Email Address or User Name (Eg- OS02)">
                                 </div>
                             </div>
                             <div class="col-12 mt-3">
@@ -176,13 +176,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         <!-- <div class="g-signin2" data-onsuccess="onSignIn"></div> -->
 
+
+                    </form>
                 </div>
-                </form>
 
             </div>
             <div class="d-none d-md-inline col-md-4 p-5 text-center side-bar-color">
                 <div class="inner-content d-block  signin-content">
-                    <img src="./pos-system/assets/images/payshia-logo-p.png" width="100px">
+                    <img class="" src="./pos-system/assets/images/payshia-logo-p.png" width="150px">
                     <h2 class="text-center mt-2">Welcome Back!</h2>
                     <p class="px-5">To Keep Connected with us please login with your personal info.</p>
                 </div>

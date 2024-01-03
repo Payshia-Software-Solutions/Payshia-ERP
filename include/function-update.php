@@ -1,5 +1,28 @@
 <?php
+include __DIR__ . './../vendor/phpqrcode/qrlib.php';
 date_default_timezone_set("Asia/Colombo");
+
+function generateQRCode($text)
+{
+
+    // $ecc stores error correction capability('L')
+    $ecc = 'L';
+    $pixel_Size = 10;
+    $frame_Size = 0;
+
+    // Generate QR Code as a string
+    ob_start(); // Start output buffering
+    QRcode::png($text, null, $ecc, $pixel_Size, $frame_Size);
+    $qrCodeData = ob_get_clean(); // Get the buffer contents and clean the buffer
+
+
+    // Create data URI for the image
+    $dataUri = 'data:image/png;base64,' . base64_encode($qrCodeData);
+
+    return $dataUri;
+}
+
+
 
 // Sent Email// Define the API URL
 function sendCurlRequest($url, $data)
@@ -54,6 +77,10 @@ function GenerateIndexNumber($link, $accType)
     }
 }
 
+function MakeFormatProductCode($refCode)
+{
+    return str_pad($refCode, 4, '0', STR_PAD_LEFT);
+}
 
 function GetCities($link)
 {
@@ -84,6 +111,21 @@ function GetAccounts($link)
     return $ArrayResult;
 }
 
+
+function GetAccountByID($link, $userName)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `email`, `user_name`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by` FROM `user_accounts` WHERE `user_name` LIKE '$userName'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['user_name']] = $row;
+        }
+    }
+    return $ArrayResult[$userName];
+}
+
 function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student_number, $address_line_1, $address_line_2, $city, $postal_code, $sex, $phone_number, $email_address, $password, $user_type, $is_active, $updateKey, $company_id, $img_path, $created_by)
 {
 
@@ -92,11 +134,12 @@ function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student
     $current_time = date("Y-m-d H:i:s");
 
     if ($password != "") {
-        if ($updateKey == 0) {
+        if ($updateKey === 0) {
+            echo $updateKey;
             $sql = "INSERT INTO `user_accounts` (`email`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by`, `civil_status`, `user_name`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         } else {
             $Student = GetAccounts($link)[$updateKey];
-            $student_number = $Student['student_number'];
+            $student_number = $Student['user_name'];
 
             $sql = "UPDATE `user_accounts` SET `email` = ?, `pass` = ?, `first_name` = ?, `last_name` = ?, `sex` = ?, `addressl1` = ?, `addressl2` = ?, `city` = ?, `PNumber` = ?, `WPNumber` = ?, `created_at` = ?, `user_status` = ?, `acc_type` = ?, `img_path` = ?, `update_by` = ?, `civil_status`= ? WHERE `user_name` = ?";
         }
@@ -120,7 +163,7 @@ function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student
             $param_15 = $img_path;
             $param_16 = $created_by;
             $param_17 = $status;
-            $param_2 = $student_number;
+            $param_2 = $updateKey;
 
             if (mysqli_stmt_execute($stmt_sql)) {
                 $error = array('status' => 'success', 'message' => 'User account data saved successfully');
@@ -188,6 +231,19 @@ function GetCityList($link)
     return $ArrayResult;
 }
 
+function getDistricts($link)
+{
+    $sql = "SELECT `id`, `province_id`, `name_en`, `name_si`, `name_ta` FROM `districts`";
+    $ArrayResult = array();
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
 function GetCountriesList($link)
 {
 
@@ -222,21 +278,21 @@ function GetLocations($link)
     return $ArrayResult;
 }
 
-function SaveLocation($link, $location_name, $is_active, $created_by, $UpdateKey)
+function SaveLocation($link, $location_name, $is_active, $created_by, $logo_path, $address_line1, $address_line2, $city, $phone_1, $phone_2, $UpdateKey)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
 
     if ($UpdateKey == 0) {
-        $sql = "INSERT INTO `master_location` (`location_name`, `is_active`, `created_at`, `created_by`) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO `master_location` (`location_name`, `is_active`, `created_at`, `created_by`, `logo_path`, `address_line1`, `address_line2`, `city`, `phone_1`, `phone_2`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ? , ?)";
     } else {
-        $sql = "UPDATE `master_location` SET `location_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `location_id` = '$UpdateKey'";
+        $sql = "UPDATE `master_location` SET `location_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ?, `logo_path` = ?, `address_line1` = ?, `address_line2` = ?, `city` = ?, `phone_1` = ?, `phone_2` = ? WHERE `location_id` = '$UpdateKey'";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssss", $location_name, $is_active, $current_time, $created_by);
+        mysqli_stmt_bind_param($stmt_sql, "ssssssssss", $location_name, $is_active, $current_time, $created_by, $logo_path, $address_line1, $address_line2, $city, $phone_1, $phone_2);
         if (mysqli_stmt_execute($stmt_sql)) {
-            $error = array('status' => 'success', 'message' => 'Location saved successfully');
+            $error = array('status' => 'success', 'message' => 'Location saved successfully', 'last_inserted_id' => $UpdateKey);
         } else {
             $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
         }
@@ -608,7 +664,7 @@ function GetRawProducts($link)
 {
 
     $ArrayResult = array();
-    $sql = "SELECT `product_id`, `product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `price_2` , `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type` FROM `master_product` WHERE `item_type` LIKE 'Raw' OR `item_type` LIKE 'SItem' ORDER BY `active_status` DESC, `product_id` DESC";
+    $sql = "SELECT `product_id`, `product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `price_2` , `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type` FROM `master_product` WHERE `item_type` LIKE 'Raw' OR `item_type` LIKE 'SItem' OR `item_type` LIKE 'RawnSell' ORDER BY `active_status` DESC, `product_id` DESC";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -620,22 +676,22 @@ function GetRawProducts($link)
 }
 
 
-function SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type)
+function SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList)
 {
     $error = array();
     $created_at = date("Y-m-d H:i:s");
 
     if ($UpdateKey == 0) {
-        $sql = "INSERT INTO `master_product` (`product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `master_product` (`product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type`, `barcode`, `location_list`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     } else {
-        $sql = "UPDATE `master_product` SET `product_code` = ?, `product_name` = ?, `display_name` = ?, `print_name` = ?, `section_id` = ?, `department_id` = ?, `category_id` = ?, `brand_id` = ?, `measurement` = ?, `reorder_level` = ?, `lead_days` = ?, `cost_price` = ?, `selling_price` = ?, `minimum_price` = ?, `wholesale_price` = ?, `item_type` = ?, `item_location` = ?, `image_path` = ?, `created_by` = ?, `created_at` = ?, `active_status` = ?, `generic_id` = ?, `supplier_list` = ?,  `size_id` = ?, `color_id`= ?, `product_description` = ?, `name_si` = ?, `name_ti` = ? , `price_2` = ?, `recipe_type` = ? WHERE `product_id` = ?";
+        $sql = "UPDATE `master_product` SET `product_code` = ?, `product_name` = ?, `display_name` = ?, `print_name` = ?, `section_id` = ?, `department_id` = ?, `category_id` = ?, `brand_id` = ?, `measurement` = ?, `reorder_level` = ?, `lead_days` = ?, `cost_price` = ?, `selling_price` = ?, `minimum_price` = ?, `wholesale_price` = ?, `item_type` = ?, `item_location` = ?, `image_path` = ?, `created_by` = ?, `created_at` = ?, `active_status` = ?, `generic_id` = ?, `supplier_list` = ?,  `size_id` = ?, `color_id`= ?, `product_description` = ?, `name_si` = ?, `name_ti` = ? , `price_2` = ?, `recipe_type` = ?, `barcode` = ?, `location_list` = ? WHERE `product_id` = ?";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
         if ($UpdateKey != 0) {
-            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $UpdateKey);
+            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList, $UpdateKey);
         } else {
-            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type);
+            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList);
         }
 
         if (mysqli_stmt_execute($stmt_sql)) {
@@ -756,7 +812,7 @@ function UpdateTableStatus($link, $is_active, $created_by, $UpdateKey)
 function GetCart($link, $UserName)
 {
     $ArrayResult = array();
-    $sql = "SELECT t.`id`, t.`user_id`, t.`product_id`, t.`item_price`, t.`item_discount`, t.`quantity`, t.`added_date`, t.`is_active`, t.`customer_id`, t.`hold_status`, mp.`display_name`
+    $sql = "SELECT t.`id`, t.`user_id`, t.`product_id`, t.`item_price`, t.`item_discount`, t.`quantity`, t.`added_date`, t.`is_active`, t.`customer_id`, t.`hold_status`, t.`printed_status`, mp.`display_name`
     FROM `temp_order` t
     JOIN `master_product` mp ON t.`product_id` = mp.`product_id` WHERE t.`user_id` LIKE '$UserName' AND t.`hold_status` = 0 ORDER BY `id`";
 
@@ -764,6 +820,80 @@ function GetCart($link, $UserName)
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetCartByLocation($link, $locationId)
+{
+    $productInfo = array();
+    $sql = "SELECT `product_id`, SUM(`quantity`) AS total_quantity FROM `temp_order` WHERE `location_id` LIKE ? GROUP BY `product_id`";
+
+    $stmt = $link->prepare($sql);
+    $stmt->bind_param("s", $locationId);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+
+    while ($row = $result->fetch_assoc()) {
+        $productInfo[$row['product_id']] = array(
+            'product_id' => $row['product_id'],
+            'total_quantity' => $row['total_quantity']
+        );
+    }
+
+    $stmt->close();
+
+    return $productInfo;
+}
+
+
+function ProductsByMaterial($link, $materialId)
+{
+    $ArrayResult = array();
+    $sql =  "SELECT `main_product`, `recipe_product`, `qty`, `created_by`, `created_at` FROM `transaction_recipe` WHERE `recipe_product` LIKE '$materialId'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['main_product']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function CheckGetCartQty($link, $productCode)
+{
+    $ArrayResult = 0;
+    $sql = "SELECT SUM(`quantity`) AS `currentQuantity` FROM `temp_order` WHERE  `product_id` LIKE '$productCode'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['currentQuantity'];
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetHoldItemQty($link, $LocationID)
+{
+
+    $ArrayResult = array();
+    $sql = "SELECT *  FROM `transaction_invoice` WHERE `invoice_status` LIKE '1' AND `location_id` LIKE '$LocationID' ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $invoiceNumber = $row['invoice_number'];
+
+            $inner_sql = "SELECT `product_id`, SUM(`quantity`) AS `total_quantity` FROM `transaction_invoice_items` WHERE `invoice_number` LIKE '$invoiceNumber' GROUP BY `product_id`";
+            $inner_result = $link->query($inner_sql);
+            if ($inner_result->num_rows > 0) {
+                while ($row = $inner_result->fetch_assoc()) {
+                    $ArrayResult[$row['product_id']] = $row;
+                }
+            }
         }
     }
     return $ArrayResult;
@@ -783,23 +913,26 @@ function GetHoldCart($link, $LoggedUser, $invoice_number)
     return $ArrayResult;
 }
 
-function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID)
+function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $locationId)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
     $is_active = 1;
 
-    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id` FROM `temp_order` WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID' AND `hold_status` = 0 ORDER BY `id`";
 
-    $result = $link->query($sql);
-    if ($result->num_rows > 0) {
-        $sql = "UPDATE `temp_order` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ?, `table_id` = ? WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID'";
-    } else {
-        $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    }
+    // $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `printed_status` FROM `temp_order` WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID' AND `hold_status` = 0 ORDER BY `id`";
+
+    // $result = $link->query($sql);
+    // if ($result->num_rows > 0) {
+    //     $sql = "UPDATE `temp_order` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ?, `table_id` = ?, `printed_status` = ? WHERE `user_id` LIKE '$UserName' AND `product_id` LIKE '$ProductID'";
+    // } else {
+    //     $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `printed_status` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // }
+
+    $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `printed_status`, `location_id` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "sssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID);
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $printedStatus, $locationId);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Cart Updated successfully');
         } else {
@@ -864,7 +997,7 @@ function DeleteCurrentInvoiceProducts($link, $invoice_number)
     return json_encode($error);
 }
 
-function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $invoice_number)
+function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $invoice_number, $printed_status)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
@@ -872,17 +1005,19 @@ function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $It
 
     $cost_price = GetCostPrice($link, $ProductID);
 
-    $sql = "SELECT `id` FROM `transaction_invoice_items` WHERE `invoice_number` LIKE '$invoice_number' AND `product_id` LIKE '$ProductID'";
+    // $sql = "SELECT `id` FROM `transaction_invoice_items` WHERE `invoice_number` LIKE '$invoice_number' AND `product_id` LIKE '$ProductID'";
 
-    $result = $link->query($sql);
-    if ($result->num_rows > 0) {
-        $sql = "UPDATE `transaction_invoice_items` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ?, `table_id` = ?, `invoice_number` = ?, `cost_price` = ? WHERE `invoice_number` LIKE '$invoice_number' AND `product_id` LIKE '$ProductID'";
-    } else {
-        $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    }
+    // $result = $link->query($sql);
+    // if ($result->num_rows > 0) {
+    //     $sql = "UPDATE `transaction_invoice_items` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ?, `table_id` = ?, `invoice_number` = ?, `cost_price` = ?, `printed_status` = ? WHERE `invoice_number` LIKE '$invoice_number' AND `product_id` LIKE '$ProductID'";
+    // } else {
+    //     $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`, `printed_status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // }
+
+    $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`, `printed_status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "sssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $invoice_number, $cost_price);
+        mysqli_stmt_bind_param($stmt_sql, "ssssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $invoice_number, $cost_price, $printed_status);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Invoice Updated successfully');
         } else {
@@ -895,7 +1030,7 @@ function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $It
     return json_encode($error);
 }
 
-function CreateInvoice($link, $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $tendered_amount, $close_type, $invoice_status, $location_id, $table_id, $created_by, $is_active, $stewardId, $cost_value)
+function CreateInvoice($link, $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $tendered_amount, $close_type, $invoice_status, $location_id, $table_id, $created_by, $is_active, $stewardId, $cost_value, $ref_hold)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
@@ -903,13 +1038,13 @@ function CreateInvoice($link, $invoice_number, $invoice_date, $inv_amount, $gran
     $sql = "SELECT `id` FROM `transaction_invoice` WHERE `invoice_number` LIKE '$invoice_number'";
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
-        $sql = "UPDATE `transaction_invoice` SET  `invoice_number` = ?, `invoice_date` = ?, `inv_amount` = ?,  `grand_total` = ?, `discount_amount`= ?,`discount_percentage` = ?, `customer_code` = ?, `service_charge` = ?, `tendered_amount` = ?, `close_type` = ?, `invoice_status` = ?, `current_time` = ?, `location_id` = ?, `table_id` = ?, `created_by` = ?, `is_active` = ?, `steward_id` = ?, `cost_value` = ? WHERE `invoice_number` LIKE '$invoice_number'";
+        $sql = "UPDATE `transaction_invoice` SET  `invoice_number` = ?, `invoice_date` = ?, `inv_amount` = ?,  `grand_total` = ?, `discount_amount`= ?,`discount_percentage` = ?, `customer_code` = ?, `service_charge` = ?, `tendered_amount` = ?, `close_type` = ?, `invoice_status` = ?, `current_time` = ?, `location_id` = ?, `table_id` = ?, `created_by` = ?, `is_active` = ?, `steward_id` = ?, `cost_value` = ?, `ref_hold` = ? WHERE `invoice_number` LIKE '$invoice_number'";
     } else {
-        $sql = "INSERT INTO `transaction_invoice` (`invoice_number`, `invoice_date`, `inv_amount`, `grand_total`, `discount_amount`, `discount_percentage`, `customer_code`, `service_charge`, `tendered_amount`, `close_type`, `invoice_status`, `current_time`, `location_id`, `table_id`, `created_by`, `is_active`, `steward_id`, `cost_value`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `transaction_invoice` (`invoice_number`, `invoice_date`, `inv_amount`, `grand_total`, `discount_amount`, `discount_percentage`, `customer_code`, `service_charge`, `tendered_amount`, `close_type`, `invoice_status`, `current_time`, `location_id`, `table_id`, `created_by`, `is_active`, `steward_id`, `cost_value`, `ref_hold`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssss", $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $tendered_amount, $close_type, $invoice_status, $current_time, $location_id, $table_id, $created_by, $is_active, $stewardId, $cost_value);
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssss", $invoice_number, $invoice_date, $inv_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $tendered_amount, $close_type, $invoice_status, $current_time, $location_id, $table_id, $created_by, $is_active, $stewardId, $cost_value, $ref_hold);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Invoice Saved successfully', 'invoice_number' => $invoice_number);
         } else {
@@ -935,6 +1070,23 @@ function SetTempInvoiceFinish($link, $invoice_number, $invoice_status)
         mysqli_stmt_close($stmt_sql);
     } else {
         $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'invoice_number' => $invoice_number);
+    }
+}
+
+
+function UpdatePrintedStatus($link, $invoice_number, $printStatus)
+{
+    $sql = "UPDATE `transaction_invoice_items` SET  `printed_status` = ? WHERE `invoice_number` LIKE '$invoice_number'";
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "s", $printStatus);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Invoice Updated successfully', 'invoice_number' => $printStatus);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'invoice_number' => $printStatus);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'invoice_number' => $printStatus);
     }
 }
 
@@ -1066,7 +1218,21 @@ function GetByInvoicesDate($link, $Date, $LocationID)
 function GetInvoiceItems($link, $invoice_number)
 {
     $ArrayResult = array();
-    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status`, `table_id`, `invoice_number` FROM `transaction_invoice_items` WHERE `invoice_number`  LIKE '$invoice_number' ORDER BY `id`";
+    $sql = "SELECT * FROM `transaction_invoice_items` WHERE `invoice_number`  LIKE '$invoice_number' ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetInvoiceItemsPrint($link, $invoice_number)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, SUM(`quantity`) AS `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status`, `table_id`, `invoice_number`, `cost_price`, `printed_status` FROM `transaction_invoice_items` WHERE `invoice_number`  LIKE '$invoice_number' GROUP BY `product_id`, `item_discount` ORDER BY `id`";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -1096,7 +1262,7 @@ function isInvoiceNumberExists($link, $invoiceNumber)
 }
 
 
-function CreateReceipt($link, $rec_number, $type, $is_active, $date, $amount, $created_by, $ref_id, $location_id, $customer_id)
+function CreateReceipt($link, $rec_number, $type, $is_active, $date, $amount, $created_by, $ref_id, $location_id, $customer_id, $today_invoice)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
@@ -1110,14 +1276,14 @@ function CreateReceipt($link, $rec_number, $type, $is_active, $date, $amount, $c
 
     if ($result->num_rows > 0) {
         // If the receipt exists, update it
-        $sql = "UPDATE `transaction_receipt` SET `rec_number`= ?, `type` = ?, `is_active` = ?, `date` = ?, `current_time` = ?, `amount` = ?, `created_by` = ?, `ref_id` = ?, `location_id` = ?, `customer_id` = ? WHERE `rec_number` LIKE '$rec_number'";
+        $sql = "UPDATE `transaction_receipt` SET `rec_number`= ?, `type` = ?, `is_active` = ?, `date` = ?, `current_time` = ?, `amount` = ?, `created_by` = ?, `ref_id` = ?, `location_id` = ?, `customer_id` = ?, `today_invoice` = ? WHERE `rec_number` LIKE '$rec_number'";
     } else {
         // If the receipt doesn't exist, insert a new one
-        $sql = "INSERT INTO `transaction_receipt` (`rec_number`, `type`, `is_active`, `date`, `current_time`, `amount`, `created_by`, `ref_id`, `location_id`, `customer_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `transaction_receipt` (`rec_number`, `type`, `is_active`, `date`, `current_time`, `amount`, `created_by`, `ref_id`, `location_id`, `customer_id`, `today_invoice`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssssssssss", $rec_number, $type, $is_active, $date, $current_time, $amount, $created_by, $ref_id, $location_id, $customer_id);
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssss", $rec_number, $type, $is_active, $date, $current_time, $amount, $created_by, $ref_id, $location_id, $customer_id, $today_invoice);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Receipt Saved successfully', 'rec_number' => $rec_number);
         } else {
@@ -1177,7 +1343,7 @@ function generateRecNumber($link, $prefix)
 function GetReceipts($link)
 {
     $ArrayResult = array();
-    $sql = "SELECT `id`, `rec_number`, `type`, `is_active`, `date`, `current_time`, `amount`, `created_by`, `ref_id`, `location_id` FROM `transaction_receipt` ORDER BY `id`";
+    $sql = "SELECT * FROM `transaction_receipt` ORDER BY `id`";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -1202,10 +1368,27 @@ function GetReceiptsByInvoice($link, $invoice_number)
     return $ArrayResult;
 }
 
+
+
+function GetReceiptsValueByInvoice($link, $invoice_number)
+{
+    $ArrayResult = 0;
+    $sql = "SELECT SUM(`amount`) AS `paymentAmount` FROM `transaction_receipt` WHERE `ref_id` LIKE '$invoice_number' AND `is_active` LIKE 1 ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['paymentAmount'];
+        }
+    }
+    return $ArrayResult;
+}
+
+
 function GetReceiptByNumber($link, $rec_number)
 {
     $ArrayResult = array();
-    $sql = "SELECT `id`, `rec_number`, `type`, `is_active`, `date`, `current_time`, `amount`, `created_by`, `ref_id`, `location_id` FROM `transaction_receipt` WHERE `rec_number` LIKE '$rec_number' ORDER BY `id`";
+    $sql = "SELECT * FROM `transaction_receipt` WHERE `rec_number` LIKE '$rec_number' ORDER BY `id`";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -1218,7 +1401,7 @@ function GetReceiptByNumber($link, $rec_number)
 
 function isInvoiceNumberExistsForTable($link, $table_id)
 {
-    $sql = "SELECT COUNT(*) FROM `transaction_invoice` WHERE `table_id` = ? AND `invoice_status` LIKE '1'";
+    $sql = "SELECT COUNT(*) FROM `transaction_invoice` WHERE `table_id` = ? AND `invoice_status` LIKE '1' AND `is_active` = '1'";
 
     if ($stmt = mysqli_prepare($link, $sql)) {
         mysqli_stmt_bind_param($stmt, "s", $table_id);
@@ -1246,6 +1429,35 @@ function GetCustomers($link)
     }
     return $ArrayResult;
 }
+
+function GetActiveCustomers($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `master_customer` WHERE `is_active` LIKE 1 ORDER BY `customer_id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['customer_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetCustomersByID($link, $CustomerID)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `master_customer` WHERE `customer_id` = '$CustomerID'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['customer_id']] = $row;
+        }
+    }
+    return $ArrayResult[$CustomerID];
+}
+
 
 
 function GetCustomerName($link, $CustomerID)
@@ -1283,27 +1495,19 @@ function GetLocationCustomers($link, $LocationID)
     return $ArrayResult;
 }
 
-function CreateCustomer($link, $customer_id, $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days)
+function CreateCustomer($link, $customer_id, $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days, $region_id, $route_id, $area_id)
 {
     $error = array();
-
-    // Check if a customer with the given `customer_id` already exists
-    $sql = "SELECT `customer_id` FROM `master_customer` WHERE `customer_id` = ?";
-    $stmt_sql = mysqli_prepare($link, $sql);
-    mysqli_stmt_bind_param($stmt_sql, "s", $customer_id);
-    mysqli_stmt_execute($stmt_sql);
-    $result = mysqli_stmt_get_result($stmt_sql);
-
-    if ($result->num_rows > 0) {
+    if ($customer_id != 0) {
         // If the customer exists, update it
-        $sql = "UPDATE `master_customer` SET `customer_first_name` = ?, `customer_last_name` = ?, `phone_number` = ?, `address_line1` = ?, `address_line2` = ?, `city_id` = ?, `email_address` = ?, `opening_balance` = ?, `created_by` = ?, `created_at` = ?, `company_id` = ?, `location_id` = ?, `is_active` = ?, `credit_limit` = ?, `credit_days` = ? WHERE `customer_id` = '$customer_id'";
+        $sql = "UPDATE `master_customer` SET   `customer_first_name` = ?, `customer_last_name` = ?, `phone_number` = ?, `address_line1` = ?, `address_line2` = ?, `city_id` = ?, `email_address` = ?, `opening_balance` = ?, `created_by` = ?, `created_at` = ?, `company_id` = ?, `location_id` = ?, `is_active` = ?, `credit_limit` = ?, `credit_days` = ?, `region_id` = ?, `route_id` = ?, `area_id` = ? WHERE `customer_id` = '$customer_id'";
     } else {
         // If the customer doesn't exist, insert a new one
-        $sql = "INSERT INTO `master_customer` (`customer_id`, `customer_first_name`, `customer_last_name`, `phone_number`, `address_line1`, `address_line2`, `city_id`, `email_address`, `opening_balance`, `created_by`, `created_at`, `company_id`, `location_id`, `is_active`, `credit_limit`, `credit_days`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `master_customer` (`customer_first_name`, `customer_last_name`, `phone_number`, `address_line1`, `address_line2`, `city_id`, `email_address`, `opening_balance`, `created_by`, `created_at`, `company_id`, `location_id`, `is_active`, `credit_limit`, `credit_days`, `region_id`, `route_id`, `area_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssss", $$customer_id,  $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days);
+        mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssss",  $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days, $region_id, $route_id, $area_id);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Customer saved successfully', 'customer_id' => $customer_id);
         } else {
@@ -2234,4 +2438,489 @@ function checkCancelStatus($link, $refKey)
     } else {
         return false; // Error in preparing the statement
     }
+}
+
+
+function GetProductionNoteItems($link, $pn_number)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_production_items` WHERE `pn_id` LIKE '$pn_number'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['product_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+function getAllProductionNote($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_production` ORDER BY `id` DESC";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['pn_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function getProductionNote($link, $pn_number)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_production`WHERE `pn_number` LIKE '$pn_number' ";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['pn_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function CreateProductionNote($link, $production_cost, $location_id, $created_by, $remark, $production_date, $pn_number, $is_active)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    $preCheck = getProductionNote($link, $pn_number);
+    if (count($preCheck) > 0) {
+        $sql = "UPDATE `transaction_production` SET `production_cost` = ?, `location_id` = ?, `created_by` = ?, `created_at` = ?, `remark` = ?, `production_date` = ?, `pn_number` = ?, `is_active` = ? WHERE `pn_number` LIKE '$pn_number'";
+    } else {
+        // If the stock entry doesn't exist, insert a new one
+        $sql = "INSERT INTO `transaction_production`( `production_cost`, `location_id`, `created_by`, `created_at`, `remark`, `production_date`, `pn_number`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "ssssssss", $production_cost, $location_id, $created_by, $current_time, $remark, $production_date, $pn_number, $is_active);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Production Note saved successfully', 'pn_number' => $pn_number);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'pn_number' => $pn_number);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'pn_number' => $pn_number);
+    }
+
+    return json_encode($error);
+}
+
+function preCheckPNItems($link, $pn_number, $product_id)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `product_id`, `quantity`, `cost_price`, `pn_id`, `created_at`, `created_by` FROM `transaction_production_items` WHERE `pn_id` LIKE '$pn_number' AND `product_id` LIKE '$product_id'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['product_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function CreateProductionNoteItems($link, $product_id,  $quantity, $cost_price, $pn_number, $created_by, $is_active)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $preCheck = preCheckPNItems($link, $pn_number, $product_id);
+    if (count($preCheck) > 0) {
+        // If the stock entry doesn't exist, insert a new one
+        $sql = "UPDATE `transaction_production_items` SET `product_id` = ?, `quantity` = ?, `cost_price` = ?, `pn_id` = ?, `created_at` = ?, `created_by` = ?, `is_active` = ? WHERE `pn_number` LIKE '$pn_number' AND `product_id` LIKE '$product_id'";
+    } else {
+        // If the stock entry doesn't exist, insert a new one
+        $sql = "INSERT INTO `transaction_production_items`( `product_id`, `quantity`, `cost_price`, `pn_id`, `created_at`, `created_by`, `is_active`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssssss", $product_id, $quantity, $cost_price, $pn_number, $current_time, $created_by, $is_active);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Production Note Item saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+
+    return json_encode($error);
+}
+
+
+
+function isPONumberExists($link, $pn_number)
+{
+    $sql = "SELECT COUNT(*) FROM `transaction_production` WHERE `pn_number` = ?";
+
+    if ($stmt = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt, "s", $pn_number);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_bind_result($stmt, $count);
+        mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
+
+        return $count > 0; // If count is greater than 0, the invoice number exists
+    } else {
+        return false; // Error in preparing the statement
+    }
+}
+
+
+function generatePNNumber($link)
+{
+
+    $prefix = "PN";
+    // Query to count existing invoice numbers
+    $sql = "SELECT COUNT(*) AS count FROM `transaction_production`";
+
+    $result = $link->query($sql);
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $count = $row['count'] + 1;
+
+        // Generate the next invoice number with the prefix
+        $invoiceNumber = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
+        return $invoiceNumber;
+    }
+
+    return null; // Return null on error
+}
+
+
+function getQuotations($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `quote_number`, `quote_date`, `quote_amount`, `grand_total`, `discount_amount`, `discount_percentage`, `customer_code`, `service_charge`, `close_type`, `invoice_status`, `current_time`, `location_id`, `created_by`, `is_active`, `cost_value`, `remark` FROM `transaction_quotation`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['quote_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function getQuotationsItems($link, $quote_number)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status`, `table_id`, `quote_number`, `cost_price` FROM `transaction_quotation_items` WHERE `quote_number` LIKE '$quote_number'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['product_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+function isQuoteExist($link, $quote_number)
+{
+    $sql = "SELECT COUNT(*) FROM `transaction_quotation` WHERE `quote_number` = ?";
+
+    if ($stmt = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt, "s", $quote_number);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_bind_result($stmt, $count);
+        mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
+
+        return $count > 0; // If count is greater than 0, the invoice number exists
+    } else {
+        return false; // Error in preparing the statement
+    }
+}
+
+
+function generateQuoteNumber($link)
+{
+
+    $prefix = "QT";
+    // Query to count existing invoice numbers
+    $sql = "SELECT COUNT(*) AS count FROM `transaction_quotation`";
+
+    $result = $link->query($sql);
+    if ($result) {
+        $row = $result->fetch_assoc();
+        $count = $row['count'] + 1;
+
+        // Generate the next invoice number with the prefix
+        $invoiceNumber = $prefix . str_pad($count, 4, '0', STR_PAD_LEFT);
+        return $invoiceNumber;
+    }
+
+    return null; // Return null on error
+}
+
+
+
+function AddToQuote($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $quote_number)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+    $is_active = 1;
+
+    $cost_price = GetCostPrice($link, $ProductID);
+
+    $sql = "SELECT `id` FROM `transaction_quotation_items` WHERE `quote_number` LIKE '$quote_number' AND `product_id` LIKE '$ProductID'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        $sql = "UPDATE `transaction_quotation_items` SET  `user_id` = ?, `product_id` = ?, `item_price` = ?, `item_discount` = ?, `quantity` = ?, `added_date` = ?, `is_active` = ?, `customer_id` = ?, `table_id` = ?, `quote_number` = ?, `cost_price` = ? WHERE `quote_number` LIKE '$quote_number' AND `product_id` LIKE '$ProductID'";
+    } else {
+        $sql = "INSERT INTO `transaction_quotation_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `quote_number`, `cost_price`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $quote_number, $cost_price);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Quotation Updated successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+    }
+    return json_encode($error);
+}
+
+function CreateQuote($link, $quote_number, $quote_date, $quote_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $invoice_status, $location_id, $created_by, $is_active, $cost_value, $remark)
+{
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    $sql = "SELECT `id` FROM `transaction_quotation` WHERE `quote_number` LIKE '$quote_number'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        $sql = "UPDATE `transaction_quotation` SET  `quote_number` = ?, `quote_date` = ?, `quote_amount` = ?, `grand_total` = ?, `discount_amount` = ?, `discount_percentage` = ?, `customer_code` = ?, `service_charge` = ?, `invoice_status` = ?, `current_time` = ?, `location_id` = ?, `created_by` = ?, `is_active` = ?, `cost_value` = ?, `remark` = ? WHERE `quote_number` LIKE '$quote_number'";
+    } else {
+        $sql = "INSERT INTO `transaction_quotation` (`quote_number`, `quote_date`, `quote_amount`, `grand_total`, `discount_amount`, `discount_percentage`, `customer_code`, `service_charge`, `invoice_status`, `current_time`, `location_id`, `created_by`, `is_active`, `cost_value`, `remark`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssssssss", $quote_number, $quote_date, $quote_amount, $grand_total, $discount_amount, $discount_percentage, $customer_code, $service_charge, $invoice_status, $current_time, $location_id, $created_by, $is_active,  $cost_value, $remark);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Quotation Saved successfully', 'quote_number' => $quote_number);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'quote_number' => $quote_number);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error, 'quote_number' => $quote_number);
+    }
+    return json_encode($error);
+}
+function getPageTable($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `page_table`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GetUserPrivileges($link, $userName, $pageID)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `user_name`, `read`, `write`, `all`, `updated_at`, `updated_by`, `page_name` FROM `user_previleges` WHERE `user_name` LIKE '$userName' AND `page_name` LIKE '$pageID'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['user_name']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function updatePrivilege($link, $userName, $pageID, $accessMode, $loggedUser)
+{
+
+    echo $accessMode;
+    $error = array();
+    $current_time = date("Y-m-d H:i:s");
+
+    $sql = "SELECT * FROM `user_previleges` WHERE `user_name` LIKE '$userName' AND `page_name` LIKE '$pageID'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $readAccess = $row['read'];
+            $writeAccess = $row['write'];
+            $AllAccess = $row['all'];
+        }
+
+        if ($accessMode == "read") {
+            if ($readAccess == 1) {
+                $readAccess = 0;
+            } else {
+                $readAccess = 1;
+            }
+        }
+
+        if ($accessMode == "write") {
+            if ($writeAccess == 1) {
+                $writeAccess = 0;
+            } else {
+                $writeAccess = 1;
+            }
+        }
+
+        if ($accessMode == "all") {
+            if ($AllAccess == 1) {
+                $AllAccess = 0;
+            } else {
+                $AllAccess = 1;
+            }
+        }
+
+        $sql = "UPDATE `user_previleges` SET  `user_name` = ?, `read` = ?, `write` = ?, `all` = ?, `updated_at` = ?, `updated_by` = ?, `page_name`  = ? WHERE `user_name` LIKE '$userName' AND `page_name` LIKE '$pageID'";
+    } else {
+
+        $readAccess = $writeAccess = $AllAccess = 0;
+
+        if ($accessMode == "read") {
+            $readAccess = 1;
+        }
+        if ($accessMode == "write") {
+            $writeAccess = 1;
+        }
+        if ($accessMode == "all") {
+            $AllAccess = 1;
+        }
+
+        $sql = "INSERT INTO `user_previleges` (`user_name`, `read`, `write`, `all`, `updated_at`, `updated_by`, `page_name`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    }
+
+    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+        mysqli_stmt_bind_param($stmt_sql, "sssssss",  $userName, $readAccess, $writeAccess, $AllAccess, $current_time, $loggedUser, $pageID);
+        if (mysqli_stmt_execute($stmt_sql)) {
+            $error = array('status' => 'success', 'message' => 'Privilege Saved successfully');
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+        mysqli_stmt_close($stmt_sql);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ');
+    }
+    return json_encode($error);
+}
+
+
+function GetCustomerCreditLimit($link, $customer_id)
+{
+
+    $ArrayResult = 0;
+    $sql = "SELECT `credit_limit` FROM `master_customer` WHERE `customer_id` LIKE '$customer_id'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['credit_limit'];
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+
+function getCustomerBalance($link, $customerId)
+{
+    $customerBalance = 0;
+    $sql = "SELECT SUM(`inv_amount`) AS `invoiceTotal` FROM `transaction_invoice` WHERE `is_active` LIKE 1 AND `customer_code` LIKE '$customerId'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $invoiceTotal = $row['invoiceTotal'];
+        }
+    }
+
+
+    $sql = "SELECT SUM(`amount`) AS `receiptAmount` FROM `transaction_receipt` WHERE `is_active` LIKE 1 AND `customer_id` LIKE '$customerId'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $receiptAmount = $row['receiptAmount'];
+        }
+    }
+
+    $customerBalance = $invoiceTotal - $receiptAmount;
+    return $customerBalance;
+}
+
+
+function GetRegions($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `customer_region` ";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetRoutes($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `customer_route` ";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetAreas($link)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `customer_area` ";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function MostUsedDiscounts($link, $ProductID)
+{
+    $ArrayResult = array();
+    $sql = "SELECT `product_id`, `item_discount`, COUNT(`item_discount`) AS discount_count  FROM `transaction_invoice_items` WHERE `is_active` LIKE 1 AND `item_discount` != 0 AND `product_id` LIKE '$ProductID' GROUP BY `product_id`, `item_discount` ORDER BY item_discount DESC, discount_count DESC LIMIT 5;";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
+        }
+    }
+    return $ArrayResult;
 }

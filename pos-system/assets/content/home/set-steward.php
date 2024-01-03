@@ -29,8 +29,12 @@ $MainDataArray = GetStewards($link);
     if (!empty($MainDataArray)) {
         foreach ($MainDataArray as $SelectArray) {
 
+            if ($SelectArray['user_status'] == 0) {
+                continue;
+            }
+
     ?>
-            <div class="col-6 col-md-4 mb-3 d-flex">
+            <div class="col-12 col-md-4 mb-3 d-flex">
                 <div class="card table-card flex-fill shadow-sm clickable" onclick="SetStewardValue ('<?= $SelectArray['user_name'] ?>', '<?= $SelectArray['first_name'] ?> <?= $SelectArray['last_name'] ?>')">
                     <div class="card-body p-0">
                         <span class="badge text-light mt-2 bg-dark"><?= $SelectArray['user_name'] ?></span>
@@ -45,7 +49,7 @@ $MainDataArray = GetStewards($link);
         <div class="col-12">
             <div class="card bg-light mb-3">
                 <div class="card-body">
-                    <h6 class="mb-0">No Stewards in this Location</h6>
+                    <p class="mb-0 text-secondary">No Stewards in this Location</p>
                 </div>
             </div>
         </div>

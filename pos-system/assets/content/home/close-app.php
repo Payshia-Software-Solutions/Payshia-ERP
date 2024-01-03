@@ -1,3 +1,15 @@
+<?php
+$exitButtonStatus = $_POST['exitButtonStatus'];
+if ($exitButtonStatus == 0) {
+?>
+    <style>
+        .x-button {
+            display: none;
+        }
+    </style>
+<?php
+}
+?>
 <div class="row">
     <div class="col-12 text-center mb-2 mt-3">
         <i class="fa-solid fa-3x fa-question text-success"></i>

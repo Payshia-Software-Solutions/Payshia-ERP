@@ -7,6 +7,7 @@ $Locations = GetLocations($link);
 $PurchaseOrders = GetPurchaseOrders($link);
 $ArrayCount = count($PurchaseOrders);
 
+$LoggedUser = $_POST['LoggedUser'];
 $ActiveCount = $ArrayCount;
 $InactiveCount = 0;
 ?>
@@ -23,10 +24,24 @@ $InactiveCount = 0;
             </div>
         </div>
     </div>
+    <?php
+    $pageID = 15;
+    $userPrivilege = GetUserPrivileges($link, $LoggedUser,  $pageID);
 
-    <div class="col-md-9 text-end mt-4 mt-md-0">
-        <button class="btn btn-dark" type="button" onclick="NewPurchaseOrder()"><i class="fa-solid fa-plus"></i> New Purchase Order</button>
-    </div>
+    if (!empty($userPrivilege)) {
+        $readAccess = $userPrivilege[$LoggedUser]['read'];
+        $writeAccess = $userPrivilege[$LoggedUser]['write'];
+        $AllAccess = $userPrivilege[$LoggedUser]['all'];
+
+        if ($writeAccess == 1) {
+    ?>
+            <div class="col-md-9 text-end mt-4 mt-md-0">
+                <button class="btn btn-dark" type="button" onclick="NewPurchaseOrder()"><i class="fa-solid fa-plus"></i> New Purchase Order</button>
+            </div>
+    <?php
+        }
+    }
+    ?>
 </div>
 <style>
     #order-table tr {

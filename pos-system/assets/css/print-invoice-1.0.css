@@ -78,6 +78,7 @@ th {
 .headerth {
     text-align: left;
     padding-top: 5px;
+    font-size: 15px;
     padding-bottom: 5px;
     padding-left: 5px;
     border-bottom: 2px solid #000;
@@ -130,9 +131,14 @@ hr {
     border-collapse: collapse
 }
 
+td {
+    font-size: 14px;
+}
+
 .table td,
 .table th {
-    border: 0px solid black padding: 8px
+    border: 0px solid black;
+    padding: 8px
 }
 
 .table th {

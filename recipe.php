@@ -1,7 +1,7 @@
 <?php
 require_once('./include/config.php');
 include './include/function-update.php';
-$pageTitle = "Recipe";
+$pageTitle = "Bill of Material";
 $SubPageTitle = "";
 $SubPage = false;
 ?>
@@ -12,21 +12,9 @@ $SubPage = false;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Add CSS -->
-    <link rel="stylesheet" href="./vendor/bootstrap/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./assets/css/styles.css" />
 
-    <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="180x180" href="./assets/images/favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./assets/images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="./assets/images/favicon/site.webmanifest">
-
-    <!-- Add Icons -->
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css' rel='stylesheet'>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDMTbt8fmdX97m_oC_fZ93cX79k92rnU&libraries=places"></script>
-
-
+    <!-- Add Script -->
+    <?php include './include/common-scripts.php' ?>
 
     <title><?= $pageTitle ?> | <?= $SiteTitle ?></title>
 </head>
@@ -47,6 +35,7 @@ $SubPage = false;
         </div>
     </div>
 
+    <?php include './include/footer.php' ?>
     <!-- Preloader -->
     <div id="preloader">
         <div id="filler"></div>
@@ -54,14 +43,9 @@ $SubPage = false;
 
     <div class="loading-popup" id="loading-popup"></div>
     <!-- Add Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-
-    <script src="./assets/js/scripts.js"></script>
-
-    <script src="./assets/js/recipe-1.0.js"></script>
-    <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <?php include './include/footer-scripts.php' ?>
+    <script src="./assets/js/recipe-1.0.js"></script>
 </body>
 
 </html>

@@ -2,7 +2,10 @@
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
 $LocationID = $_POST['LocationID'];
+
+$Locations = GetLocations($link);
 $MainDataArray = GetTablesByLocation($link, $LocationID);
+$locationType = $Locations[$LocationID]['location_type'];
 ?>
 
 <style>
@@ -10,7 +13,17 @@ $MainDataArray = GetTablesByLocation($link, $LocationID);
         display: none;
     }
 </style>
+
 <div class="row mt-3">
+    <div class="col-12 text-end">
+        <button type="button" id="hold-list" class="btn refresh-button mr-2" onclick="GetHoldInvoices ('<?= $LocationID ?>', 0)">
+            <i class="fa-solid fa-bars"></i> Hold Bills </button>
+        <button type="button" onclick="OpenIndex()" class="btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate"></i></button>
+        <button type="button" onclick="PromptCloseApp(0)" class="btn refresh-button mr-2"><i class="fa-solid fa-power-off"></i> Exit</button>
+    </div>
+</div>
+
+<div class="row mt-4">
     <div class="col-12 col-md-4 col-xl-4 mb-3 d-flex">
         <div class="card table-card flex-fill shadow-sm clickable" onclick="SetTableValue ('0', 'Take Away')">
             <div class="card-body p-0">
@@ -85,18 +98,11 @@ $MainDataArray = GetTablesByLocation($link, $LocationID);
         <div class="col-12">
             <div class="card bg-light mb-3">
                 <div class="card-body">
-                    <h4 class="mb-0">No Tables in this Location</h4>
+                    <p class="mb-0 text-secondary">No Tables in this Location</p>
                 </div>
             </div>
         </div>
     <?php
     }
     ?>
-</div>
-
-<div class="row">
-    <div class="col-12 text-end">
-        <button type="button" onclick="OpenIndex()" class="btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button type="button" onclick="PromptCloseApp()" class="btn refresh-button mr-2"><i class="fa-solid fa-power-off"></i> Exit</button>
-    </div>
 </div>

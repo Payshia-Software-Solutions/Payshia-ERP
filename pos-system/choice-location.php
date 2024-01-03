@@ -155,7 +155,6 @@ $Locations = GetLocations($link);
 
     <div class="footer-credit">
         <div id="logged-user"><i class="fa-solid fa-user"></i> <span><?= $LoggedName ?></span></div>
-        <div id="logged-user"><i class="fa-solid fa-location-dot"></i> <span><?= $Locations[$LocationID]['location_name'] ?></span></div>
         <div id="date-time"></div>
         <div class="credit-text">Powered By Payshia.com</div>
     </div>

@@ -1,96 +1,30 @@
 <?php
 require_once('./include/config.php');
 include './include/session.php';
+include './include/settings_functions.php';
 
+$defaultLocation = $default_location_name = null;
 $company_id = 1452254565;
 $UserLevel = $session_user_level;
 $StudentNumber = $session_student_number;
 $LoggedStudent = GetAccounts($link)[$session_student_number];
 $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
-?>
 
+$Locations = GetLocations($link);
+$defaultLocation = GetUserDefaultValue($link, $session_student_number, 'defaultLocation');
+if (isset($defaultLocation) && $defaultLocation != "") {
+    $default_location_name = $Locations[$defaultLocation]['location_name'];
+}
+?>
 <input type="hidden" value="<?php echo $session_student_number; ?>" id="LoggedUser" name="LoggedUser">
 <input type="hidden" value="<?php echo $session_user_level; ?>" id="UserLevel" name="UserLevel">
 <input type="hidden" value="<?php echo $company_id; ?>" id="company_id" name="company_id">
-
-<style>
-    .submenu {
-        display: none;
-        padding-left: 20px;
-    }
-
-    .submenu li {
-        list-style: none;
-    }
-
-    .submenu-item {
-        display: flex;
-        align-items: center;
-        padding: 8px;
-    }
-
-    .submenu-icon {
-        margin-right: 10px;
-    }
-
-    .collapse-icon {
-        margin-left: auto;
-        margin-right: 10px;
-        /* Add margin to create spacing between link text and icon */
-    }
-
-    .nav-link {
-        display: flex;
-        align-items: center;
-    }
-
-    .submenu .nav-item .active {
-        background-color: #328bed !important;
-    }
-
-    .swal2-html-container input {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-    }
-
-    .logged-details {
-        padding: 10px;
-        border-bottom: 1px solid grey;
-    }
-
-    .logged-details p {
-        font-weight: 500;
-        margin-bottom: 0px;
-    }
-
-    .logged-details .hero-title-bar {
-        border-bottom: none !important;
-    }
-
-    .logged-details .sidebar-profile-image {
-        width: 50px;
-    }
-
-    .clickable {
-        cursor: pointer;
-    }
+<input type="hidden" value="<?php echo $defaultLocation; ?>" id="default_location" name="default_location">
+<input type="hidden" value="<?php echo $default_location_name; ?>" id="default_location_name" name="default_location_name">
+<input type="hidden" value="" id="deviceFingerPrint" name="deviceFingerPrint">
 
 
 
-    #index-content {
-        margin-bottom: 15px;
-    }
-</style>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-<link rel="stylesheet" href="./assets/css/select2.css">
-
-<script src="./node_modules/chart.js/dist/chart.umd.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <div class="overlay">
     <div class="overlay-content text-center">
         <div class="card-body p-5 my-5">
@@ -109,6 +43,7 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
             <button class="btn hide-button navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fa-solid fa-down-left-and-up-right-to-center top-icon"></i>
             </button>
+
         </div>
     </div>
     <div class="logged-details">
@@ -118,7 +53,13 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
             </div>
             <div class="col-9">
                 <p class="class-fee text-light"><?= $LoggedName ?></p>
-                <a href="./"><i class="fa-solid fa-home text-white clickable"></i></a> <a href="./logout.php" class="mx-1"><i class="fa-solid text-white fa-right-from-bracket"></i></a> <span class="badge bg-danger mt-2"><?= $UserLevel ?></span>
+                <a href="./"><i class="fa-solid fa-home text-white clickable"></i></a>
+                <a href="./pos-system" target="_blank" class="mx-1"><i class="fa-solid fa-cash-register text-white clickable"></i></a>
+                <a href="./logout.php" class="mx-1"><i class="fa-solid text-white fa-right-from-bracket"></i></a>
+                <span class="badge bg-danger mt-2"><?= $UserLevel ?></span>
+            </div>
+            <div class="col-12 mb-1">
+                <p class="bg-success p-1 rounded-3 text-center text-white mt-3 clickable" onclick="ChoiceUserLocation('<?= $StudentNumber ?>', 1)"><i class="fa-solid px-1 fa-location-dot"></i> <?= $default_location_name ?></p>
             </div>
         </div>
 
@@ -126,6 +67,14 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
     <!-- Sidebar content -->
     <div class="sidebar-content">
         <ul class="nav flex-column nav-menu">
+
+            <div class="row">
+                <div class="col-12 px-3 mt-2">
+                    <h6 class="text-light">Common Modules</h6>
+                    <div class="border-top border-secondary mt-2"></div>
+                </div>
+            </div>
+
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
 
                 <li class="nav-item">
@@ -136,55 +85,185 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./product">
-                                <i class="fa-brands fa-product-hunt menu-icon"></i>
-                                Product
-                            </a>
-                        </li>
+                        <?php
+                        $pageID = 1;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./product">
+                                        <i class="fa-brands fa-product-hunt menu-icon"></i>
+                                        Product/Service
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 3;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./location">
+                                        <i class="fa-solid fa-location-dot menu-icon"></i>
+                                        Location
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 4;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./supplier">
+                                        <i class="fa-solid fa-building menu-icon"></i>
+                                        Supplier
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 5;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./section">
+                                        <i class="fa-solid fa-bookmark menu-icon"></i>
+                                        Section
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 6;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./department">
+                                        <i class="fa-solid fa-city menu-icon"></i>
+                                        Department
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 7;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./category">
+                                        <i class="fa-solid fa-briefcase menu-icon"></i>
+                                        Category
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 8;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./unit-of-measurement">
+                                        <i class="fa-solid  fa-weight-hanging menu-icon"></i>
+                                        Unit of Measurement
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <?php
+                        $pageID = 9;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./table">
+                                        <i class="fa-solid  fa-weight-hanging menu-icon"></i>
+                                        Tables
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
 
                         <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./location">
-                                <i class="fa-solid fa-location-dot menu-icon"></i>
-                                Location
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./supplier">
-                                <i class="fa-solid fa-building menu-icon"></i>
-                                Supplier
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./section">
-                                <i class="fa-solid fa-bookmark menu-icon"></i>
-                                Section
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./department">
-                                <i class="fa-solid fa-city menu-icon"></i>
-                                Department
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./category">
-                                <i class="fa-solid fa-briefcase menu-icon"></i>
-                                Category
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./unit-of-measurement">
-                                <i class="fa-solid  fa-weight-hanging menu-icon"></i>
-                                Unit of Measurement
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./table">
-                                <i class="fa-solid  fa-weight-hanging menu-icon"></i>
-                                Tables
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-print menu-icon"></i>
+                                Printers <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
                             </a>
                         </li>
 
@@ -202,54 +281,189 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./purchase-order">
-                                <i class="fa-solid fa-file-contract menu-icon"></i>
-                                Purchase Order
-                            </a>
-                        </li>
+                        <?php
+                        $pageID = 10;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
 
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./good-receive-note">
-                                <i class="fa-solid fa-file-arrow-down menu-icon"></i>
-                                Good Receive Note
-                            </a>
-                        </li>
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
 
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./recipe">
-                                <i class="fa-solid fa-right-left menu-icon"></i>
-                                Recipe
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./invoice">
-                                <i class="fa-solid fa-file-invoice menu-icon"></i>
-                                Invoice
-                            </a>
-                        </li>
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./purchase-order">
+                                        <i class="fa-solid fa-file-contract menu-icon"></i>
+                                        Purchase Order
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
 
+                        <?php
+                        $pageID = 11;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
 
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./invoice">
-                                <i class="fa-solid fa-receipt menu-icon"></i>
-                                Quotation
-                            </a>
-                        </li>
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
 
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./good-receive-note">
+                                        <i class="fa-solid fa-file-arrow-down menu-icon"></i>
+                                        Good Receive Note
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
 
-                        <li class="nav-item">
-                            <a class="nav-link submenu-item" href="./production-note">
+                        <?php
+                        $pageID = 12;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
 
-                                <i class="fa-solid  fa-tarp-droplet menu-icon"></i>
-                                Production Note
-                            </a>
-                        </li>
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./recipe">
+                                        <i class="fa-solid fa-right-left menu-icon"></i>
+                                        Bill of Materials
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <?php
+                        $pageID = 13;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./invoice">
+                                        <i class="fa-solid fa-file-invoice menu-icon"></i>
+                                        Invoice
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 28;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./receipt">
+
+                                        <i class="fa-solid fa-receipt menu-icon"></i>
+                                        Receipt
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 14;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./quotation">
+                                        <i class="fa-solid fa-receipt menu-icon"></i>
+                                        Quotation
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 15;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./production-note">
+
+                                        <i class="fa-solid  fa-tarp-droplet menu-icon"></i>
+                                        Production Note
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                        <?php
+                        $pageID = 16;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./pos-system">
+                                        <i class="fa-solid fa-cash-register menu-icon"></i>
+                                        POS System
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
                     </ul>
                 </li>
             <?php } ?>
 
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+
+
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
                         <i class="fa-solid fa-landmark menu-icon"></i>
@@ -257,10 +471,274 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
+                        <?php
+                        $pageID = 17;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./chart-of-accounts">
+                                        <i class="fa-solid fa-chart-bar menu-icon"></i>
+                                        Chart of Accounts
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-file-lines menu-icon"></i>
+                        Reports
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <?php
+                        $pageID = 18;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./reports">
+                                        <i class="fa-solid fa-file menu-icon"></i>
+                                        ERP Reports
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                    </ul>
+                </li>
+            <?php } ?>
+
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-gear menu-icon"></i>
+                        Administration
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <?php
+                        $pageID = 19;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./cancellation">
+                                        <i class="fa-solid fa-wrench menu-icon"></i>
+                                        Cancellation
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+            <?php if ($UserLevel == "Admin") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-users-gear menu-icon"></i>
+                        User Maintenance
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <?php
+                        $pageID = 20;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./user-maintenance">
+                                        <i class="fa-solid fa-children menu-icon"></i>
+                                        Users
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                        <?php
+                        $pageID = 21;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="./user-privileges">
+                                        <i class="fa-solid fa-pen-nib menu-icon"></i>
+                                        Change Privileges
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-brands fa-intercom menu-icon"></i>
+                        CRM <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <?php
+                        $pageID = 2;
+                        $userPrivilege = GetUserPrivileges($link, $session_student_number,  $pageID);
+
+                        if (!empty($userPrivilege)) {
+                            $readAccess = $userPrivilege[$session_student_number]['read'];
+                            $writeAccess = $userPrivilege[$session_student_number]['write'];
+                            $AllAccess = $userPrivilege[$session_student_number]['all'];
+
+                            if ($readAccess == 1) {
+                        ?>
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./customer">
+                                        <i class="fa-solid fa-person-military-pointing menu-icon"></i>
+                                        Customer
+                                    </a>
+                                </li>
+                        <?php
+                            }
+                        }
+                        ?>
+                    </ul>
+                </li>
+            <?php } ?>
+
+            <?php if ($UserLevel == "Admin") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-building-user menu-icon"></i>
+                        HRM <span class="mx-2 badge bg-primary" style="font-size: 10px;">Coming soon</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
-                                <i class="fa-solid fa-chart-bar menu-icon"></i>
-                                Chart of Accounts
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-users menu-icon"></i>
+                                Employees
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-money-bill menu-icon"></i>
+                                Salary
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-person-walking-arrow-right menu-icon"></i>
+                                Leaves
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-building menu-icon"></i>
+                                Departments
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            <?php } ?>
+
+            <div class="row">
+                <div class="col-12 px-3 mt-4">
+                    <h6 class="text-light">Organization</h6>
+                    <div class="border-top border-secondary mt-2"></div>
+                </div>
+            </div>
+            <?php if ($UserLevel == "Admin") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-building-wheat  menu-icon"></i>
+                        Hotel Management <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-computer menu-icon"></i>
+                                Front Desk
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-house menu-icon"></i>
+                                Rooms
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-house-circle-check menu-icon"></i>
+                                Housekeeping
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-hat-cowboy menu-icon"></i>
+                                Room Types
+                            </a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-percent menu-icon"></i>
+                                Promo Code
                             </a>
                         </li>
                     </ul>
@@ -271,15 +749,63 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
-                        <i class="fa-solid fa-file-lines menu-icon"></i>
-                        Reports
+                        <i class="fa-solid fa-graduation-cap menu-icon"></i>
+                        LMS Management <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
                         <li class="nav-item">
-                            <a class="nav-link" href="./reports">
-                                <i class="fa-solid fa-file menu-icon"></i>
-                                All Reports
+                            <a class="nav-link" href="./course-management">
+                                <i class="fa-solid fa-award  menu-icon"></i>
+                                Course Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./received-orders">
+                                <i class="fa-solid fa-hard-drive  menu-icon"></i>
+                                Delivery Orders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./lms-user-approval">
+                                <i class="fa-solid fa-user-check  menu-icon"></i>
+                                User Approval
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./lms-report-view">
+                                <i class="fa-solid fa-laptop-file menu-icon"></i>
+                                LMS Reports
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+
+            <?php } ?>
+
+
+
+            <?php if ($UserLevel == "Admin") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-car-side menu-icon"></i>
+                        Vehicle Management <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-truck menu-icon"></i>
+                                Vehicles
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-charging-station menu-icon"></i>
+                                Orders
                             </a>
                         </li>
                     </ul>
@@ -291,7 +817,7 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
                         <i class="fa-solid fa-tags menu-icon"></i>
-                        Barcode Printing
+                        Label Printing
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
@@ -303,58 +829,31 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
                         </li>
                     </ul>
                 </li>
-
             <?php } ?>
 
-            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
-                        <i class="fa-solid fa-gear menu-icon"></i>
-                        Administration
+                        <i class="fa-brands fa-webflow menu-icon"></i>
+                        Website Management <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
                         <li class="nav-item">
-                            <a class="nav-link" href="./cancellation">
-                                <i class="fa-solid fa-wrench menu-icon"></i>
-                                Cancellation
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-folder-tree  menu-icon"></i>
+                                Content Management
                             </a>
                         </li>
+
+
                     </ul>
                 </li>
 
             <?php } ?>
 
 
-            <?php if ($UserLevel == "Admin") { ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
-                        <i class="fa-solid fa-users-gear menu-icon"></i>
-                        User Maintenance
-                        <i class="fas fa-chevron-right collapse-icon"></i>
-                    </a>
-                    <ul class="submenu">
-                        <li class="nav-item">
-                            <a class="nav-link" href="./user-maintenance">
-                                <i class="fa-solid fa-children menu-icon"></i>
-                                Users
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="./change-privileges">
-                                <i class="fa-solid fa-pen-nib menu-icon"></i>
-                                Change Privileges
-                            </a>
-                        </li>
-
-                    </ul>
-                </li>
-
-            <?php } ?>
         </ul>
-
-
     </div>
 </nav>
 
@@ -375,7 +874,3 @@ $LoggedName =  $LoggedStudent['first_name'] . " " . $LoggedStudent['last_name'];
         </div>
     </div>
 </div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.20/dist/sweetalert2.all.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />

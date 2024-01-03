@@ -26,6 +26,9 @@ $company_id = $_POST["company_id"];
 $location_id = $_POST["location_id"];
 $credit_limit = $_POST["credit_limit"];
 $credit_days = $_POST["credit_days"];
+$region_id = $_POST["region_id"];
+$route_id = $_POST["route_id"];
+$area_id = $_POST["area_id"];
 
-$QueryResult = CreateCustomer($link, $customer_id, $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days);
+$QueryResult = CreateCustomer($link, $customer_id, $customer_first_name, $customer_last_name, $phone_number, $address_line1, $address_line2, $city_id, $email_address, $opening_balance, $created_by, $created_at, $company_id, $location_id, $is_active, $credit_limit, $credit_days, $region_id, $route_id, $area_id);
 echo $QueryResult;

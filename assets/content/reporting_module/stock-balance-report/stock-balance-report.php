@@ -11,6 +11,7 @@ $Locations = GetLocations($link);
 $Products = GetProducts($link);
 $location_id = $_POST['location_id'];
 
+$dateInput = $_POST['date-input'];
 $section_id = $_POST['section_id'];
 $department_id = $_POST['department_id'];
 $category_id = $_POST['category_id'];
@@ -35,7 +36,7 @@ $category_id = $_POST['category_id'];
                 $totalStockValue = $totalSellingValue = 0;
                 foreach ($Products as $selectedArray) {
                     $product_id = $selectedArray['product_id'];
-                    $stockBalance = GetStockBalanceByProductByLocation($link, $product_id, $location_id);
+                    $stockBalance = GetStockBalanceByProductByLocationToDate($link, $product_id, $location_id, $dateInput);
                     $costPrice = GetCostPrice($link, $product_id);
                     $sellingPrice = GetSellingPrice($link, $product_id);
                     $stockValue = $stockBalance * $costPrice;

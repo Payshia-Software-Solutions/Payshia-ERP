@@ -81,6 +81,10 @@ $location_name = $Locations[$location_id]['location_name'];
                         <th>To Date</th>
                         <td class="text-end"><?= $formattedToQueryDate ?></td>
                     </tr>
+                    <tr>
+                        <th>Location</th>
+                        <td class="text-end"><?= $location_name ?></td>
+                    </tr>
                 </table>
             </div>
 
@@ -95,6 +99,7 @@ $location_name = $Locations[$location_id]['location_name'];
                     <tr>
                         <th scope="col">Date</th>
                         <th scope="col">Invoice #</th>
+                        <th scope="col">Ref #</th>
                         <th scope="col">Sub Total</th>
                         <th scope="col">Discount</th>
                         <th scope="col">Tax</th>
@@ -105,15 +110,34 @@ $location_name = $Locations[$location_id]['location_name'];
                     <?php
                     if (!empty($invoiceSales)) {
                         foreach ($invoiceSales as $selectedArray) {
-                            $invoice_date = date("Y-m-d", strtotime($selectedArray['invoice_date']));
+                            $referenceText = "";
+                            $invoice_date = date("Y-m-d H:i", strtotime($selectedArray['current_time']));
                             $subTotal += $selectedArray['inv_amount'];
+                            $ref_hold = $selectedArray['ref_hold'];
                             $discountAmount += $selectedArray['discount_amount'];
                             $serviceCharge += $selectedArray['service_charge'];
                             $grandTotal += $selectedArray['grand_total'];
+
+                            if ($ref_hold == '0') {
+                                // $referenceText = "Take Away";
+                                $referenceText = "Direct";
+                            } else if ($ref_hold == '-1') {
+                                // $referenceText = "Retail";
+                                $referenceText = "Direct";
+                            } else if ($ref_hold == '-2') {
+                                // $referenceText = "Delivery";
+                                $referenceText = "Direct";
+                            } else if ($ref_hold == "") {
+                                // $referenceText = "None";
+                                $referenceText = "Direct";
+                            } else {
+                                $referenceText = $ref_hold;
+                            }
                     ?>
                             <tr>
                                 <td><?= $invoice_date ?></td>
                                 <td><?= $selectedArray['invoice_number'] ?></td>
+                                <td><?= $referenceText ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['inv_amount']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['discount_amount']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['service_charge']) ?></td>
@@ -125,7 +149,7 @@ $location_name = $Locations[$location_id]['location_name'];
                     }
                     ?>
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="3"><?= formatAccountBalance($subTotal) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="4"><?= formatAccountBalance($subTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($discountAmount) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($serviceCharge) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($grandTotal) ?></td>

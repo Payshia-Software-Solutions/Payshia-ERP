@@ -69,7 +69,7 @@ $LocationName = $Locations[$SelectedReport['location_id']]['location_name'];
             </div>
 
             <div id="right-section">
-                <h2 class="report-title"><?= strtoupper($reportTitle) ?></h2>
+                <h2 class="report-title-mini"><?= strtoupper($reportTitle) ?></h2>
                 <table>
                     <tr>
                         <th>Date</th>
@@ -163,7 +163,7 @@ $LocationName = $Locations[$SelectedReport['location_id']]['location_name'];
                     ?>
                             <tr>
                                 <td class="text-center"><?= $rawNumber ?></td>
-                                <td><?= $productName ?></td>
+                                <td><?= $ProductID ?> - <?= $productName ?></td>
                                 <td class="text-center"><?= $OrderUnit ?></td>
                                 <td class="text-center"><?= number_format($received_qty, 2) ?></td>
                                 <td class="text-end"><?= number_format($PerRate, 2) ?></td>

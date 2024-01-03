@@ -52,7 +52,9 @@ if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION["user_name"])) {
     // exit;
   }
 } else {
-  // handle the case when the session or user_name variable is not set
+  // Redirect to logout.php
+  header("Location: logout");
+  exit(); // Make sure to stop the script after the redirect
 }
 
 // Check if the user is logged in, if not then redirect him to login page

@@ -1,6 +1,8 @@
 {
   "dependencies": {
     "chart.js": "^4.4.0",
-    "sweetalert2": "^11.10.0"
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "sweetalert2": "^11.10.0",
+    "tinymce": "^6.8.2"
   }
 }

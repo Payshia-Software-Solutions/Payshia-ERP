@@ -10,11 +10,8 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            z-index: 999 !important;
+            z-index: 4 !important;
             background-color: #fff;
-            display: flex;
-            justify-content: space-between;
-            /* This will push the date-time to the left and credit to the right. */
             padding: 10px;
         }
 
@@ -32,13 +29,54 @@
             font-weight: 700;
             margin-left: 5px;
         }
+
+        @media (max-width: 768px) {
+            .footer-credit {
+                color: grey;
+                padding: 2px;
+            }
+
+            .credit-text {
+                font-weight: 400;
+                font-size: 12px;
+            }
+
+            #date-time {
+                margin: 0;
+                font-size: 15px;
+                font-weight: 400;
+                padding: 0;
+            }
+
+            #logged-user span {
+                font-weight: 400;
+                margin-left: 5px;
+                font-size: 15px;
+            }
+
+        }
     </style>
 
-    <div class="footer-credit">
-        <div id="logged-user"><i class="fa-solid fa-user"></i> <span><?= $LoggedName ?></span></div>
-        <div id="logged-user"><i class="fa-solid fa-location-dot"></i> <span><?= $Locations[$LocationID]['location_name'] ?></span></div>
-        <div id="date-time"></div>
-        <div class="credit-text">Powered By Payshia.com</div>
+    <div class="footer-credit shadow-sm">
+        <div class="row">
+            <div class="col-6 col-md-3 text-center">
+                <div id="logged-user"><i class="fa-solid fa-user"></i> <span><?= $LoggedName ?></span></div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+                <div id="logged-user"><i class="fa-solid fa-location-dot"></i> <span><?= $Locations[$LocationID]['location_name'] ?></span></div>
+            </div>
+            <div class="col-12  d-md-none">
+                <div class="border-bottom"></div>
+            </div>
+            <div class="col-12 col-md-3 text-center">
+                <div id="date-time"></div>
+            </div>
+            <div class="col-12 col-md-3 text-center bg-light">
+                <div class="credit-text">Powered By Payshia.com</div>
+            </div>
+        </div>
+
+
     </div>
 
 

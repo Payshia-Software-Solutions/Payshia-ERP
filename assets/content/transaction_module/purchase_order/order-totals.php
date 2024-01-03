@@ -39,3 +39,5 @@ $TotalPayment = $totalOrderValue + $TaxValue;
         <h4 class="text-end"><?= number_format($totalOrderValue, 2) ?></h4>
     </div>
 </div>
+
+<input type="number" name="no_of_items" id="no_of_items" value="<?= count($TempOrder) ?>">

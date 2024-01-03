@@ -10,9 +10,17 @@ $FilterType = $_POST['FilterType'];
 $LocationID = $_POST['LocationID'];
 $IconMode = GetSetting($link, $LocationID, 'itemImage');
 $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
+$barcodeDisplay = 1;
 ?>
+<div class="row">
+    <div class="col-12">
+        <div class="mt-1">
+            <input type="text" class="form-control mb-2 p-2 border-2" oninput="ChangeFilterProducts(this.value)" placeholder="Search Product" id="search-key-2" onclick="this.select()">
+        </div>
+    </div>
+</div>
 
-<div class="row " id="product-container">
+<div class="row g-2" id="product-container">
 
     <?php
     $ItemCount = 0;
@@ -30,10 +38,15 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
             $generic_id = $Product['generic_id'];
             $size_id = $Product['size_id'];
             $color_id = $Product['color_id'];
+            $barcode = $Product['barcode'];
 
             if ($Product['item_type'] == "Raw") {
                 continue;
             }
+
+            // if ($Product['item_location'] != $LocationID) {
+            //     continue;
+            // }
 
             if ($FilterType != 'not-set') {
                 if ($FilterType == 'section_id') {
@@ -66,17 +79,44 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
 
             $CurrentStockBalance = 100;
 
+
+            $location_list = $Product['location_list'];
+            $locationArray = explode(",", $location_list);
+            $isChecked = in_array($LocationID, $locationArray) ? true : false;
+
+            if ($Product['item_location'] == $LocationID) {
+                $isChecked = true;
+            }
+            if (!$isChecked) {
+                continue;
+            }
     ?>
 
-            <div class="col-4 col-md-4 col-lg-4 col-xl-4 col-xxl-3 mb-2 d-flex p-0 px-1 product-column" data-department="<?= $department_id ?>" data-category="<?= $category_id ?>" data-section="<?= $section_id ?>">
-                <div class="card product-card shadow-sm flex-fill" onclick="OpenQtySelector('<?= $Product['product_id'] ?>', '<?= $Product['selling_price'] ?>' , '<?= 0 ?>', '<?= $CurrentStockBalance ?>')">
-                    <div class="card-body">
+            <div class="col-6 col-md-4 col-lg-4 col-xl-4 col-xxl-3 d-flex product-column-2" data-department="<?= $department_id ?>" data-category="<?= $category_id ?>" data-section="<?= $section_id ?>">
+                <div class="card product-card rounded-4 shadow-sm flex-fill" onclick="OpenQtySelector('<?= $Product['product_id'] ?>', '<?= $Product['selling_price'] ?>' , '<?= 0 ?>', '<?= $CurrentStockBalance ?>')">
+                    <div class="card-body p-1 p-md-2">
                         <?php
                         if ($IconMode == 1) { ?>
-                            <div class="card-image" style="background-image:url('<?= $file_path ?>')"></div>
+                            <div class="card-image  rounded-4" style="background-image:url('<?= $file_path ?>')"></div>
                         <?php } ?>
 
-                        <h4 class="card-title my-0 text-center item-name"><?= $display_name ?></h4>
+                        <h4 class="card-title my-0 text-center item-name">
+                            <?= $display_name ?>
+                            <p id="productBarcode" class="d-none"><?= $barcode ?></p>
+                            <p class="d-none"><?= $selling_price ?></p>
+                        </h4>
+                        <?php
+                        if ($barcodeDisplay == 1 && $barcode != "") {
+                            $imgCodeBarcode = GenerateNormalBarcode($barcode);
+                        ?>
+                            <div class="text-center">
+                                <img class="logo-image p-0 text-center" src="data:image/png;base64,<?= $imgCodeBarcode; ?>" alt="Barcode" style="height:20px; width:50%;">
+                                <p class="m-0"><?= $barcode ?></p>
+                            </div>
+                        <?php
+                        }
+                        ?>
+
                         <h4 class="card-price text-center bold-text-600">LKR <?= $selling_price ?></h4>
                     </div>
                 </div>
@@ -98,3 +138,65 @@ $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
 
     ?>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get the input element by its ID
+        var inputBox = document.getElementById("search-key-2");
+        var programmaticFocus = true; // Flag to track programmatic focus
+
+        // Set up a focus event listener
+        inputBox.addEventListener("focus", function() {
+            if (programmaticFocus) {
+                this.select(); // Select the text when the input box is focused programmatically
+            }
+        });
+
+        // Set focus on the input box
+        inputBox.focus();
+
+        // Set the flag to false when the input box is clicked
+        inputBox.addEventListener("click", function() {
+            programmaticFocus = false;
+        });
+    });
+</script>
+
+<script>
+    function ChangeFilterProducts(searchText) {
+        searchText = searchText.toLowerCase();
+        const productColumns = document.querySelectorAll(".product-column-2");
+        let visibleProductCount = 0;
+        let lastVisibleProduct = null;
+
+        productColumns.forEach(function(productColumn) {
+            const productName = productColumn.querySelector(".card-title").textContent.toLowerCase();
+            const productBarcodeElement = productColumn.querySelector("#productBarcode");
+            const barcode = productBarcodeElement.textContent.trim();
+
+            if (productName.includes(searchText)) {
+                productColumn.classList.remove("d-none");
+                productColumn.classList.add("d-block");
+                if (barcode == searchText) {
+                    visibleProductCount++;
+                    lastVisibleProduct = productColumn; // Update the last visible product
+                }
+            } else {
+                productColumn.classList.remove("d-block");
+                productColumn.classList.add("d-none");
+            }
+        });
+
+        if (visibleProductCount === 1) {
+            // Run the onclick function for the last visible product
+            const loadingPopup = document.getElementById("loading-popup");
+            if (lastVisibleProduct && loadingPopup.style.display !== "flex") {
+                lastVisibleProduct.querySelector('.card').click(); // Adjust this line based on your actual onclick function
+            }
+        }
+
+        if (visibleProductCount == 0) {
+            showNotification("No Matching Results")
+        }
+    }
+</script>

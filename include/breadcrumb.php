@@ -43,7 +43,8 @@
 
     <div class="profile-container">
         <ul class="nav-links">
-            <li class="nav-item"><a href="./profile"><i class="fa-solid fa-circle-user top-icon"></i>Profile</a></li>
+            <!-- <li class="nav-item"><a href="./profile"><i class="fa-solid fa-circle-user top-icon"></i>Profile</a></li> -->
+            <li class="nav-item" onclick="ChoiceUserLocation('<?= $StudentNumber ?>', 1)"><a href="#"><i class="fa-solid fa-location-dot top-icon"></i>Change Location</a></li>
             <li class="nav-item"><a href="./logout"><i class="fa-solid fa-right-from-bracket top-icon"></i>Sign Out</a></li>
         </ul>
     </div>

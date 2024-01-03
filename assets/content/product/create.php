@@ -5,7 +5,8 @@ include '../../../include/function-update.php';
 $ActiveStatus = 1;
 $updateKey = 0;
 $ButtonText = "Save";
-$product_code = $product_name = $print_name = $display_name = $name_si = $name_ti = $product_section = $product_department = $product_category = $product_unit = $product_description = $ImgURL =  $supplier_list = $recipe_type = $item_type = "";
+$location_list = "";
+$product_code = $product_name = $print_name = $display_name = $productBarcode = $name_si = $name_ti = $product_section = $product_department = $product_category = $product_unit = $product_description = $ImgURL =  $supplier_list = $recipe_type = $item_type = "";
 $ImgURL = "no-image.png";
 
 $cost_price = $min_price = $selling_price = $wholesale_price = $price_2 = 0;
@@ -30,16 +31,18 @@ if ($_POST['updateKey'] != 0) {
     $price_2 = $Product['price_2'];
     $ImgURL = $Product['image_path'];
     $supplier_list = $Product['supplier_list'];
+    $location_list = $Product['location_list'];
     $recipe_type = $Product['recipe_type'];
     $item_type = $Product['item_type'];
+    $productBarcode = $Product['barcode'];
     $item_location = $Product['item_location'];
 }
 $SupplierArray = explode(",", $supplier_list);
+$locationArray = explode(",", $location_list);
 
 if (isset($_POST['is_active'])) {
     $ActiveStatus = $_POST['is_active'];
 }
-
 
 if ($ActiveStatus == 0) {
     $ButtonText = "Delete";
@@ -101,15 +104,21 @@ $Categories = GetCategories($link);
                 </div>
 
                 <div class="row mt-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="DestinationName" class="form-label">Sinhala Name</label>
                         <input type="text" name="name_si" id="name_si" class="form-control" value="<?= $name_si ?>" placeholder="Print Name" required>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label for="DestinationName" class="form-label">Tamil Name</label>
                         <input type="text" name="name_ti" id="name_ti" class="form-control" value="<?= $name_ti ?>" placeholder="Display Name" required>
                     </div>
+
+                    <div class="col-md-4">
+                        <label for="DestinationName" class="form-label">Barcode</label>
+                        <input type="number" name="productBarcode" id="productBarcode" class="form-control" value="<?= $productBarcode ?>" placeholder="Barcode">
+                    </div>
+
                 </div>
 
 
@@ -315,7 +324,7 @@ $Categories = GetCategories($link);
                 </div>
 
                 <div class="col-md-3">
-                    <label class="">Item Location</label>
+                    <label class="">Base Location</label>
                     <select class="form-control form-control-sm" name="item_location" id="ItemLocation" required>
                         <option value="">Select Location</option>
                         <?php
@@ -333,6 +342,7 @@ $Categories = GetCategories($link);
                         ?>
                     </select>
                 </div>
+
 
                 <div class="col-md-3">
                     <label for="FeaturedImage" class="form-label">Product Image</label>
@@ -352,6 +362,37 @@ $Categories = GetCategories($link);
 
             </div>
 
+
+            <p class="card-description my-4">Available Locations</p>
+            <div class="row mt-3">
+                <?php
+                if (!empty($Locations)) {
+                    foreach ($Locations as $location) {
+                        if ($location['is_active'] == 1) {
+                            $active_status = "Active";
+                            $color = "primary";
+                        } else {
+                            continue;
+                        }
+
+                        $isChecked = in_array($location['location_id'], $locationArray) ? 'checked' : '';
+                ?>
+                        <div class="col-4 col-md-3">
+                            <div class="form-check form-check-primary">
+                                <label class="form-check-label">
+                                    <input type="checkbox" name="availableLocation[]" id="availableLocation" class="form-check-input supplier" value="<?= $location['location_id']; ?>" <?= $isChecked ?>>
+                                    <?= $location['location_name']; ?>
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+                <?php
+                    }
+                }
+                ?>
+            </div>
+
+            <hr>
             <div class="mt-4">
                 <label for="product_description" class="form-label">Product Description</label>
                 <textarea name="product_description" id="product_description" class="form-control" spellcheck="false" placeholder="Product Description"><?= $product_description ?></textarea>

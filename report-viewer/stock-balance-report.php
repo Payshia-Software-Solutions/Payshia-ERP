@@ -94,14 +94,6 @@ $reportTitle = "Stock Balance Report";
                     if (!empty($Products)) {
                         $totalStockValue = $totalSellingValue = 0;
                         foreach ($Products as $selectedArray) {
-                            $product_id = $selectedArray['product_id'];
-                            $stockBalance = GetStockBalanceByProductByLocationToDate($link, $product_id, $location_id, $dateInput);
-                            $costPrice = GetCostPrice($link, $product_id);
-                            $sellingPrice = GetSellingPrice($link, $product_id);
-                            $stockValue = $stockBalance * $costPrice;
-                            $stockSellingValue = $sellingPrice * $stockBalance;
-                            $totalStockValue += $stockValue;
-                            $totalSellingValue += $stockSellingValue;
 
                             if ($section_id != $selectedArray['section_id'] && $section_id != 'All') {
                                 continue;
@@ -112,6 +104,17 @@ $reportTitle = "Stock Balance Report";
                             if ($category_id != $selectedArray['category_id'] && $category_id != 'All') {
                                 continue;
                             }
+
+                            $product_id = $selectedArray['product_id'];
+                            $stockBalance = GetStockBalanceByProductByLocationToDate($link, $product_id, $location_id, $dateInput);
+                            $costPrice = GetCostPrice($link, $product_id);
+                            $sellingPrice = GetSellingPrice($link, $product_id);
+                            $stockValue = $stockBalance * $costPrice;
+                            $stockSellingValue = $sellingPrice * $stockBalance;
+                            $totalStockValue += $stockValue;
+                            $totalSellingValue += $stockSellingValue;
+
+
                     ?>
                             <tr>
                                 <td class="">#00<?= $selectedArray['product_id'] ?></td>

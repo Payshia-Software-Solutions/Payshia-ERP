@@ -497,6 +497,56 @@ if (isset($defaultLocation) && $defaultLocation != "") {
 
             <?php } ?>
 
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-percent menu-icon"></i>
+                        Promotions <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-clock menu-icon"></i>
+                                Seasonal Discounts
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-business-time menu-icon"></i>
+                                Item Discounts
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-socks menu-icon"></i>
+                                BOGO Type
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-ticket menu-icon"></i>
+                                Coupons Codes
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./chart-of-accounts">
+                                <i class="fa-solid fa-user-tie menu-icon"></i>
+                                Employee Discounts
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+            <?php } ?>
+
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
 
                 <li class="nav-item">

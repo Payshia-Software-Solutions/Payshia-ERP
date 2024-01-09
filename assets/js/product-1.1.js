@@ -166,3 +166,51 @@ function ChangeStatus(IsActive, UpdateKey) {
     }
     fetch_data()
 }
+
+function SelectDepartments(sectionId, selectedDepartment = 0, selectedCategory = 0) {
+    showOverlay()
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/' + folder + '/get-departments.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                company_id: company_id,
+                sectionId: sectionId,
+                selectedDepartment: selectedDepartment,
+                selectedCategory: selectedCategory
+            },
+            success: function(data) {
+                $('#department_id').html(data)
+                hideOverlay()
+
+                SelectCategory(sectionId, selectedDepartment, selectedCategory)
+            }
+        })
+    }
+    fetch_data()
+}
+
+function SelectCategory(sectionId, departmentId, selectedCategory = 0) {
+    showOverlay()
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/' + folder + '/get-category.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                company_id: company_id,
+                sectionId: sectionId,
+                departmentId: departmentId,
+                selectedCategory: selectedCategory
+            },
+            success: function(data) {
+                $('#category_id').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}

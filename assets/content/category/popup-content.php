@@ -37,7 +37,7 @@ if ($UpdateKey > 0) {
                     <div class="col-6 mb-2">
 
                         <h6 class="taxi-label">Section</h6>
-                        <select class="form-control" name="section_id" id="section_id">
+                        <select onchange="SelectDepartments(this.value)" class="form-control" name="section_id" id="section_id">
                             <?php
                             if (!empty($Sections)) {
                                 foreach ($Sections as $select_array) {
@@ -53,15 +53,7 @@ if ($UpdateKey > 0) {
 
                         <h6 class="taxi-label">Department</h6>
                         <select class="form-control" name="department_id" id="department_id">
-                            <?php
-                            if (!empty($Departments)) {
-                                foreach ($Departments as $select_array) {
-                            ?>
-                                    <option <?= ($select_array['id'] == $department_id) ? 'selected' : '' ?> value="<?= $select_array['id'] ?>"><?= $select_array['department_name'] ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
+
                         </select>
                     </div>
                     <div class="col-8 mb-2">
@@ -87,3 +79,7 @@ if ($UpdateKey > 0) {
         </div>
     </div>
 </div>
+
+<script>
+    SelectDepartments(document.getElementById('section_id').value, '<?= $department_id ?>')
+</script>

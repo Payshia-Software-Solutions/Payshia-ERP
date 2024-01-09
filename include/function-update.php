@@ -2926,3 +2926,36 @@ function MostUsedDiscounts($link, $ProductID)
     }
     return $ArrayResult;
 }
+
+
+function GetDepartmentsBySection($link, $sectionId)
+{
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `section_id`, `department_name`, `is_active`, `created_at`, `created_by`, `pos_display` FROM `master_departments` WHERE `section_id` LIKE '$sectionId'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+function GetCategoryBySectionDepartment($link, $sectionId, $departmentId)
+{
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `section_id`, `department_id`, `category_name`, `is_active`, `created_at`, `created_by`, `pos_display` FROM `master_categories` WHERE `section_id` LIKE '$sectionId' AND `department_id` LIKE '$departmentId'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}

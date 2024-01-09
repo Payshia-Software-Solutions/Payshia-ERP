@@ -145,7 +145,7 @@ if ($invoiceLogoStatus == 1) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./assets/css/print-invoice-1.0.css" />
+    <link rel="stylesheet" href="./assets/css/print-invoice-1.1.css" />
     <title><?= $InvoiceNumber ?></title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@200;300&display=swap');
@@ -157,7 +157,8 @@ if ($invoiceLogoStatus == 1) {
         @page {
             size: 80mm;
             /* Set the page size to 80mm */
-            margin: 0;
+            margin: none !important;
+            padding: 0px;
             /* Adjust margins as needed */
         }
     </style>
@@ -347,7 +348,7 @@ if ($invoiceLogoStatus == 1) {
                     if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
                         // Use html2canvas to convert the content to an image
                         html2canvas(document.getElementById('inv'), {
-                            scale: 3
+                            scale: 2
                         }).then(function(canvas) {
                             //Create a ClientPrintJob
                             var cpj = new JSPM.ClientPrintJob();
@@ -361,14 +362,29 @@ if ($invoiceLogoStatus == 1) {
                             var imgBase64DataUri = canvas.toDataURL("image/png");
                             var imgBase64Content = imgBase64DataUri.substring(b64Prefix.length, imgBase64DataUri.length);
 
+
+
                             var myImageFile = new JSPM.PrintFile(imgBase64Content, JSPM.FileSourceType.Base64, '<?= $invoice_number ?>.png', 1);
                             //add file to print job
                             cpj.files.push(myImageFile);
 
-
-
                             //Send print job to printer!
                             cpj.sendToClient();
+
+
+                            // // Create a download link
+                            // var a = document.createElement('a');
+                            // a.href = imgBase64DataUri;
+                            // a.download = myImageFile;
+                            // a.style.display = 'none';
+                            // document.body.appendChild(a);
+
+                            // // Trigger a click event on the link to initiate download
+                            // a.click();
+
+                            // // Remove the link from the DOM
+                            // document.body.removeChild(a);
+
 
                             setTimeout(function() {
                                 // window.location.href = 'https://demo.payshia.com/pos-system/?last_invoice=true&display_invoice_number=<?= $invoice_number ?>&location_id=<?= $SelectedArray['location_id'] ?>';

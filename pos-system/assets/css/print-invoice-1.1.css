@@ -85,7 +85,11 @@ th {
 }
 
 tr.selected {
-    border-bottom: 1px solid black;
+    border-bottom: 1px dotted #504c4c;
+}
+
+tr.selected td {
+    padding-bottom: 4px;
 }
 
 .text-right {
@@ -151,6 +155,7 @@ td {
         margin: 0;
         /* Adjust margins as needed */
     }
+
     body {
         margin: 0px;
         padding: 2px;

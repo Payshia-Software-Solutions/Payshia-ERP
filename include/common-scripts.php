@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="./vendor/bootstrap/css/bootstrap.min.css" />
 <link rel="stylesheet" href="./assets/css/styles.css" />
 
+<link rel="manifest" href="./manifest.json">
 <style>
     .submenu {
         display: none;

@@ -83,7 +83,7 @@ if ($guestReceiptLogoStatus == 1) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./assets/css/print-invoice-1.0.css" />
+    <link rel="stylesheet" href="./assets/css/print-invoice-1.1.css" />
     <title><?= $InvoiceNumber ?></title>
     <style>
         .d-none {
@@ -270,7 +270,7 @@ if ($guestReceiptLogoStatus == 1) {
             if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
                 // Use html2canvas to convert the content to an image
                 html2canvas(document.getElementById('inv'), {
-                    scale: 3
+                    scale: 2
                 }).then(function(canvas) {
                     //Create a ClientPrintJob
                     var cpj = new JSPM.ClientPrintJob();

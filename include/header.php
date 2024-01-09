@@ -251,7 +251,7 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                         ?>
                                 <li class="nav-item">
                                     <a class="nav-link submenu-item" href="./table">
-                                        <i class="fa-solid  fa-weight-hanging menu-icon"></i>
+                                        <i class="fa-solid  fa-table menu-icon"></i>
                                         Tables
                                     </a>
                                 </li>

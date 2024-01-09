@@ -1,6 +1,6 @@
 <script src="./pos-system/vendor/jquery/jquery-3.7.1.min.js"></script>
 <script src="./vendor/bootstrap/js/bootstrap.min.js"></script>
-<script src="./assets/js/scripts-1.0.js"></script>
+<script src="./assets/js/scripts-1.1.js"></script>
 
 <!-- Data Tables -->
 <script src="./vendor/datatables/DataTables-1.13.8/js/jquery.dataTables.js"></script>

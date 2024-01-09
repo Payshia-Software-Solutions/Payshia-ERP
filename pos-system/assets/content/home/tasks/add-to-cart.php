@@ -94,8 +94,8 @@ if ($recipeType == 1) {
 
             $htmlOutput .= '<tr>
     <' . $elementTag . '>' . $product_name . '</' . $elementTag . '>
-    <' . $elementTag . '>' . $requiredQuantity . $item_unit . '</' . $elementTag . '>
-    <' . $elementTag . '>' . $currentStock . $item_unit . '</' . $elementTag . '>
+    <' . $elementTag . '>' . number_format($requiredQuantity, 3) . $item_unit . '</' . $elementTag . '>
+    <' . $elementTag . '>' . number_format($currentStock, 3) . $item_unit . '</' . $elementTag . '>
 </tr>';
         }
     }

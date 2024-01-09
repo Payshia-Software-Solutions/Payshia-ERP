@@ -1,20 +1,5 @@
 <?php
-$server = "localhost";
-$username = "root";
-$password = "";
-$database = "device_approval";
-$database_error = "";
-$error = array();
-/* Attempt to connect to MySQL database */
-$approveLink = mysqli_connect($server, $username, $password, $database);
-
-// Check connection
-
-if ($approveLink === false) {
-    die("ERROR: Could not connect. " . mysqli_connect_error());
-} else {
-    $database_error = "Connected to the Server";
-}
+require_once('../../../include/config.php');
 
 $approveStatus = 0;
 $LoggedUser = $_POST['LoggedUser'];
@@ -24,7 +9,7 @@ $uniqueIdentifier = $_POST['visitorId'];
 $dateTime = new DateTime();
 $timestamp = $dateTime->format("Y-m-d H:i:s.u");
 
-$sql = "SELECT `id` FROM `device_list` WHERE `unique_identifier` LIKE '$uniqueIdentifier' AND `user_name` LIKE '$LoggedUser'";
+$sql = "SELECT `id` FROM `approved_device_list` WHERE `unique_identifier` LIKE '$uniqueIdentifier' AND `user_name` LIKE '$LoggedUser'";
 $result = $approveLink->query($sql);
 if ($result->num_rows <= 0) {
     $sql = "INSERT INTO `device_list` (`unique_identifier`, `user_name`, `user_level`, `created_at`, `approve_status`) VALUES (?, ?, ?, ?, ?)";

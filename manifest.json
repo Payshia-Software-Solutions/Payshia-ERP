@@ -1,10 +1,42 @@
 {
-    "manifest_version": 2,
-    "name": "Printer Extension",
-    "version": "1.0",
-    "permissions": ["print"],
-    "browser_action": {
-        "default_icon": "icon.png",
-        "default_popup": "popup.html"
-    }
+    "name": "Payshia ERP System",
+    "short_name": "Payshia ERP System",
+    "description": "#1 Payshia ERP Solution in Sri Lanka",
+    "start_url": "/",
+    "display_override": ["fullscreen"],
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#333",
+    "icons": [{
+            "src": "./pos-system/assets/images/favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "./pos-system/assets/images/favicon/android-chrome-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "./pos-system/assets/images/favicon/android-chrome-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [{
+            "src": "./pos-system/assets/images/favicon/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Payshia POS"
+        },
+        {
+            "src": "./pos-system/assets/images/favicon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Payshia POS Mobile"
+        }
+    ]
 }

@@ -61,6 +61,11 @@ function setActiveNavLink() {
             }
 
             $(this).closest('.submenu').prev('.nav-link').addClass('active')
+                // Scroll to the active nav-link within the container
+            var container = $(this).closest('.submenu'); // Replace with the actual selector of your container
+            container.animate({
+                scrollTop: $(this).offset().top + container.scrollTop() - container.offset().top - 50
+            }, 1000); // You can adjust the duration as needed
 
             return false // Break the loop if a match is found
         }
@@ -202,4 +207,50 @@ function getDeviceApproval(LoggedUser, UserLevel, visitorId) {
             }
         }
     })
+}
+
+function SelectDepartments(sectionId, selectedDepartment = 0, selectedCategory = 0) {
+    showOverlay()
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/product/get-departments.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                company_id: company_id,
+                sectionId: sectionId,
+                selectedDepartment: selectedDepartment,
+                selectedCategory: selectedCategory
+            },
+            success: function(data) {
+                $('#department_id').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+function SelectCategory(sectionId, departmentId, selectedCategory = 0) {
+    showOverlay()
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/product/get-category.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                company_id: company_id,
+                sectionId: sectionId,
+                departmentId: departmentId,
+                selectedCategory: selectedCategory
+            },
+            success: function(data) {
+                $('#category_id').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
 }

@@ -1,7 +1,7 @@
 <?php
 require_once('./include/config.php');
 include './include/function-update.php';
-$pageTitle = "POS Printers";
+$pageTitle = "Setup Printers";
 $SubPageTitle = "";
 $SubPage = false;
 ?>
@@ -11,7 +11,6 @@ $SubPage = false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 
     <!-- Add Script -->
     <?php include './include/common-scripts.php' ?>

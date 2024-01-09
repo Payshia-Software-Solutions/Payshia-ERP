@@ -125,7 +125,7 @@ $Categories = GetCategories($link);
                 <div class="row mt-3">
                     <div class="col-md-3">
                         <label for="section_id" class="form-label">Section</label>
-                        <select class="form-select" name="section_id" id="section_id" required>
+                        <select onchange="SelectDepartments(this.value, '<?= $product_department ?>', '<?= $product_category ?>')" class="form-select" name="section_id" id="section_id" required>
                             <option value="">Select Section</option>
                             <?php
                             if (!empty($Sections)) {
@@ -145,21 +145,8 @@ $Categories = GetCategories($link);
 
                     <div class="col-md-3">
                         <label for="department_id" class="form-label">Department</label>
-                        <select class="form-select" name="department_id" id="department_id" required autocomplete="off">
+                        <select onchange="SelectCategory(document.getElementById('section_id').value, this.value, '<?= $product_category ?>')" class="form-select" name="department_id" id="department_id" required autocomplete="off">
                             <option value="">Select Department</option>
-                            <?php
-                            if (!empty($Departments)) {
-                                foreach ($Departments as $selected_array) {
-                                    if ($selected_array['is_active'] != 1) {
-                                        continue;
-                                    }
-                            ?>
-                                    ?>
-                                    <option <?= ($selected_array['id'] == $product_department) ? 'selected' : '' ?> value="<?= $selected_array['id'] ?>"><?= $selected_array['department_name'] ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
                         </select>
                     </div>
 
@@ -167,19 +154,6 @@ $Categories = GetCategories($link);
                         <label for="category_id" class="form-label">Category</label>
                         <select class="form-select" name="category_id" id="category_id" required autocomplete="off">
                             <option value="">Select Category</option>
-                            <?php
-                            if (!empty($Categories)) {
-                                foreach ($Categories as $selected_array) {
-                                    if ($selected_array['is_active'] != 1) {
-                                        continue;
-                                    }
-                            ?>
-                                    ?>
-                                    <option <?= ($selected_array['id'] == $product_category) ? 'selected' : '' ?> value="<?= $selected_array['id'] ?>"><?= $selected_array['category_name'] ?></option>
-                            <?php
-                                }
-                            }
-                            ?>
                         </select>
                     </div>
                 </div>
@@ -413,4 +387,10 @@ $Categories = GetCategories($link);
         plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
         toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
     });
+</script>
+
+<!-- JavaScript to trigger onchange event on page load -->
+<script>
+    var SelectedSection = document.getElementById('section_id').value;
+    SelectDepartments(SelectedSection, '<?= $product_department ?>', '<?= $product_category ?>')
 </script>

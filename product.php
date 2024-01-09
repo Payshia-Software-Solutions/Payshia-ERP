@@ -42,7 +42,7 @@ $SubPage = false;
     <!-- Add Scripts -->
 
     <?php include './include/footer-scripts.php' ?>
-    <script src="./assets/js/product-1.0.js"></script>
+    <script src="./assets/js/product-1.1.js"></script>
 </body>
 
 </html>

@@ -135,7 +135,7 @@ if ($guestReceiptLogoStatus == 1) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./assets/css/print-invoice-1.0.css" />
+    <link rel="stylesheet" href="./assets/css/print-invoice-1.1.css" />
     <title><?= $InvoiceNumber ?></title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@200;300&display=swap');
@@ -333,7 +333,7 @@ if ($guestReceiptLogoStatus == 1) {
                     if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
                         // Use html2canvas to convert the content to an image
                         html2canvas(document.getElementById('inv'), {
-                            scale: 3
+                            scale: 2
                         }).then(function(canvas) {
                             //Create a ClientPrintJob
                             var cpj = new JSPM.ClientPrintJob();

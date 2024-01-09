@@ -21,16 +21,24 @@ function GetSetting($link, $location_id, $setting)
 }
 
 
-
-function UpdateSetting($link, $location_id, $setting, $value)
+function GetDefaultSettingValues($link)
 {
-    $sql = "SELECT * FROM `setting_location` WHERE `setting` LIKE '$setting'";
+    $ArrayResult = array();
+    $sql = 'SELECT `id`, `settingName`, `defaultValue` FROM `setting_default_values`';
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $default_value = $row['default_value'];
+            $ArrayResult[$row['settingName']] = $row;
         }
     }
+    return $ArrayResult;
+}
+
+
+function UpdateSetting($link, $location_id, $setting, $value)
+{
+    $defaultValues = GetDefaultSettingValues($link);
+    $default_value = $defaultValues[$setting]['defaultValue'];
 
     $sql = "SELECT * FROM `setting_location` WHERE `setting` LIKE '$setting' AND `location_id` LIKE '$location_id'";
     $result = $link->query($sql);

@@ -10,5 +10,5 @@ $ref_id = $_POST['refKey'];
 $reason = $_POST['reason'];
 $userID = $_POST['userID'];
 
-$result = SaveRemovalNotice($link, $ref_id, $reason, $userID, $UserName, $LocationID);
+$result = SaveRemovalNotice($link, $ref_id, $reason, $userID, $UserName, $LocationID, $productID);
 echo $result;

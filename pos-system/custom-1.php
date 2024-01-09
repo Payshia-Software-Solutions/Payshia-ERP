@@ -4,6 +4,7 @@ include '../include/function-update.php';
 
 include '../include/settings_functions.php';
 
+$displayStatus = $fontClass = "";
 $netTotal = $total = 0;
 $invoice_number = $_GET['invoice_number'];
 $PrinterName = $_GET['PrinterName'];
@@ -119,6 +120,14 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
     $file_path = "./assets/images/location/" . $selectedLocation['location_id'] . "/" . $selectedLocation['logo_path'];
 }
 
+$guestReceiptLogoStatus = GetSetting($link, $selectedLocation['location_id'], 'guestReceiptLogoStatus');
+if ($guestReceiptLogoStatus == 1) {
+    $displayStatus = "d-block";
+} else {
+    $displayStatus = "d-none";
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -131,21 +140,30 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@200;300&display=swap');
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../node_modules/jsprintmanager/JSPrintManager.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script> -->
 
+    <style>
+        .d-none {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
 
 
     <div class="inv" id="inv">
-        <div class="logo-box" style="margin-bottom: 20px;">
-            <img class="logo-image" src="<?= $file_path ?>">
+        <div class="logo-box <?= $displayStatus ?>" style="margin-bottom: 20px;">
+            <img class="logo-image <?= $displayStatus ?>" src="<?= $file_path ?>" onerror="this.src='./assets/images/pos-logo.png';">
         </div>
 
-        <p class="address">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
-        <p class="telephone">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
-        <p class="telephone">Email : info@transitaradhana.com</p>
-        <hr />
+        <p class="address <?= $displayStatus ?>">#<?= $selectedLocation['address_line1'] ?>, <?= $selectedLocation['address_line2'] ?>, <?= $selectedLocation['city'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Tel : <?= $selectedLocation['phone_1'] ?> / <?= $selectedLocation['phone_2'] ?></p>
+        <p class="telephone <?= $displayStatus ?>">Email : info@transitaradhana.com</p>
+        <hr class="<?= $displayStatus ?>" />
 
 
         <h2 class="company" <?= $fontClass ?>><?= $textArray['invoice'][$LanguageMode] ?></h2>
@@ -262,6 +280,10 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
 
 
         <div class="bill-foooter" <?= $fontClass ?>><?= $textArray['greeting'][$LanguageMode] ?></div>
+        <?php
+        // Force Display
+        $displayStatus = 1;
+        ?>
         <hr />
         <div class="credits" style="margin-top:10px">Software by Payshia </div>
         <img class="logo-image" src="./assets/images/payshia-logo-p.png" style="width: 8mm; margin-top:10px;">
@@ -303,6 +325,46 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
                 // Close the window after printing
                 window.onafterprint = function() {
                     window.close();
+                };
+            <?php } else { ?>
+                JSPM.JSPrintManager.auto_reconnect = true;
+                JSPM.JSPrintManager.start();
+                JSPM.JSPrintManager.WS.onStatusChanged = function() {
+                    if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
+                        // Use html2canvas to convert the content to an image
+                        html2canvas(document.getElementById('inv'), {
+                            scale: 3
+                        }).then(function(canvas) {
+                            //Create a ClientPrintJob
+                            var cpj = new JSPM.ClientPrintJob();
+
+                            var myPrinter = new JSPM.InstalledPrinter('<?= $PrinterName ?>');
+                            myPrinter.paperName = '80(72.1) x 297 mm';
+
+                            cpj.clientPrinter = myPrinter;
+                            //Set content to print... 
+                            var b64Prefix = "data:image/png;base64,";
+                            var imgBase64DataUri = canvas.toDataURL("image/png");
+                            var imgBase64Content = imgBase64DataUri.substring(b64Prefix.length, imgBase64DataUri.length);
+
+                            var myImageFile = new JSPM.PrintFile(imgBase64Content, JSPM.FileSourceType.Base64, '<?= $invoice_number ?>.png', 1);
+                            //add file to print job
+                            cpj.files.push(myImageFile);
+
+
+
+                            //Send print job to printer!
+                            cpj.sendToClient();
+
+                            setTimeout(function() {
+                                // window.location.href = 'https://demo.payshia.com/pos-system/?last_invoice=true&display_invoice_number=<?= $invoice_number ?>&location_id=<?= $SelectedArray['location_id'] ?>';
+                                window.close();
+                            }, 1000); // 1000 milliseconds = 1 second
+
+                        });
+
+
+                    }
                 };
             <?php } ?>
 

@@ -261,9 +261,9 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                         ?>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="./printers">
                                 <i class="fa-solid fa-print menu-icon"></i>
-                                Printers <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                                Printers
                             </a>
                         </li>
 

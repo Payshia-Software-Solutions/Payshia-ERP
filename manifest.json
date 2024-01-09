@@ -1,0 +1,10 @@
+{
+    "manifest_version": 2,
+    "name": "Printer Extension",
+    "version": "1.0",
+    "permissions": ["print"],
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "popup.html"
+    }
+}

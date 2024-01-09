@@ -118,12 +118,15 @@ $change_amount = max($tendered_amount - $grand_total, 0);
 <?php
 $kotPrintStatus = GetSetting($link, $LocationID, 'kot_printer');
 $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
+
+$kotPrintMethod = GetSetting($link, $LocationID, 'kotPrintMethod');
+$receiptPrintMethod  = GetSetting($link, $LocationID, 'receiptPrintMethod');
 ?>
 
 
 <div class="row mt-0 g-1 mt-md-0">
     <div class="col-6 d-flex">
-        <button onclick="ProcessInvoice('<?= $invoice_number ?>', '1' , '<?= $kotPrintStatus ?>' )" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
+        <button onclick="ProcessInvoice('<?= $invoice_number ?>', '1' , '<?= $kotPrintStatus ?>', '<?= $kotPrintMethod ?>')" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
     </div>
     <div class="col-6 d-flex">
         <?php
@@ -131,13 +134,13 @@ $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
         ?>
             <button onclick="SetPayment()" class="text-white flex-fill w-100 btn btn-dark hold-button btn-lg action-button"><i class="fa-solid fa-money-bill btn-icon p-md-3"></i> Payment</button>
         <?php } else { ?>
-            <button onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
+            <button onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>', '<?= $receiptPrintMethod ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
         <?php } ?>
     </div>
     <?php
     if ($invoice_number != '0') { ?>
         <div class="col-12 d-flex">
-            <button onclick="PrintGuestReceipt('<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', 1)" class=" flex-fill text-white w-100 btn btn-secondary hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-receipt btn-icon"></i> Guest Receipt</button>
+            <button onclick="PrintGuestReceipt('<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', 1, '<?= $receiptPrintMethod ?>')" class=" flex-fill text-white w-100 btn btn-secondary hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-receipt btn-icon"></i> Guest Receipt</button>
         </div>
     <?php } ?>
 </div>

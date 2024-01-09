@@ -25,6 +25,9 @@ $CustomerName = GetCustomerName($link, $customer_code);
 $kotPrintStatus = GetSetting($link, $LocationID, 'kot_printer');
 $receiptPrinterStatus = GetSetting($link, $LocationID, 'receipt_printer');
 
+$kotPrintMethod = GetSetting($link, $LocationID, 'kotPrintMethod');
+$receiptPrintMethod  = GetSetting($link, $LocationID, 'receiptPrintMethod');
+
 
 $service_charge = $SelectedArray['service_charge'];
 $discountPercentage = $SelectedArray['discount_percentage'];
@@ -81,9 +84,9 @@ $netTotal = $grand_total - $discountAmount;
         <div class="row mt-3">
             <div class="col-12">
                 <?php if (strpos($invoice_number, 'INV') === 0) { ?>
-                    <button onclick="PrintInvoice ('<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', 1)" class="text-white w-100 btn btn-dark hold-button btn-lg p-4"><i class="fa-solid fa-print btn-icon"></i> Reprint Invoice</button>
+                    <button onclick="PrintInvoice ('<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', 1, '<?= $receiptPrintMethod ?>')" class="text-white w-100 btn btn-dark hold-button btn-lg p-4"><i class="fa-solid fa-print btn-icon"></i> Reprint Invoice</button>
                 <?php  } else { ?>
-                    <button onclick="PrintKOT ('<?= $invoice_number ?>', '<?= $kotPrintStatus ?>', '<?= $LocationID ?>', 1, 1)" class="text-white w-100 btn btn-dark hold-button btn-lg p-4 mt-2"><i class="fa-solid fa-print btn-icon"></i> Reprint Full KOT</button>
+                    <button onclick="PrintKOT ('<?= $invoice_number ?>', '<?= $kotPrintStatus ?>', '<?= $LocationID ?>', 1, 1, '<?= $kotPrintMethod ?>')" class="text-white w-100 btn btn-dark hold-button btn-lg p-4 mt-2"><i class="fa-solid fa-print btn-icon"></i> Reprint Full KOT</button>
                 <?php  } ?>
             </div>
 
@@ -93,7 +96,7 @@ $netTotal = $grand_total - $discountAmount;
                 foreach ($receipts as $SelectedArray) {
             ?>
                     <div class="col-12">
-                        <button onclick="PrintPaymentReceipt('<?= $SelectedArray['rec_number'] ?>','<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>')" class="text-white w-100 btn btn-secondary hold-button btn-lg p-4 mt-3"><i class="fa-solid fa-receipt btn-icon"></i> Payment Receipt</button>
+                        <button onclick="PrintPaymentReceipt('<?= $SelectedArray['rec_number'] ?>','<?= $invoice_number ?>', '<?= $receiptPrinterStatus ?>', '<?= $LocationID ?>', '<?= $receiptPrintMethod ?>')" class="text-white w-100 btn btn-secondary hold-button btn-lg p-4 mt-3"><i class="fa-solid fa-receipt btn-icon"></i> Payment Receipt</button>
                     </div>
             <?php
                 }

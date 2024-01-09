@@ -132,7 +132,12 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
     $file_path = "./assets/images/location/" . $selectedLocation['location_id'] . "/" . $selectedLocation['logo_path'];
 }
 
-
+$invoiceLogoStatus = GetSetting($link, $selectedLocation['location_id'], 'invoiceLogoStatus');
+if ($invoiceLogoStatus == 1) {
+    $displayStatus = "d-block";
+} else {
+    $displayStatus = "d-none";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -148,8 +153,18 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
         .d-none {
             display: none !important;
         }
-    </style>
 
+        @page {
+            size: 80mm;
+            /* Set the page size to 80mm */
+            margin: 0;
+            /* Adjust margins as needed */
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../node_modules/jsprintmanager/JSPrintManager.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script> -->
 </head>
 
 <body>
@@ -279,6 +294,10 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
             </tr>
         </table>
         <hr />
+        <?php
+        // Force Display
+        $displayStatus = 1;
+        ?>
         <div class="bill-foooter" <?= $fontClass ?>><?= $textArray['greeting'][$LanguageMode] ?></div>
         <div class="credits <?= $displayStatus ?>" style="margin-top:10px">Software by Payshia </div>
         <img class="logo-image <?= $displayStatus ?>" src="./assets/images/payshia-logo-p.png" style="width: 8mm; margin-top:10px;">
@@ -321,10 +340,53 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
                 window.onafterprint = function() {
                     window.close();
                 };
+            <?php } else { ?>
+                JSPM.JSPrintManager.auto_reconnect = true;
+                JSPM.JSPrintManager.start();
+                JSPM.JSPrintManager.WS.onStatusChanged = function() {
+                    if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
+                        // Use html2canvas to convert the content to an image
+                        html2canvas(document.getElementById('inv'), {
+                            scale: 3
+                        }).then(function(canvas) {
+                            //Create a ClientPrintJob
+                            var cpj = new JSPM.ClientPrintJob();
+
+                            var myPrinter = new JSPM.InstalledPrinter('<?= $PrinterName ?>');
+                            myPrinter.paperName = '80(72.1) x 297 mm';
+
+                            cpj.clientPrinter = myPrinter;
+                            //Set content to print... 
+                            var b64Prefix = "data:image/png;base64,";
+                            var imgBase64DataUri = canvas.toDataURL("image/png");
+                            var imgBase64Content = imgBase64DataUri.substring(b64Prefix.length, imgBase64DataUri.length);
+
+                            var myImageFile = new JSPM.PrintFile(imgBase64Content, JSPM.FileSourceType.Base64, '<?= $invoice_number ?>.png', 1);
+                            //add file to print job
+                            cpj.files.push(myImageFile);
+
+
+
+                            //Send print job to printer!
+                            cpj.sendToClient();
+
+                            setTimeout(function() {
+                                // window.location.href = 'https://demo.payshia.com/pos-system/?last_invoice=true&display_invoice_number=<?= $invoice_number ?>&location_id=<?= $SelectedArray['location_id'] ?>';
+                                window.close();
+                            }, 1000); // 1000 milliseconds = 1 second
+
+                        });
+
+
+                    }
+                };
             <?php } ?>
 
         });
     </script>
+
+    <!-- 80(72.1) x 210 mm -->
+    <!-- 80(72.1) x 297 mm -->
 
 </body>
 

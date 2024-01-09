@@ -3,12 +3,40 @@
     "short_name": "Payshia",
     "description": "#1 POS Solution in Sri Lanka",
     "start_url": "/pos-system/",
+    "display_override": ["fullscreen"],
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#333",
     "icons": [{
-        "src": "./assets/images/pos-logo.png",
-        "sizes": "192x192",
-        "type": "image/png"
-    }]
+            "src": "./assets/images/app-icon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "./assets/images/app-icon/android-chrome-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "./assets/images/app-icon/android-chrome-512x512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [{
+            "src": "./assets/images/app-icon/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Payshia POS"
+        },
+        {
+            "src": "./assets/images/app-icon/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Payshia POS Mobile"
+        }
+    ]
 }

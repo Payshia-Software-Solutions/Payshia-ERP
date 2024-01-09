@@ -10,7 +10,7 @@ $FilterType = $_POST['FilterType'];
 $LocationID = $_POST['LocationID'];
 $IconMode = GetSetting($link, $LocationID, 'itemImage');
 $brandFilter = GetSetting($link, $LocationID, 'brandFilter');
-$barcodeDisplay = 1;
+$barcodeDisplay = GetSetting($link, $LocationID, 'barcodeDisplay');
 ?>
 <div class="row">
     <div class="col-12">

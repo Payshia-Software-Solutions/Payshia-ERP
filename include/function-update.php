@@ -880,7 +880,7 @@ function GetHoldItemQty($link, $LocationID)
 {
 
     $ArrayResult = array();
-    $sql = "SELECT *  FROM `transaction_invoice` WHERE `invoice_status` LIKE '1' AND `location_id` LIKE '$LocationID' ORDER BY `id`";
+    $sql = "SELECT *  FROM `transaction_invoice` WHERE `invoice_status` LIKE '1' AND `is_active` LIKE 1 AND `location_id` LIKE '$LocationID' ORDER BY `id`";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -2292,27 +2292,27 @@ function GetRemovalNotices($link)
 {
 
     $ArrayResult = array();
-    $sql = " SELECT * FROM `transaction_removal_remark`";
+    $sql = " SELECT * FROM `transaction_removal_remark` ORDER BY `id` DESC";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
-            $ArrayResult[$row['user_name']] = $row;
+            $ArrayResult[$row['id']] = $row;
         }
     }
     return $ArrayResult;
 }
 
 
-function SaveRemovalNotice($link, $ref_id, $remark, $user_id, $created_by, $location_id)
+function SaveRemovalNotice($link, $ref_id, $remark, $user_id, $created_by, $location_id, $product_id)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
 
-    $sql = "INSERT INTO `transaction_removal_remark` (`ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`) VALUES (?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO `transaction_removal_remark` (`ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`, `product_id`) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssssss", $ref_id, $remark, $user_id,  $created_by, $current_time, $location_id);
+        mysqli_stmt_bind_param($stmt_sql, "sssssss", $ref_id, $remark, $user_id,  $created_by, $current_time, $location_id, $product_id);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Remark Saved successfully');
         } else {
@@ -2325,6 +2325,8 @@ function SaveRemovalNotice($link, $ref_id, $remark, $user_id, $created_by, $loca
 
     return json_encode($error);
 }
+
+
 
 
 function CancelInvoice($link, $invoice_number)

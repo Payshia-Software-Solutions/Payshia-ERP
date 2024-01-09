@@ -82,11 +82,11 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
                                         <i class="fa-solid fa-right-left m-0"></i>
                                         <p class="m-0">Return</p>
                                     </button>
-                                    <button type="button" class="btn btn-sm  btn-danger mr-2  d-none d-lg-inline "><i class="fa-solid fa-money-bill-trend-up"></i>
-                                        <p class="mb-0">Refund</p>
+                                    <button type="button" onclick="OpenRemovalNotices()" class="btn btn-sm  btn-danger mr-2  d-none d-lg-inline "><i class="fa-solid fa-bars"></i>
+                                        <p class="mb-0">Remarks</p>
                                     </button>
-                                    <button type="button" class="btn btn-sm  btn-secondary mr-2  d-none d-lg-inline "><i class="fa-solid fa-gift"></i>
-                                        <p class="mb-0">Gift</p>
+                                    <button id="fullscreenButton" onclick="toggleFullscreen()" type="button" class="btn btn-sm  btn-secondary mr-2  d-none d-lg-inline "><i class="fa-solid fa-expand"></i>
+                                        <p class="mb-0">Full</p>
                                     </button>
                                     <button type="button" class="btn btn-sm  btn-success mr-2  d-none d-lg-inline "><i class="fa-solid fa-money-bill"></i>
                                         <p class="mb-0">Expenses</p>
@@ -132,6 +132,11 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
                                     Sales
                                 </a>
 
+                                <a href="./choice-location" class="list-group-item list-group-item-action text-center">
+                                    <i class="fa-solid fa-location-dot fs-3  d-block mx-auto"></i>
+                                    Branch
+                                </a>
+
                                 <a href="./logout" class="list-group-item list-group-item-action text-center">
                                     <i class="fa-solid fa-right-from-bracket fs-3  d-block mx-auto"></i>
                                     Logout
@@ -157,7 +162,7 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
 
                 <?php include './include/footer.php' ?>
 
-                <script src="./assets/js/index-1.7.js"></script>
+                <script src="./assets/js/index-1.8.js"></script>
                 <script type="text/javascript" src="./assets/js/qz-tray.js"></script>
                 <script>
                     $("#menu-toggle").click(function(e) {

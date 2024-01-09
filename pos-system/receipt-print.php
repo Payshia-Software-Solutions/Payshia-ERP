@@ -4,6 +4,7 @@ include '../include/function-update.php';
 
 $netTotal = $total = 0;
 $rec_number = $_GET['rec_number'];
+$PrinterName = $_GET['PrinterName'];
 $Receipt =  GetReceiptByNumber($link, $rec_number)[$rec_number];
 
 $type = $Receipt['type'];
@@ -14,8 +15,6 @@ $amount = $Receipt['amount'];
 $created_by = $Receipt['created_by'];
 $ref_id = $Receipt['ref_id'];
 $location_id = $Receipt['location_id'];
-
-
 
 
 $SelectedInvoiceArray = GetInvoiceByNumber($link, $ref_id);
@@ -58,7 +57,23 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./assets/css/print-invoice-1.0.css" />
     <title><?= $rec_number ?></title>
-    <style></style>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@200;300&display=swap');
+
+        .d-none {
+            display: none !important;
+        }
+
+        @page {
+            size: 80mm;
+            /* Set the page size to 80mm */
+            margin: 0;
+            /* Adjust margins as needed */
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../node_modules/jsprintmanager/JSPrintManager.js"></script>
 </head>
 
 <body>
@@ -119,11 +134,13 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
             var filledHeight = calculateFilledHeightInMillimeters(invElement);
 
             filledHeight = parseFloat(filledHeight) + 30; // Parse to an integer and then add 40
+
             // Update the @page size in your style tag
             var styleTag = document.createElement("style");
             styleTag.innerHTML = `
             @media print {
                 @page {
+                    size: 78mm ${filledHeight}mm; /* Set the calculated height */
                     margin: 0;
                     /* Adjust margins as needed */
                 }
@@ -138,6 +155,56 @@ if ($selectedLocation['logo_path'] == 'no-image.png') {
             // window.onafterprint = function() {
             //     window.close();
             // };
+
+            <?php if ($PrinterName == "default") { ?>
+                // Print the page
+                window.print();
+
+                // Close the window after printing
+                window.onafterprint = function() {
+                    window.close();
+                };
+            <?php } else { ?>
+                JSPM.JSPrintManager.auto_reconnect = true;
+                JSPM.JSPrintManager.start();
+                JSPM.JSPrintManager.WS.onStatusChanged = function() {
+                    if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open) {
+                        // Use html2canvas to convert the content to an image
+                        html2canvas(document.getElementById('inv'), {
+                            scale: 3
+                        }).then(function(canvas) {
+                            //Create a ClientPrintJob
+                            var cpj = new JSPM.ClientPrintJob();
+
+                            var myPrinter = new JSPM.InstalledPrinter('<?= $PrinterName ?>');
+                            myPrinter.paperName = '80(72.1) x 297 mm';
+
+                            cpj.clientPrinter = myPrinter;
+                            //Set content to print... 
+                            var b64Prefix = "data:image/png;base64,";
+                            var imgBase64DataUri = canvas.toDataURL("image/png");
+                            var imgBase64Content = imgBase64DataUri.substring(b64Prefix.length, imgBase64DataUri.length);
+
+                            var myImageFile = new JSPM.PrintFile(imgBase64Content, JSPM.FileSourceType.Base64, '<?= $rec_number ?>.png', 1);
+                            //add file to print job
+                            cpj.files.push(myImageFile);
+
+
+
+                            //Send print job to printer!
+                            cpj.sendToClient();
+
+                            setTimeout(function() {
+                                // window.location.href = 'https://demo.payshia.com/pos-system/?last_invoice=true&display_invoice_number=<?= $rec_number ?>&location_id=<?= $location_id ?>';
+                                window.close();
+                            }, 1000); // 1000 milliseconds = 1 second
+
+                        });
+
+
+                    }
+                };
+            <?php } ?>
         });
     </script>
 

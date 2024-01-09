@@ -16,8 +16,10 @@ $locationType = $Locations[$LocationID]['location_type'];
 
 <div class="row mt-3">
     <div class="col-12 text-end">
+
         <button type="button" id="hold-list" class="btn refresh-button mr-2" onclick="GetHoldInvoices ('<?= $LocationID ?>', 0)">
             <i class="fa-solid fa-bars"></i> Hold Bills </button>
+        <button type="button" onclick="toggleFullscreen()" class="btn refresh-button mr-2"><i class="fa-solid fa-expand"></i></button>
         <button type="button" onclick="OpenIndex()" class="btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate"></i></button>
         <button type="button" onclick="PromptCloseApp(0)" class="btn refresh-button mr-2"><i class="fa-solid fa-power-off"></i> Exit</button>
     </div>
@@ -105,4 +107,11 @@ $locationType = $Locations[$LocationID]['location_type'];
     <?php
     }
     ?>
+</div>
+
+<div class="row">
+    <div class="col-12 text-end">
+        <a href="./choice-location" type="button" class="btn btn-secondary mr-2">
+            <i class="fa-solid fa-location-dot"></i> Change Branch </a>
+    </div>
 </div>

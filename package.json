@@ -2,6 +2,7 @@
   "dependencies": {
     "chart.js": "^4.4.0",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "jsprintmanager": "^6.0.3",
     "sweetalert2": "^11.10.0",
     "tinymce": "^6.8.2"
   }

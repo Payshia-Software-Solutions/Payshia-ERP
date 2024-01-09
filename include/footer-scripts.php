@@ -14,7 +14,6 @@
 <script src="./vendor/datatables/Buttons-2.4.2/js/buttons.print.min.js"></script>
 <script src="./vendor/datatables/Buttons-2.4.2/js/buttons.colVis.min.js"></script>
 <script src="./node_modules/sweetalert2/dist/sweetalert2.min.js"></script>
-
 <script src="./vendor/select2/dist/js/select2.min.js"></script>
 
 <script>

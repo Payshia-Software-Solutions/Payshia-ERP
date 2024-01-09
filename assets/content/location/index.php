@@ -65,11 +65,22 @@ $InactiveCount = 0;
                 $color = "primary";
             }
 
+
+            if ($Location['logo_path'] == 'no-image.png') {
+                $file_path = "./pos-system/assets/images/pos-logo.png";
+            } else {
+                $file_path = "./pos-system/assets/images/location/" . $Location['location_id'] . "/" . $Location['logo_path'];
+            }
+
     ?>
             <div class="col-6 col-md-3 mb-3 d-flex">
                 <div class="card flex-fill">
                     <div class="card-body p-2 pb-2">
                         <span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span>
+                        <div class="text-center">
+                            <img class="logo-image" style="max-height: 60px;" src="<?= $file_path ?>" onerror="this.src='./pos-system/assets/images/pos-logo.png';">
+
+                        </div>
                         <h1 class="tutor-name mt-2"><?= $location_name ?></h1>
                         <div class="text-end mt-3">
                             <button class="mt-0 mb-1 btn btn-sm btn-dark view-button" type="button" onclick="AddNewLocation (1, '<?= $Location['location_id'] ?>')"><i class="fa-solid fa-pen-to-square"></i> Update</button>

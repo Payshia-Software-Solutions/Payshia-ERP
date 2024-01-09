@@ -3,7 +3,7 @@
 
  <!-- Add CSS -->
  <link rel="stylesheet" href="../vendor/bootstrap/css/bootstrap.min.css" />
- <link rel="stylesheet" href="./assets/css/styles-1.1.css" />
+ <link rel="stylesheet" href="./assets/css/styles-1.2.css" />
  <link rel="stylesheet" href="./assets/css/loader.css" />
  <link rel="manifest" href="./manifest.json">
 

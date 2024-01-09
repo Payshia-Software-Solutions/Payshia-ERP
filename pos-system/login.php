@@ -123,7 +123,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="../assets/images/favicon/apple-touch-icon.png" rel="icon">
     <link href="../assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon">
 
-    <title>Login | UniERP POS Solution</title>
+    <title>Login | Payshia POS Solution</title>
 </head>
 
 <body class="login">
@@ -133,9 +133,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
                 <div class="signin-form d-block">
-                    <img class="" src="./assets/images/unierp.png" width="150px">
-                    <h2 class=" text-center my-4 border-top pt-3">Sign in to UniERP POS Solution</h2>
-                    <p class=" text-secondary">Use your email account or User Name!</p>
+                    <h2 class=" text-center mb-4">Sign in to <?= $SiteTitle ?> POS System</h2>
+                    <i class="fa-brands fa-facebook menu-icon"></i>
+                    <i class="fa-brands fa-google-plus-g menu-icon"></i>
+                    <i class="fa-brands fa-linkedin-in menu-icon"></i>
+                    <p class="mt-4 text-secondary">Or use your email account!</p>
                     <form class="" action="" method="post">
                         <div class="row">
                             <div class="col-12">
@@ -181,7 +183,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="d-none d-md-inline col-md-4 p-5 text-center side-bar-color">
                 <div class="inner-content d-block  signin-content">
-                    <img class="bg-light p-3 rounded-4" src="./assets/images/unierp.png" width="150px">
+                    <img class="" src="./assets/images/payshia-logo-p.png" width="150px">
                     <h2 class="text-center mt-2">Welcome Back!</h2>
                     <p class="px-5">To Keep Connected with us please login with your personal info.</p>
                 </div>

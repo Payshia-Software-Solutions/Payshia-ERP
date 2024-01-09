@@ -17,7 +17,7 @@ function openURLInNewWindow(url) {
     var sanitizedUrl = validateAndSanitizeUrl(url);
 
     // Open the URL in a new window
-    window.open(sanitizedUrl, '_blank');
+    window.open(sanitizedUrl, "_blank");
 }
 
 function openURL(url) {
@@ -98,7 +98,7 @@ function PromptCloseApp(exitButtonStatus) {
                 UserLevel: UserLevel,
                 company_id: company_id,
                 LocationID: LocationID,
-                exitButtonStatus: exitButtonStatus
+                exitButtonStatus: exitButtonStatus,
             },
             success: function(data) {
                 $("#pop-content").html(data);
@@ -109,12 +109,40 @@ function PromptCloseApp(exitButtonStatus) {
     fetch_data();
 }
 
+function toggleFullscreen() {
+    var elem = document.documentElement;
+
+    if (!document.fullscreenElement && !document.mozFullScreenElement &&
+        !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+            elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+}
+
 const InnerLoader = document.getElementById(
     "inner-preloader-content"
 ).innerHTML;
 // const InnerLoader = 'Please Wait..'
 
 function OpenIndex() {
+
     function fetch_data() {
         SetTable();
         $.ajax({
@@ -128,6 +156,7 @@ function OpenIndex() {
             },
             success: function(data) {
                 $("#index-content").html(data);
+
                 OpenItemContainer(0, "not-set");
                 OpenBillContainer("Table Not Set", -1, 1, 0, 0, 0, 0, 1, "Default", 0);
             },
@@ -208,6 +237,7 @@ function OpenBillContainer(
 
 function OpenQtySelector(ProductID, ItemPrice, ItemDiscount, CurrentStock) {
     var TableID = document.getElementById("set-table").getAttribute("data-id");
+    document.getElementById("search-key-2").blur();
 
     function fetch_data() {
         OpenPopup();
@@ -223,11 +253,10 @@ function OpenQtySelector(ProductID, ItemPrice, ItemDiscount, CurrentStock) {
                 ItemPrice: ItemPrice,
                 ItemDiscount: ItemDiscount,
                 CurrentStock: CurrentStock,
-                LocationID: LocationID
+                LocationID: LocationID,
             },
             success: function(data) {
                 $("#pop-content").html(data);
-
             },
         });
     }
@@ -238,8 +267,6 @@ function OpenQtySelector(ProductID, ItemPrice, ItemDiscount, CurrentStock) {
         fetch_data();
     }
 }
-
-
 
 function appendToInput(value) {
     var inputBox = document.getElementById("qty-input");
@@ -263,7 +290,9 @@ function AddToCart(ProductID) {
         .getElementById("customer-id")
         .getAttribute("data-id");
 
-    var stewardID = document.getElementById("set-steward").getAttribute("data-id");
+    var stewardID = document
+        .getElementById("set-steward")
+        .getAttribute("data-id");
     var stewardName = document.getElementById("set-steward").value;
     var ItemPrice = document.getElementById("itemPrice").value;
     var ItemDiscount = document.getElementById("itemDiscount").value;
@@ -290,7 +319,7 @@ function AddToCart(ProductID) {
                 CustomerID: CustomerID,
                 ItemQty: ItemQty,
                 TableID: TableID,
-                LocationID: LocationID
+                LocationID: LocationID,
             },
             success: function(data) {
                 var response = JSON.parse(data);
@@ -312,7 +341,7 @@ function AddToCart(ProductID) {
                 } else {
                     var result = response.message;
                     var htmlOutput = response.htmlOutput;
-                    $('#pop-content').html(htmlOutput)
+                    $("#pop-content").html(htmlOutput);
                     showNotification(result);
                 }
                 showNotification(result);
@@ -347,7 +376,9 @@ function RemoveFromCart(ProductID) {
 
     document.getElementById("pop-content").innerHTML = InnerLoader;
 
-    var stewardID = document.getElementById("set-steward").getAttribute("data-id");
+    var stewardID = document
+        .getElementById("set-steward")
+        .getAttribute("data-id");
     var stewardName = document.getElementById("set-steward").value;
     var discount_rate = document.getElementById("discount_rate").value;
     var chargeStatus = document.getElementById("charge_status").value;
@@ -386,7 +417,7 @@ function RemoveFromCart(ProductID) {
                 }
                 showNotification(result);
 
-                ClosePopUP()
+                ClosePopUP();
             },
         });
     }
@@ -430,8 +461,9 @@ function SetTableValue(TableID, TableName) {
         $("#charge_status").val(1);
     }
 
-
-    var stewardID = document.getElementById("set-steward").getAttribute("data-id");
+    var stewardID = document
+        .getElementById("set-steward")
+        .getAttribute("data-id");
     var stewardName = document.getElementById("set-steward").value;
     var discount_rate = document.getElementById("discount_rate").value;
     var chargeStatus = document.getElementById("charge_status").value;
@@ -483,7 +515,6 @@ function SetStewardValue(stewardID, stewardName) {
     document.getElementById("set-steward").setAttribute("data-id", stewardID);
     document.getElementById("set-steward").value = stewardName;
 
-
     var TableID = document.getElementById("set-table").getAttribute("data-id");
     var TableName = document.getElementById("set-table").value;
 
@@ -518,14 +549,15 @@ function SetInputFocus() {
     var inputBox = document.getElementById("search-key-2");
     inputBox.focus();
     inputBox.select();
-
 }
 
-function ProcessInvoice(InvoiceNumber, InvoiceStatus, PrinterStatus) {
+function ProcessInvoice(InvoiceNumber, InvoiceStatus, PrinterStatus, PrintMethod) {
     var PrintType = PrinterStatus;
-    var reprintStatus = 0
+    var reprintStatus = 0;
     var TableID = document.getElementById("set-table").getAttribute("data-id");
-    var stewardID = document.getElementById("set-steward").getAttribute("data-id");
+    var stewardID = document
+        .getElementById("set-steward")
+        .getAttribute("data-id");
     var CustomerID = document
         .getElementById("customer-id")
         .getAttribute("data-id");
@@ -563,14 +595,27 @@ function ProcessInvoice(InvoiceNumber, InvoiceStatus, PrinterStatus) {
                         }
                         if (InvoiceStatus == "2") {
                             reprintStatus = 0;
-                            PrintInvoice(insert_invoice_number, PrintType, LocationID, reprintStatus);
+                            PrintInvoice(
+                                insert_invoice_number,
+                                PrintType,
+                                LocationID,
+                                reprintStatus,
+                                PrintMethod
+                            );
                         } else if (InvoiceStatus == "1") {
-                            PrintKOT(insert_invoice_number, PrintType, LocationID, reprintStatus, 0);
+                            PrintKOT(
+                                insert_invoice_number,
+                                PrintType,
+                                LocationID,
+                                reprintStatus,
+                                0,
+                                PrintMethod
+                            );
                         }
                     } else {
                         var result = response.message;
                     }
-                    OpenIndex()
+                    OpenIndex();
                     showNotification(result);
                     hideOverlay();
                     InvoiceFinishWindow(insert_invoice_number);
@@ -664,7 +709,7 @@ function GetHoldInvoices(LocationID, closeButtonStatus) {
                 UserLevel: UserLevel,
                 company_id: company_id,
                 LocationID: LocationID,
-                closeButtonStatus: closeButtonStatus
+                closeButtonStatus: closeButtonStatus,
             },
             success: function(data) {
                 // $("#bill-container").html(data);
@@ -731,88 +776,153 @@ function TakeHoldToCart(
 
 function DefaultPrintInvoice(InvoiceNumber, PrinterName) {
     // Replace 'bill-print.php' with the actual URL of your PHP script
-    var windowWidth = 600 // Adjust this width as needed
-    var windowHeight = 800 // Adjust this height as needed
+    var windowWidth = 600; // Adjust this width as needed
+    var windowHeight = 800; // Adjust this height as needed
 
     // Calculate the center position based on screen dimensions
-    var screenWidth = window.screen.availWidth
-    var screenHeight = window.screen.availHeight
-    var left = (screenWidth - windowWidth) / 2
-    var top = (screenHeight - windowHeight) / 2
+    var screenWidth = window.screen.availWidth;
+    var screenHeight = window.screen.availHeight;
+    var left = (screenWidth - windowWidth) / 2;
+    var top = (screenHeight - windowHeight) / 2;
 
     // Replace 'bill-print.php' with the actual URL of your PHP script
-    var printWindow = window.open('invoice-print.php?PrinterName=' + PrinterName + '&invoice_number=' + InvoiceNumber, '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top)
+    var printWindow = window.open(
+        "invoice-print.php?PrinterName=" +
+        PrinterName +
+        "&invoice_number=" +
+        InvoiceNumber,
+        "_blank",
+        "width=" +
+        windowWidth +
+        ",height=" +
+        windowHeight +
+        ",left=" +
+        left +
+        ",top=" +
+        top
+    );
 
     // Check if the window was opened successfully
     if (printWindow) {
         // Add an event listener to print once the content is loaded
-        printWindow.addEventListener('load', function() {
-            printWindow.document.location.href = 'invoice-print.php?PrinterName=' + PrinterName + '&invoice_number=' + InvoiceNumber
-            printWindow.print()
-        })
+        printWindow.addEventListener("load", function() {
+            printWindow.document.location.href =
+                "invoice-print.php?PrinterName=" +
+                PrinterName +
+                "&invoice_number=" +
+                InvoiceNumber;
+            printWindow.print();
+        });
     } else {
-        alert('The popup window was blocked. Please allow pop-ups for this site.')
+        alert("The popup window was blocked. Please allow pop-ups for this site.");
     }
 }
 
-function PrintInvoice(InvoiceNumber, PrinterName, locationID, reprintStatus) {
+function PrintInvoice(InvoiceNumber, PrinterName, locationID, reprintStatus, PrintMethod = "Popup Window") {
     // Replace 'kot-print.php' with the actual URL of your PHP script
     var url =
         "invoice-print.php?invoice_number=" +
         InvoiceNumber +
         "&PrinterName=" +
-        PrinterName + "&locationID=" +
-        locationID + '&reprintStatus=' + reprintStatus;
+        PrinterName +
+        "&locationID=" +
+        locationID +
+        "&reprintStatus=" +
+        reprintStatus;
 
     // Navigate to the KOT URL in the same window
-    if (PrinterName != 'default') {
-        window.location.href = url;
-    } else {
-        window.open(url, '_blank');
-    }
+    // if (PrinterName != 'default') {
+    //     window.location.href = url;
+    // } else {
+    //     window.open(url, '_blank');
+    // }
+
+    // window.open(url, "_blank");
+    DoPrinting(PrintMethod, url)
 }
 
-function PrintGuestReceipt(InvoiceNumber, PrinterName, locationID, reprintStatus) {
+function PrintGuestReceipt(
+    InvoiceNumber,
+    PrinterName,
+    locationID,
+    reprintStatus,
+    PrintMethod = "Popup Window"
+) {
     // Replace 'kot-print.php' with the actual URL of your PHP script
     var url =
         "custom-1.php?invoice_number=" +
         InvoiceNumber +
         "&PrinterName=" +
-        PrinterName + "&locationID=" +
-        locationID + '&reprintStatus=' + reprintStatus;
+        PrinterName +
+        "&locationID=" +
+        locationID +
+        "&reprintStatus=" +
+        reprintStatus;
 
-    // Navigate to the KOT URL in the same window
-    if (PrinterName != 'default') {
+    DoPrinting(PrintMethod, url)
+
+}
+
+function DoPrinting(PrintMethod, url) {
+    if (PrintMethod == "Popup Window") {
+        OpenPopUp(url)
+    } else if (PrintMethod == "New Tab") {
+        window.open(url, "_blank");
+    } else if (PrintMethod == "Same Window") {
         window.location.href = url;
     } else {
-        window.open(url, '_blank');
+        OpenPopUp(url)
     }
 }
 
 function DefaultPrintKOT(InvoiceNumber, PrinterName) {
-    console.log('print_invoice');
     // Replace 'bill-print.php' with the actual URL of your PHP script
-    var windowWidth = 600 // Adjust this width as needed
-    var windowHeight = 800 // Adjust this height as needed
+    var windowWidth = 600; // Adjust this width as needed
+    var windowHeight = 800; // Adjust this height as needed
 
     // Calculate the center position based on screen dimensions
-    var screenWidth = window.screen.availWidth
-    var screenHeight = window.screen.availHeight
-    var left = (screenWidth - windowWidth) / 2
-    var top = (screenHeight - windowHeight) / 2
+    var screenWidth = window.screen.availWidth;
+    var screenHeight = window.screen.availHeight;
+    var left = (screenWidth - windowWidth) / 2;
+    var top = (screenHeight - windowHeight) / 2;
 
     // Replace 'bill-print.php' with the actual URL of your PHP script
-    var printWindow = window.open('kot-print.php?PrinterName=' + PrinterName + '&invoice_number=' + InvoiceNumber, '_blank', 'width=' + windowWidth + ',height=' + windowHeight + ',left=' + left + ',top=' + top)
+    var printWindow = window.open("kot-print.php?PrinterName=" + PrinterName + "&invoice_number=" + InvoiceNumber, "_blank", "width=" + windowWidth + ",height=" + windowHeight + ",left=" + left + ",top=" + top);
 
     // Check if the window was opened successfully
     if (printWindow) {
         // Add an event listener to print once the content is loaded
-        printWindow.addEventListener('load', function() {
-            printWindow.document.location.href = 'kot-print.php?PrinterName=' + PrinterName + '&invoice_number=' + InvoiceNumber
-            printWindow.print()
-        })
+        printWindow.addEventListener("load", function() {
+            // printWindow.document.location.href = "kot-print.php?PrinterName=" + PrinterName + "&invoice_number=" + InvoiceNumber;
+            printWindow.print();
+        });
     } else {
-        alert('The popup window was blocked. Please allow pop-ups for this site.')
+        alert("The popup window was blocked. Please allow pop-ups for this site.");
+    }
+}
+
+function OpenPopUp(linkURL) {
+    // Replace 'bill-print.php' with the actual URL of your PHP script
+    var windowWidth = 340; // Adjust this width as needed
+    var windowHeight = 800; // Adjust this height as needed
+
+    // Calculate the center position based on screen dimensions
+    var screenWidth = window.screen.availWidth;
+    var screenHeight = window.screen.availHeight;
+    var left = (screenWidth - windowWidth) / 2;
+    var top = (screenHeight - windowHeight) / 2;
+
+    // Replace 'bill-print.php' with the actual URL of your PHP script
+    var printWindow = window.open(linkURL, "_blank", "width=" + windowWidth + ",height=" + windowHeight + ",left=" + left + ",top=" + top);
+
+    // Check if the window was opened successfully
+    if (printWindow) {
+        // Add an event listener to print once the content is loaded
+        // printWindow.addEventListener("load", function() {
+        //     printWindow.print();
+        // });
+    } else {
+        alert("The popup window was blocked. Please allow pop-ups for this site.");
     }
 }
 
@@ -823,22 +933,17 @@ function DefaultPrintKOT(InvoiceNumber, PrinterName) {
 //     window.open(newTabUrl);
 // }
 
-function PrintKOT(InvoiceNumber, PrinterName, locationID, reprintStatus, forceStatus) {
+function PrintKOT(InvoiceNumber, PrinterName, locationID, reprintStatus, forceStatus, PrintMethod = "Popup Window") {
     // Replace 'kot-print.php' with the actual URL of your PHP script
-    var url =
-        "kot-print.php?invoice_number=" +
-        InvoiceNumber +
-        "&PrinterName=" +
-        PrinterName + "&locationID=" +
-        locationID + "&reprintStatus=" + reprintStatus + "&forceStatus=" + forceStatus;
-
-
+    var url = `kot-print.php?invoice_number=${InvoiceNumber}&PrinterName=${PrinterName}&locationID=${locationID}&reprintStatus=${reprintStatus}&forceStatus=${forceStatus}`;
     // Navigate to the KOT URL in the same window
-    if (PrinterName != 'default') {
-        window.location.href = url;
-    } else {
-        window.open(url, '_blank');
-    }
+    // if (PrinterName != 'default') {
+    //     window.location.href = url;
+    // } else {
+    //     window.open(url, '_blank');
+    // }
+    // window.open(url, "_blank");
+    DoPrinting(PrintMethod, url)
 }
 
 // function PrintKOT(InvoiceNumber, PrinterName) {
@@ -901,7 +1006,13 @@ function PrintKOT(InvoiceNumber, PrinterName, locationID, reprintStatus, forceSt
 //     }
 // }
 
-function PrintPaymentReceipt(RecNumber, InvoiceNumber, PrinterName, locationID) {
+function PrintPaymentReceipt(
+    RecNumber,
+    InvoiceNumber,
+    PrinterName,
+    locationID,
+    PrintMethod = "Popup Window"
+) {
     // Replace 'kot-print.php' with the actual URL of your PHP script
     var url =
         "receipt-print.php?invoice_number=" +
@@ -909,15 +1020,12 @@ function PrintPaymentReceipt(RecNumber, InvoiceNumber, PrinterName, locationID) 
         "&PrinterName=" +
         PrinterName +
         "&rec_number=" +
-        RecNumber + "&locationID=" +
+        RecNumber +
+        "&locationID=" +
         locationID;
 
     // Navigate to the KOT URL in the same window
-    if (PrinterName != 'default') {
-        window.location.href = url;
-    } else {
-        window.open(url, '_blank');
-    }
+    DoPrinting(PrintMethod, url)
 }
 
 function InvoiceFinishWindow(InvoiceNumber) {
@@ -1081,7 +1189,7 @@ function SaveCustomer() {
 }
 
 function ValidateStockToCart(recipeType, LocationID, ProductID, itemType) {
-    var CartQty = document.getElementById('qty-input').value
+    var CartQty = document.getElementById("qty-input").value;
 
     function fetch_data() {
         showNotification("Checking stock availability");
@@ -1090,14 +1198,18 @@ function ValidateStockToCart(recipeType, LocationID, ProductID, itemType) {
             method: "POST",
             data: {
                 LocationID: LocationID,
-                ProductID: ProductID
+                ProductID: ProductID,
             },
             success: function(data) {
                 var response = JSON.parse(data);
                 if (response.status === "success") {
                     var stock_balance = response.stock_balance;
-                    if (stock_balance >= CartQty || recipeType == '1' || itemType == "SService") {
-                        AddToCart(ProductID)
+                    if (
+                        stock_balance >= CartQty ||
+                        recipeType == "1" ||
+                        itemType == "SService"
+                    ) {
+                        AddToCart(ProductID);
                     } else {
                         showNotification("Insufficient Stock to Proceed");
                     }
@@ -1131,7 +1243,6 @@ function OpenSetting() {
     fetch_data();
 }
 
-
 function UpdateSetting(settingKey, settingValue) {
     // document.getElementById("pop-content").innerHTML = InnerLoader;
 
@@ -1150,9 +1261,9 @@ function UpdateSetting(settingKey, settingValue) {
             success: function(data) {
                 var response = JSON.parse(data);
                 if (response.status === "success") {
-                    var message = response.message
-                    OpenSetting()
-                    OpenIndex()
+                    var message = response.message;
+                    OpenSetting();
+                    OpenIndex();
                     showNotification(message);
                 } else {
                     showNotification("Something went Wrong!");
@@ -1168,7 +1279,9 @@ function OpenRemoval(productID, invoiceNumber) {
     OpenPopup();
     document.getElementById("pop-content").innerHTML = InnerLoader;
 
-    var stewardID = document.getElementById("set-steward").getAttribute("data-id");
+    var stewardID = document
+        .getElementById("set-steward")
+        .getAttribute("data-id");
 
     function fetch_data() {
         $.ajax({
@@ -1182,6 +1295,29 @@ function OpenRemoval(productID, invoiceNumber) {
                 productID: productID,
                 invoiceNumber: invoiceNumber,
                 stewardID: stewardID,
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function OpenRemovalNotices() {
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/deleted-items.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
             },
             success: function(data) {
                 $("#pop-content").html(data);
@@ -1210,8 +1346,8 @@ function SetRemovalNotice(refKey, reason, userID, productID) {
             success: function(data) {
                 var response = JSON.parse(data);
                 if (response.status === "success") {
-                    var message = response.message
-                    RemoveFromCart(productID)
+                    var message = response.message;
+                    RemoveFromCart(productID);
                     showNotification(message);
                 } else {
                     showNotification("Something went Wrong!");
@@ -1224,7 +1360,6 @@ function SetRemovalNotice(refKey, reason, userID, productID) {
     } else {
         showNotification("Please specify the reason to remove!");
     }
-
 }
 
 function OpenProductSelector(FilterKey, FilterType) {
@@ -1241,7 +1376,7 @@ function OpenProductSelector(FilterKey, FilterType) {
                 company_id: company_id,
                 LocationID: LocationID,
                 FilterKey: FilterKey,
-                FilterType: FilterType
+                FilterType: FilterType,
             },
             success: function(data) {
                 $("#pop-content").html(data);
@@ -1264,7 +1399,7 @@ function OpenButtonSet() {
                 LoggedUser: LoggedUser,
                 UserLevel: UserLevel,
                 company_id: company_id,
-                LocationID: LocationID
+                LocationID: LocationID,
             },
             success: function(data) {
                 $("#pop-content").html(data);

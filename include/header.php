@@ -509,35 +509,35 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                     <ul class="submenu">
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
+                            <a class="nav-link" href="seasonal-offers">
                                 <i class="fa-solid fa-clock menu-icon"></i>
                                 Seasonal Discounts
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
+                            <a class="nav-link" href="#">
                                 <i class="fa-solid fa-business-time menu-icon"></i>
                                 Item Discounts
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
+                            <a class="nav-link" href="#">
                                 <i class="fa-solid fa-socks menu-icon"></i>
                                 BOGO Type
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
+                            <a class="nav-link" href="#">
                                 <i class="fa-solid fa-ticket menu-icon"></i>
                                 Coupons Codes
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./chart-of-accounts">
+                            <a class="nav-link" href="#">
                                 <i class="fa-solid fa-user-tie menu-icon"></i>
                                 Employee Discounts
                             </a>

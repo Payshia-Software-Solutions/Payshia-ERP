@@ -511,7 +511,7 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                         <li class="nav-item">
                             <a class="nav-link" href="seasonal-offers">
                                 <i class="fa-solid fa-clock menu-icon"></i>
-                                Seasonal Discounts
+                                Timed Discounts
                             </a>
                         </li>
 

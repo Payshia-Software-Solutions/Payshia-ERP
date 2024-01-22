@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . './../vendor/phpqrcode/qrlib.php';
+// include __DIR__ . './../vendor/phpqrcode/qrlib.php';
 date_default_timezone_set("Asia/Colombo");
 
 function generateQRCode($text)
@@ -2955,6 +2955,21 @@ function GetCategoryBySectionDepartment($link, $sectionId, $departmentId)
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetBankList($link)
+{
+    $ArrayResult = array();
+
+    $sql = "SELECT * FROM `master_banks`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['bank_id']] = $row;
         }
     }
     return $ArrayResult;

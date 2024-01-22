@@ -28,3 +28,26 @@ function OpenIndex() {
     }
     fetch_data()
 }
+
+function AddNewOffer(UpdateKey = 0) {
+    showOverlay()
+    document.getElementById('loading-popup').innerHTML = InnerLoader
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/promotion_module/seasonal-offers/add-new-offer.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                UpdateKey: UpdateKey
+            },
+            success: function(data) {
+                $('#loading-popup').html(data)
+                OpenPopup()
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}

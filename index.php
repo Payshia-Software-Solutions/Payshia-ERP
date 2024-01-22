@@ -5,6 +5,8 @@ $pageTitle = "Home";
 $SubPageTitle = "";
 $SubPage = false;
 
+// Path to your PowerPoint file
+$pptxFile = './newPresentation.pptx';
 ?>
 
 <!DOCTYPE html>
@@ -32,8 +34,32 @@ $SubPage = false;
                     <?php include './include/breadcrumb.php' ?>
                 </div>
 
-
                 <div id="index-content"></div>
+
+
+                <!-- Include necessary JavaScript libraries -->
+                <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+                <style>
+                    #presentationContainer {
+                        width: 100%;
+                        height: 600px;
+                        /* Set the desired height */
+                    }
+                </style>
+                <!-- Container for the PowerPoint presentation -->
+                <div id="presentationContainer">
+                    <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=https://web.pharmacollege.lk/newPresentation.pptx" width="100%" height="100%" frameborder="0"> </iframe>
+                </div>
+
+
+
+
+
+
+
+
+
+
             </main>
 
         </div>

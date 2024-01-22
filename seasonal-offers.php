@@ -15,6 +15,8 @@ $SubPage = false;
     <!-- Add Script -->
     <?php include './include/common-scripts.php' ?>
 
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="./assets/content/promotion_module/assets/css/promo-styles.css">
     <script src="https://cdn.tiny.cloud/1/zov6oixuwjxcoleammunkvb3fm95tbgzg2kbzgcjj8f30pxf/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
     <title><?= $pageTitle ?> | <?= $SiteTitle ?></title>

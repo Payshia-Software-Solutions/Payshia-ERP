@@ -134,18 +134,19 @@ function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student
     $current_time = date("Y-m-d H:i:s");
 
     if ($password != "") {
-        if ($updateKey === 0) {
-            echo $updateKey;
-            $sql = "INSERT INTO `user_accounts` (`email`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by`, `civil_status`, `user_name`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        if ($updateKey === '0') {
+            // echo $updateKey;
+            $updateKey = GenerateIndexNumber($link, $user_type);
+            $sql = "INSERT INTO `user_accounts` (`email`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by`, `civil_status`, `nic_number`, `user_name`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         } else {
             $Student = GetAccounts($link)[$updateKey];
             $student_number = $Student['user_name'];
 
-            $sql = "UPDATE `user_accounts` SET `email` = ?, `pass` = ?, `first_name` = ?, `last_name` = ?, `sex` = ?, `addressl1` = ?, `addressl2` = ?, `city` = ?, `PNumber` = ?, `WPNumber` = ?, `created_at` = ?, `user_status` = ?, `acc_type` = ?, `img_path` = ?, `update_by` = ?, `civil_status`= ? WHERE `user_name` = ?";
+            $sql = "UPDATE `user_accounts` SET `email` = ?, `pass` = ?, `first_name` = ?, `last_name` = ?, `sex` = ?, `addressl1` = ?, `addressl2` = ?, `city` = ?, `PNumber` = ?, `WPNumber` = ?, `created_at` = ?, `user_status` = ?, `acc_type` = ?, `img_path` = ?, `update_by` = ?, `civil_status`= ?, `nic_number` = ? WHERE `user_name` = ?";
         }
 
         if ($stmt_sql = mysqli_prepare($link, $sql)) {
-            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssss", $param_1, $param_3, $param_4, $param_5, $param_6, $param_7, $param_8, $param_9, $param_10, $param_11, $param_12, $param_13, $param_14, $param_15, $param_16, $param_17, $param_2);
+            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssss", $param_1, $param_3, $param_4, $param_5, $param_6, $param_7, $param_8, $param_9, $param_10, $param_11, $param_12, $param_13, $param_14, $param_15, $param_16, $param_17, $param_18, $param_2);
 
             $param_1 = $email_address;
             $param_3 = password_hash($password, PASSWORD_DEFAULT);
@@ -163,6 +164,7 @@ function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student
             $param_15 = $img_path;
             $param_16 = $created_by;
             $param_17 = $status;
+            $param_18 = $nic;
             $param_2 = $updateKey;
 
             if (mysqli_stmt_execute($stmt_sql)) {

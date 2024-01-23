@@ -389,7 +389,7 @@ if ($invoiceLogoStatus == 1) {
                             setTimeout(function() {
                                 // window.location.href = 'https://demo.payshia.com/pos-system/?last_invoice=true&display_invoice_number=<?= $invoice_number ?>&location_id=<?= $SelectedArray['location_id'] ?>';
                                 window.close();
-                            }, 1000); // 1000 milliseconds = 1 second
+                            }, 5000); // 1000 milliseconds = 1 second
 
                         });
 

@@ -27,6 +27,7 @@ if (isset($_POST['UpdateKey']) && $_POST['UpdateKey'] !== "0") {
     $img_path = $Tutor['img_path'];
     $user_type = $Tutor['acc_type'];
     $UpdateKey = $_POST['UpdateKey'];
+    $nic = $_POST['nic_number'];
 }
 
 

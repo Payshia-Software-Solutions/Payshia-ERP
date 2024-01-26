@@ -49,7 +49,7 @@ $Locations = GetLocations($link);
         <div class="col-12 col-md-3 text-end">
             <p class="mb-0">Action</p>
             <button class="mb-0 btn action-button btn-success view-button" type="button" onclick="GetReceiptReport()"><i class="fa-solid fa-eye"></i> Get</button>
-            <button class="mb-0 btn action-button btn-dark view-button" type="button" onclick="PrintReceiptReport()"><i class="fa-solid fa-print"></i> Print</button>
+            <button class="mb-0 btn action-button btn-dark view-button" type="button" onclick="PrintReceiptReportNew()"><i class="fa-solid fa-print"></i> Print</button>
         </div>
 
     </div>

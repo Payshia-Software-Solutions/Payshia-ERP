@@ -4,14 +4,76 @@ include '../include/function-update.php';
 include '../include/finance-functions.php';
 include '../include/reporting-functions.php';
 
-$fromQueryDate = isset($_GET['from-date-input']) && $_GET['from-date-input'] !== '' ? $_GET['from-date-input'] : null;
-$toQueryDate = isset($_GET['to-date-input']) && $_GET['to-date-input'] !== '' ? $_GET['to-date-input'] : null;
-$location_id = isset($_GET['location_id']) && $_GET['location_id'] !== '' ? $_GET['location_id'] : null;
+?>
 
-// Check if the required parameters are not set or have empty values
-if ($fromQueryDate === null || $toQueryDate === null || $location_id === null) {
-    die("Invalid request. Please provide all required parameters with non-empty values.");
+<?php
+
+$encryptedData = $_GET['encryptedData'];
+$key = $_GET['key'];
+$iv = $_GET['iv'];
+
+// URL decode the parameters
+$encryptedData = urldecode($encryptedData);
+$key = urldecode($key);
+$iv = urldecode($iv);
+
+// Convert hex-encoded key to binary
+$key = hex2bin($key);
+
+
+// Convert base64-encoded IV to binary
+$iv = base64_decode($iv);
+
+try {
+    // Ensure the key is the correct length (32 bytes for a 256-bit key)
+    $key = substr($key, 0, 32);
+
+    // Decrypt the data using AES-GCM
+    $decryptedData = openssl_decrypt(
+        base64_decode($encryptedData),
+        'aes-256-gcm',
+        $key,
+        0,
+        $iv
+    );
+
+    // Check if decryption was successful before parsing JSON
+    if ($decryptedData === false) {
+        throw new Exception('Decryption failed');
+    }
+
+    // Convert the JSON string to an associative array
+    $dataArray = json_decode($decryptedData, true);
+
+    // Check if JSON decoding was successful
+    if ($dataArray === null) {
+        throw new Exception('JSON decoding failed');
+    }
+
+    // Now you can use $dataArray['location_id'], $dataArray['fromQueryDate'], and $dataArray['toQueryDate'] in your PHP logic
+
+    // For demonstration purposes, we're just logging the decoded values
+    echo "Decoded Location ID: " . ($dataArray['location_id'] ?? 'Not available') . "<br>";
+    echo "Decoded From Date: " . ($dataArray['fromQueryDate'] ?? 'Not available') . "<br>";
+    echo "Decoded To Date: " . ($dataArray['toQueryDate'] ?? 'Not available') . "<br>";
+} catch (Exception $e) {
+    echo 'Error: ' . $e->getMessage() . '<br>';
+    echo 'Decryption Debug: Key=' . bin2hex($key) . ', IV=' . base64_encode($iv);
 }
+?>
+
+
+
+<?php
+
+// $fromQueryDate = isset($_GET['from-date-input']) && $_GET['from-date-input'] !== '' ? $_GET['from-date-input'] : null;
+// $toQueryDate = isset($_GET['to-date-input']) && $_GET['to-date-input'] !== '' ? $_GET['to-date-input'] : null;
+// $location_id = isset($_GET['location_id']) && $_GET['location_id'] !== '' ? $_GET['location_id'] : null;
+
+// // Check if the required parameters are not set or have empty values
+// if ($fromQueryDate === null || $toQueryDate === null || $location_id === null) {
+//     die("Invalid request. Please provide all required parameters with non-empty values.");
+// }
 
 // Rest of your code goes here...
 

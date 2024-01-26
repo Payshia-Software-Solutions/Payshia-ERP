@@ -359,10 +359,13 @@ function ReceiptReport() {
 }
 
 
+
+
 function GetReceiptReport() {
     document.getElementById('report-view').innerHTML = InnerLoader
     var form = document.getElementById('report-form')
     var formData = new FormData(form)
+
     formData.append('LoggedUser', LoggedUser)
     formData.append('UserLevel', UserLevel)
     formData.append('company_id', company_id)
@@ -383,7 +386,11 @@ function GetReceiptReport() {
         })
     }
     fetch_data()
+
+
 }
+
+
 
 function PrintReceiptReport() {
     var fromQueryDate = document.getElementById('from-date-input').value
@@ -397,6 +404,153 @@ function PrintReceiptReport() {
         printWindow.focus();
     }
 }
+
+async function PrintReceiptReportNew() {
+    var fromQueryDate = document.getElementById('from-date-input').value;
+    var toQueryDate = document.getElementById('to-date-input').value;
+    var location_id = document.getElementById('location_id').value;
+
+    // Generate a secure random key and IV
+    var key = await generateRandomKey();
+    var iv = await generateRandomIV();
+
+    // Encrypt the data using AES-GCM
+    var encryptedData = await encryptData({ location_id, fromQueryDate, toQueryDate }, key, iv);
+    console.log(encryptedData)
+
+    // Assuming you have the encryptedData, key, and iv
+    var decryptedData = await decryptData(encryptedData, key, iv);
+
+    console.log('Decrypted Data:', decryptedData);
+
+    // Open a new tab with the encrypted query parameters
+    var printWindow = window.open('report-viewer/receipt-report?encryptedData=' + encodeURIComponent(encryptedData) + '&key=' + encodeURIComponent(key) + '&iv=' + encodeURIComponent(iv), '_blank');
+
+    // Focus on the new tab
+    if (printWindow) {
+        printWindow.focus();
+    }
+}
+
+async function encryptData(data, key, iv) {
+    try {
+        // Convert the key and IV to Uint8Arrays
+        var keyArray = new TextEncoder().encode(key);
+        var ivArray = new TextEncoder().encode(iv);
+
+        // Ensure the key is the correct length (256 bits)
+        keyArray = keyArray.slice(0, 32);
+
+        // Import the key
+        var importedKey = await crypto.subtle.importKey(
+            'raw',
+            keyArray, { name: 'AES-GCM', length: 256 },
+            false, ['encrypt']
+        );
+
+        // Convert the data to a JSON string
+        var jsonString = JSON.stringify(data);
+
+        // Convert the JSON string to an ArrayBuffer
+        var dataBuffer = new TextEncoder().encode(jsonString);
+
+        // Encrypt the data using AES-GCM
+        var encryptedDataBuffer = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: ivArray },
+            importedKey,
+            dataBuffer
+        );
+
+        // Convert the encrypted data to a Base64 string
+        return btoa(String.fromCharCode.apply(null, new Uint8Array(encryptedDataBuffer)));
+    } catch (error) {
+        console.error('Error encrypting data:', error);
+        throw error;
+    }
+}
+
+
+
+async function generateRandomKey() {
+    try {
+        const key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 },
+            true, ['encrypt', 'decrypt']
+        );
+
+        // Export the key as a CryptoKey object
+        const keyData = await crypto.subtle.exportKey('raw', key);
+
+        // Convert the key data to a hex string or use it as needed
+        const keyHex = Array.from(new Uint8Array(keyData)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+        console.log('Generated Key Length:', keyData.byteLength * 8);
+
+        return keyHex;
+    } catch (error) {
+        console.error('Error generating key:', error);
+        throw error;
+    }
+}
+
+
+
+async function generateRandomIV() {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+
+    return btoa(String.fromCharCode.apply(null, iv));
+}
+
+function hexStringToUint8Array(hexString) {
+    return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+}
+
+
+// Decrypt function
+// Decrypt function
+async function decryptData(encryptedData, key, iv) {
+    try {
+        // Convert the key and IV to Uint8Arrays
+        var keyArray = hexStringToUint8Array(key);
+        var ivArray = new TextEncoder().encode(iv);
+
+        // Import the key
+        var importedKey = await crypto.subtle.importKey(
+            'raw',
+            keyArray, { name: 'AES-GCM' },
+            false, ['encrypt', 'decrypt']
+        );
+
+        // Convert the encrypted data from Base64 to ArrayBuffer
+        var encryptedDataBuffer = new Uint8Array(atob(encryptedData).split('').map(char => char.charCodeAt(0))).buffer;
+
+        // Decrypt the data using AES-GCM
+        var decryptedDataBuffer = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: ivArray },
+            importedKey,
+            encryptedDataBuffer
+        );
+
+        // Convert the decrypted data ArrayBuffer to a JSON string
+        var decryptedDataString = new TextDecoder().decode(decryptedDataBuffer);
+
+        // Log decrypted data string
+        console.log('Decrypted Data String:', decryptedDataString);
+
+        // Parse the JSON string to an object
+        var decryptedData = JSON.parse(decryptedDataString);
+
+        return decryptedData;
+    } catch (error) {
+        console.error('Error decrypting data:', error);
+
+        // Log additional information
+        console.log('Encrypted Data:', encryptedData);
+        console.log('Key:', key);
+        console.log('IV:', iv);
+
+        throw error; // Throw the original error for more details
+    }
+}
+
+
 
 function ChargeReport() {
     document.getElementById('report-index').innerHTML = InnerLoader

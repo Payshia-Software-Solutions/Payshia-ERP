@@ -166,7 +166,7 @@ if ($guestReceiptLogoStatus == 1) {
 
         <?php
         // Force Display
-        $displayStatus = 1;
+        // $displayStatus = 1;
         ?>
         <div class="bill-foooter <?= $displayStatus ?>">Thank You..! Come Again</div>
         <div class="credits <?= $displayStatus ?>" style="margin-top:10px">Software by <?= $SiteTitle ?> </div>

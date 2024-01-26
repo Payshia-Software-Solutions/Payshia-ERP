@@ -2306,15 +2306,15 @@ function GetRemovalNotices($link)
 }
 
 
-function SaveRemovalNotice($link, $ref_id, $remark, $user_id, $created_by, $location_id, $product_id)
+function SaveRemovalNotice($link, $ref_id, $remark, $user_id, $created_by, $location_id, $product_id, $itemQuantity)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
 
-    $sql = "INSERT INTO `transaction_removal_remark` (`ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`, `product_id`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO `transaction_removal_remark` (`ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`, `product_id`, `item_quantity`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "sssssss", $ref_id, $remark, $user_id,  $created_by, $current_time, $location_id, $product_id);
+        mysqli_stmt_bind_param($stmt_sql, "ssssssss", $ref_id, $remark, $user_id,  $created_by, $current_time, $location_id, $product_id, $itemQuantity);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Remark Saved successfully');
         } else {
@@ -2972,6 +2972,22 @@ function GetBankList($link)
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['bank_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function RemovedItemsByInvoice($link, $invNumber)
+{
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`, `product_id`, SUM(item_quantity) AS `item_quantity` FROM `transaction_removal_remark` WHERE `ref_id` LIKE '$invNumber' GROUP BY `product_id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
         }
     }
     return $ArrayResult;

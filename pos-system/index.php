@@ -162,7 +162,7 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
 
                 <?php include './include/footer.php' ?>
 
-                <script src="./assets/js/index-1.8.js"></script>
+                <script src="./assets/js/index-1.9.js"></script>
                 <script type="text/javascript" src="./assets/js/qz-tray.js"></script>
                 <script>
                     $("#menu-toggle").click(function(e) {

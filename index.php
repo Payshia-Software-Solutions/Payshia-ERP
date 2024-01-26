@@ -51,20 +51,9 @@ $pptxFile = './newPresentation.pptx';
                     <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=https://web.pharmacollege.lk/newPresentation.pptx" width="100%" height="100%" frameborder="0"> </iframe>
                 </div>
 
-
-
-
-
-
-
-
-
-
             </main>
 
         </div>
-
-
 
     </div>
 

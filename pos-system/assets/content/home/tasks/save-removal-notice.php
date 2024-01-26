@@ -9,6 +9,7 @@ $productID = $_POST['productID'];
 $ref_id = $_POST['refKey'];
 $reason = $_POST['reason'];
 $userID = $_POST['userID'];
+$itemQuantity = $_POST['itemQuantity'];
 
-$result = SaveRemovalNotice($link, $ref_id, $reason, $userID, $UserName, $LocationID, $productID);
+$result = SaveRemovalNotice($link, $ref_id, $reason, $userID, $UserName, $LocationID, $productID, $itemQuantity);
 echo $result;

@@ -9,6 +9,7 @@ $stewardID = $_POST['stewardID'];
 
 $productID = $_POST['productID'];
 $invoiceNumber = $_POST['invoiceNumber'];
+$itemQuantity = $_POST['itemQuantity'];
 
 $Cashier = GetAccounts($link)[$LoggedUser];
 if ($stewardID != 0) {
@@ -34,7 +35,7 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
     </div>
     <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
         <?php $reason = "Change of Mind" ?>
-        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>')">
+        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">
             <div class="card-body p-0">
                 <h5 class="tutor-name mt-2"><?= $reason ?></h5>
             </div>
@@ -43,7 +44,7 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
 
     <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
         <?php $reason = "Wrong Bill" ?>
-        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>')">
+        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">
             <div class="card-body p-0">
                 <h5 class="tutor-name mt-2"><?= $reason ?></h5>
             </div>
@@ -52,7 +53,7 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
 
     <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
         <?php $reason = "Wrong Item" ?>
-        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>')">
+        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">
             <div class="card-body p-0">
                 <h5 class="tutor-name mt-2"><?= $reason ?></h5>
             </div>
@@ -61,7 +62,7 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
 
     <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
         <?php $reason = "Cashier Entry Error" ?>
-        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>')">
+        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">
             <div class="card-body p-0">
                 <h5 class="tutor-name mt-2"><?= $reason ?></h5>
             </div>
@@ -70,7 +71,7 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
 
     <div class="col-12 col-md-6 col-xl-6 mb-3 d-flex">
         <?php $reason = "Miscommunication" ?>
-        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>')">
+        <div class="card table-card flex-fill shadow-sm clickable" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', '<?= $reason ?>', '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">
             <div class="card-body p-0">
                 <h5 class="tutor-name mt-2"><?= $reason ?></h5>
             </div>
@@ -83,6 +84,6 @@ $LoggedName =  $Cashier['first_name'] . " " . $Cashier['last_name'];
         <input class="form-control" type=" text" name="reasonText" id="reasonText" placeholder="specify the reason to remove">
     </div>
     <div class="col-3">
-        <button class="w-100 btn btn-dark" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', document.getElementById('reasonText').value, '<?= $stewardID ?>', '<?= $productID ?>')">Remove</button>
+        <button class="w-100 btn btn-dark" onclick="SetRemovalNotice('<?= $invoiceNumber ?>', document.getElementById('reasonText').value, '<?= $stewardID ?>', '<?= $productID ?>', '<?= $itemQuantity ?>')">Remove</button>
     </div>
 </div>

@@ -304,7 +304,7 @@ if ($guestReceiptLogoStatus == 1) {
             var invElement = document.getElementById("inv");
             var filledHeight = calculateFilledHeightInMillimeters(invElement);
 
-            filledHeight = parseFloat(filledHeight) + 30; // Parse to an integer and then add 40
+            filledHeight = parseFloat(filledHeight) + 50; // Parse to an integer and then add 40
 
             // Update the @page size in your style tag
             var styleTag = document.createElement("style");

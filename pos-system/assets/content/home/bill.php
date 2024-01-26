@@ -126,15 +126,15 @@ $receiptPrintMethod  = GetSetting($link, $LocationID, 'receiptPrintMethod');
 
 <div class="row mt-0 g-1 mt-md-0">
     <div class="col-6 d-flex">
-        <button onclick="ProcessInvoice('<?= $invoice_number ?>', '1' , '<?= $kotPrintStatus ?>', '<?= $kotPrintMethod ?>')" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
+        <button  id="holdButton"  onclick="ProcessInvoice('<?= $invoice_number ?>', '1' , '<?= $kotPrintStatus ?>', '<?= $kotPrintMethod ?>')" class=" flex-fill text-white w-100 btn btn-info hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-pause btn-icon"></i> Hold</button>
     </div>
     <div class="col-6 d-flex">
         <?php
         if ($tendered_amount < $grand_total && $close_type != -1) {
         ?>
-            <button onclick="SetPayment()" class="text-white flex-fill w-100 btn btn-dark hold-button btn-lg action-button"><i class="fa-solid fa-money-bill btn-icon p-md-3"></i> Payment</button>
+            <button onclick="SetPayment()" class="text-white flex-fill w-100 btn btn-dark hold-button btn-lg action-button" id="paymentButton"><i class="fa-solid fa-money-bill btn-icon p-md-3"></i> Payment</button>
         <?php } else { ?>
-            <button onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>', '<?= $receiptPrintMethod ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
+            <button type="button" id="invoiceButton" onclick="ProcessInvoice('<?= $invoice_number ?>', '2', '<?= $receiptPrinterStatus ?>', '<?= $receiptPrintMethod ?>')" class="text-white w-100 btn btn-success hold-button btn-lg action-button p-md-3"><i class="fa-solid fa-check btn-icon"></i> Proceed</button>
         <?php } ?>
     </div>
     <?php
@@ -207,7 +207,7 @@ $receiptPrintMethod  = GetSetting($link, $LocationID, 'receiptPrintMethod');
                                         <h4 class="product-price"><?= number_format($line_total, 2) ?></h4>
                                         <span class="product-title text-danger">(<?= number_format($totalItemDiscount, 2) ?>)</span>
                                     </div>
-                                    <div class="col-4 col-md-1 mt-2 mt-md-0 text-end"><i class="fa-solid fa-trash text-danger clickable" onclick="OpenRemoval('<?= $product_id ?>', '<?= $invoice_number ?>')"></i></div>
+                                    <div class="col-4 col-md-1 mt-2 mt-md-0 text-end"><i class="fa-solid fa-trash text-danger clickable" onclick="OpenRemoval('<?= $product_id ?>', '<?= $invoice_number ?>', '<?= $item_quantity ?>')"></i></div>
                                 </div>
                             </div>
                         </div>

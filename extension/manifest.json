@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "My Printing Extension",
+    "version": "1.0",
+    "description": "Print content from headless browser",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "printing"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["contentScript.js"],
+        "run_at": "document_idle"
+    }],
+    "action": {
+        "default_popup": "printers.html",
+        "default_icon": {
+            "16": "images/android-chrome-192x192.png",
+            "48": "images/android-chrome-512x512.png",
+            "128": "images/apple-touch-icon.png"
+        }
+    }
+}

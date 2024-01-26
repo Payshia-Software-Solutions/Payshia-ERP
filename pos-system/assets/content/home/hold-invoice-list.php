@@ -1,6 +1,9 @@
 <?php
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
+include '../../../../include/settings_functions.php';
+include '../../../../include/finance-functions.php';
+
 $LocationID = $_POST['LocationID'];
 $LoggedUser = $_POST['LoggedUser'];
 
@@ -11,6 +14,9 @@ if ($LoggedUser == "Admin") {
 }
 $stewards = GetStewards($link);
 $closeButtonStatus = $_POST['closeButtonStatus'];
+
+$kotPrintStatus = GetSetting($link, $LocationID, 'kot_printer');
+$kotPrintMethod = GetSetting($link, $LocationID, 'kotPrintMethod');
 
 $Accounts = GetAccounts($link);
 if ($closeButtonStatus == 0) {
@@ -96,44 +102,57 @@ if ($closeButtonStatus == 0) {
 
             ?>
 
-                    <div class="col-12 col-md-6 col-xl-4 mb-3 d-flex">
-                        <div class="card table-card flex-fill shadow-sm clickable" onclick="TakeHoldToCart('<?= $TableName ?>', '<?= $TableID ?>', '<?= $charge_status ?>', '<?= $discount_rate ?>', '<?= $close_type ?>', '<?= $tendered_amount ?>', '<?= $invoice_number ?>', '<?= $CustomerID ?>', '<?= $stewardName ?>', '<?= $stewardId ?>')">
-                            <div class="card-body p-2 pb-2">
+                    <div class="col-12 col-md-6 col-xl-4 mb-3">
 
-                                <span class="badge text-dark mt-2 bg-light"><?= $CustomerName ?></span>
-                                <span class="badge text-light mt-2 bg-primary"><?= $TableName ?></span>
-                                <h4 class="mb-0"><?= $SelectedArray['invoice_number'] ?></h4>
-                                <h2 class="tutor-name mb-0"><?= number_format($SelectedArray['inv_amount'], 2) ?></h2>
-                                <span class="badge text-light mt-2 bg-success"><?= $invoice_date ?></span>
-                                <span class="badge text-light mt-2 bg-danger"><?= $stewardName ?></span>
-                                <?php
-                                if ($LoggedUser == "Admin") {
-                                ?>
-                                    <span class="badge text-light mt-2 bg-info"><?= $createdAccountName ?></span>
-                                <?php
-                                }
-                                ?>
+                        <div class="row">
+                            <div class="col-12 d-flex">
+                                <div class="card table-card flex-fill shadow-sm clickable" onclick="TakeHoldToCart('<?= $TableName ?>', '<?= $TableID ?>', '<?= $charge_status ?>', '<?= $discount_rate ?>', '<?= $close_type ?>', '<?= $tendered_amount ?>', '<?= $invoice_number ?>', '<?= $CustomerID ?>', '<?= $stewardName ?>', '<?= $stewardId ?>')">
+                                    <div class="card-body p-2 pb-2">
 
+                                        <span class="badge text-dark mt-2 bg-light"><?= $CustomerName ?></span>
+                                        <span class="badge text-light mt-2 bg-primary"><?= $TableName ?></span>
+                                        <h4 class="mb-0"><?= $SelectedArray['invoice_number'] ?></h4>
+                                        <h2 class="tutor-name mb-0"><?= number_format($SelectedArray['inv_amount'], 2) ?></h2>
+                                        <span class="badge text-light mt-2 bg-success"><?= $invoice_date ?></span>
+                                        <span class="badge text-light mt-2 bg-danger"><?= $stewardName ?></span>
+                                        <?php
+                                        if ($LoggedUser == "Admin") {
+                                        ?>
+                                            <span class="badge text-light mt-2 bg-info"><?= $createdAccountName ?></span>
+                                        <?php
+                                        }
+                                        ?>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button onclick="PrintKOT ('<?= $SelectedArray['invoice_number'] ?>', '<?= $kotPrintStatus ?>', '<?= $LocationID ?>', 1, 1, '<?= $kotPrintMethod ?>')" class="text-white w-100 btn btn-dark hold-button btn-lg mt-2"><i class="fa-solid fa-print btn-icon"></i> Reprint Full KOT</button>
                             </div>
                         </div>
                     </div>
 
-                <?php
+
+                    <?php
                 }
             } else {
-                ?>
-                <div class="col-12">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <p class="mb-0">No Hold Invoices</p>
+                    ?>
+                    <div class="col-12">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body">
+                                <p class="mb-0">No Hold Invoices</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php
+                <?php
             }
-            ?>
+                ?>
+
+                    </div>
 
         </div>
-
     </div>
-</div>

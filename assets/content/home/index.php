@@ -28,6 +28,7 @@ $default_location_name = $Locations[$defaultLocation]['location_name'];
 </style>
 
 <div class="row mt-5">
+
     <div class="col-md-6 col-lg-3 d-flex">
         <div class="card item-card flex-fill">
             <div class="overlay-box">
@@ -40,6 +41,7 @@ $default_location_name = $Locations[$defaultLocation]['location_name'];
             </div>
         </div>
     </div>
+
     <div class="col-md-6 col-lg-3 d-flex">
         <div class="card item-card flex-fill">
             <div class="overlay-box">
@@ -78,6 +80,7 @@ $default_location_name = $Locations[$defaultLocation]['location_name'];
             </div>
         </div>
     </div>
+    
 </div>
 
 <div class="row mt-5">

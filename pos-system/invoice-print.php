@@ -85,6 +85,7 @@ if ($ref_hold == '0') {
     $referenceText = $ref_hold;
 }
 
+
 // echo $invAmount;
 $customer_code = $SelectedArray['customer_code'];
 $invoice_status = $SelectedArray['invoice_status'];
@@ -296,9 +297,25 @@ if ($invoiceLogoStatus == 1) {
         </table>
         <hr />
         <?php
+        $removedItems = RemovedItemsByInvoice($link, $ref_hold);
+
         // Force Display
         $displayStatus = 1;
+        if (!empty($removedItems)) {
+            echo '<h4 style="margin: 0px; margin-bottom: 5px">Removed Items</h4>';
+            foreach ($removedItems as $SelectRecord) {
+                $display_name = $Products[$SelectRecord['product_id']]['display_name'];
+                $print_name = $Products[$SelectRecord['product_id']]['print_name'];
+                $name_si = $Products[$SelectRecord['product_id']]['name_si'];
+                $item_unit = $Units[$Products[$SelectRecord['product_id']]['measurement']]['unit_name'];
+                $item_quantity = $SelectRecord['item_quantity'];
         ?>
+               <p class="mb-0" style="margin: 0px !important;"><?= $print_name; ?>  - <?= $item_quantity ?></p>
+        <?php
+            }
+        }
+        ?>
+
         <div class="bill-foooter" <?= $fontClass ?>><?= $textArray['greeting'][$LanguageMode] ?></div>
         <div class="credits <?= $displayStatus ?>" style="margin-top:10px">Software by Payshia </div>
         <img class="logo-image <?= $displayStatus ?>" src="./assets/images/payshia-logo-p.png" style="width: 8mm; margin-top:10px;">

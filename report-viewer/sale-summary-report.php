@@ -99,6 +99,7 @@ $location_name = $Locations[$location_id]['location_name'];
                     <tr>
                         <th scope="col">Date</th>
                         <th scope="col">Invoice #</th>
+                        <th scope="col">Customer</th>
                         <th scope="col">Ref #</th>
                         <th scope="col">Sub Total</th>
                         <th scope="col">Discount</th>
@@ -112,11 +113,16 @@ $location_name = $Locations[$location_id]['location_name'];
                         foreach ($invoiceSales as $selectedArray) {
                             $referenceText = "";
                             $invoice_date = date("Y-m-d H:i", strtotime($selectedArray['current_time']));
+                            $invoice_date = date("Y-m-d", strtotime($selectedArray['current_time']));
                             $subTotal += $selectedArray['inv_amount'];
                             $ref_hold = $selectedArray['ref_hold'];
                             $discountAmount += $selectedArray['discount_amount'];
                             $serviceCharge += $selectedArray['service_charge'];
                             $grandTotal += $selectedArray['grand_total'];
+
+
+                            $CustomerID = $selectedArray['customer_code'];
+                            $Customer = GetCustomersByID($link, $CustomerID);
 
                             if ($ref_hold == '0') {
                                 // $referenceText = "Take Away";
@@ -137,6 +143,7 @@ $location_name = $Locations[$location_id]['location_name'];
                             <tr>
                                 <td><?= $invoice_date ?></td>
                                 <td><?= $selectedArray['invoice_number'] ?></td>
+                                <td><?= $Customer['customer_first_name'] ?> <?= $Customer['customer_last_name'] ?></td>
                                 <td><?= $referenceText ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['inv_amount']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['discount_amount']) ?></td>
@@ -149,7 +156,7 @@ $location_name = $Locations[$location_id]['location_name'];
                     }
                     ?>
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="4"><?= formatAccountBalance($subTotal) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5"><?= formatAccountBalance($subTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($discountAmount) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($serviceCharge) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($grandTotal) ?></td>

@@ -142,6 +142,8 @@ $LocationName = $Locations[$SelectedInvoice['location_id']]['location_name'];
                         $SubTotal = $rawNumber = 0;
                         foreach ($InvProducts as $selectedArray) {
 
+                            $taxAmount = $shippingAmount = $otherAmount = 0;
+
                             $OrderDate = $selectedArray['added_date'];
                             $OrderQuantity = $selectedArray['quantity'];
                             $PerRate = $selectedArray['item_price'];

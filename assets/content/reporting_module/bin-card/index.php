@@ -40,7 +40,6 @@ $Products = GetProducts($link);
                             continue;
                         }
                 ?>
-
                         <option <?= ($SelectedArray['location_id'] == $location_id) ? 'selected' : '' ?> value="<?= $SelectedArray['location_id'] ?>"><?= $SelectedArray['location_name'] ?></option>
                 <?php
                     }
@@ -67,11 +66,6 @@ $Products = GetProducts($link);
             </select>
         </div>
 
-
-
-
-
-
         <div class="col-12 col-md-4 text-end mt-2">
             <p class="mb-0">Action</p>
             <button class="mb-0 btn action-button btn-success view-button" type="button" onclick="GetBinCardReport()"><i class="fa-solid fa-eye"></i> Get</button>
@@ -88,3 +82,7 @@ $Products = GetProducts($link);
         <div id="report-view"></div>
     </div>
 </div>
+
+<script>
+    $('#select_product').select2()
+</script>

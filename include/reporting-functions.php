@@ -194,7 +194,7 @@ function GetItemWiseSale($link, $fromDate, $toDate, $location_id)
     $fromDate = date('Y-m-d', strtotime($fromDate));
     $toDate = date('Y-m-d', strtotime($toDate));
 
-    $sql = "SELECT ti.`id`, ti.`user_id`, ti.`product_id`, ti.`item_price`, SUM(ti.`item_discount`) AS `total_discounts`, SUM(ti.`quantity`) AS `total_quantity`, ti.`added_date`, t.`is_active` AS `inv_status`, ti.`customer_id`, ti.`hold_status`, ti.`table_id`, ti.`invoice_number`, ti.`cost_price`, t.`invoice_date`, t.`location_id` 
+    $sql = "SELECT ti.`id`, ti.`user_id`, ti.`product_id`, ti.`item_price`, ti.`item_discount`, SUM(ti.`item_discount`) AS `total_discounts`, SUM(ti.`quantity`) AS `total_quantity`, ti.`added_date`, t.`is_active` AS `inv_status`, ti.`customer_id`, ti.`hold_status`, ti.`table_id`, ti.`invoice_number`, ti.`cost_price`, t.`invoice_date`, t.`location_id` 
 FROM `transaction_invoice_items` ti 
 JOIN `transaction_invoice` t ON ti.`invoice_number` = t.`invoice_number` 
 WHERE DATE(`added_date`) BETWEEN '$fromDate' AND '$toDate' AND t.`is_active` = 1 AND t.`location_id` LIKE '$location_id' AND t.`invoice_status` LIKE '2' GROUP BY ti.`product_id`, ti.`item_price`";

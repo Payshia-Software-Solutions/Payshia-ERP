@@ -98,7 +98,6 @@ function SaveProduct(is_active, UpdateKey) {
         for (var i = 0; i < supplierList.length; i++) {
             if (supplierList[i].checked) {
                 checked = true
-                fetch_data()
                 break
             }
         }
@@ -106,9 +105,12 @@ function SaveProduct(is_active, UpdateKey) {
         for (var i = 0; i < availableLocations.length; i++) {
             if (availableLocations[i].checked) {
                 LocationChecked = true
-                fetch_data()
                 break
             }
+        }
+
+        if (checked && LocationChecked) {
+            fetch_data()
         }
 
         if (!checked) {

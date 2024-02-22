@@ -26,13 +26,7 @@ if ($minPayment < 0) {
     $minPayment = 0;
 }
 
-$PaymentTypes = [
-    ["id" => "0", "text" => "Cash"],
-    ["id" => "1", "text" => "Visa/Master"],
-    ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
-];
-
+$PaymentTypes = GetPaymentTypes();
 
 ?>
 <style>
@@ -46,7 +40,7 @@ $PaymentTypes = [
             <button class="btn btn-sm btn-dark" onclick="ClosePopUP()"><i class="fa-regular fa-circle-xmark"></i></button>
         </div>
     </div>
-    <div class="row">
+    <div class="row g-3">
         <div class="col-md-12">
             <h3 class="mb-0">Payment Receipt</h3>
             <p class="border-bottom pb-2"></p>
@@ -55,26 +49,26 @@ $PaymentTypes = [
             <p class="text-secondary text-center mb-0">Due Amount</p>
             <h1 class="text-center due-amount border-bottom pb-2">LKR <?= number_format($grandTotal, 2) ?></h1>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-3">
             <p class="text-secondary mb-0">Customer</p>
             <h5 class=""><?= GetCustomerName($link, $customerId) ?></h5>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-3">
             <p class="text-secondary mb-0">Customer Balance</p>
             <h5 class="">LKR <?= number_format($customerBalance, 2) ?></h5>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-3">
             <p class="text-secondary mb-0">Credit Limit</p>
             <h5 class="">LKR <?= number_format($availableLimit, 2) ?></h5>
         </div>
-        <div class="col-3">
+        <div class="col-6 col-md-3">
             <p class="text-secondary mb-0">Minimum Payment</p>
             <h5 class="">LKR <?= number_format($minPayment, 2) ?></h5>
         </div>
     </div>
 
     <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector">
-        <div class="row">
+        <div class="row g-2">
             <div class="col-md-6">
                 <label class="form-label">Select Payment Method</label>
                 <select class="form-control" name="payment_type" id="payment_type" required autocomplete="off" onchange="goToValue(this.value)">
@@ -94,7 +88,7 @@ $PaymentTypes = [
 
 
 
-            <div class="col-6 col-md-4" id="amountSet">
+            <div class="col-12 col-md-4" id="amountSet">
                 <label class="form-label">Amount</label>
                 <input type="number" step="0.01" onchange="validateMinAmount(this.value, '<?= $minPayment ?>', '<?= $grandTotal ?>')" min='<?= $minPayment ?>' max="<?= $grandTotal ?>" value="<?= $grandTotal ?>" class="form-control text-end" name="payment_amount" id="payment_amount" placeholder="0.0">
             </div>

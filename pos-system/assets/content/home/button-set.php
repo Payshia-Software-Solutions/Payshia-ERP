@@ -8,23 +8,30 @@
         </button>
     </div>
     <div class="col-6 col-md-4">
-        <button type="button" class="btn btn-lg btn-warning mr-2 w-100 text-white">
+        <button onclick="OpenReturnBox()" type="button" class="btn btn-lg btn-warning mr-2 w-100 text-white">
             <i class="fa-solid fa-right-left m-0"></i>
             <p class="m-0">Return</p>
         </button>
     </div>
     <div class="col-6 col-md-4">
-        <button type="button" class="btn btn-lg w-100  btn-danger mr-2"><i class="fa-solid fa-money-bill-trend-up"></i>
+        <button onclick="OpenRefund()" type="button" class="btn btn-lg w-100  btn-danger mr-2"><i class="fa-solid fa-money-bill-trend-up"></i>
             <p class="mb-0">Refund</p>
         </button>
     </div>
+
+    <div class="col-6 col-md-4">
+        <button onclick="OpenReceipt()" type="button" class="btn btn-lg w-100  btn-dark mr-2"><i class="fa-solid fa-receipt"></i>
+            <p class="mb-0">Receipt</p>
+        </button>
+    </div>
+
     <div class="col-6 col-md-4">
         <button type="button" class="btn btn-lg w-100 btn-secondary mr-2"><i class="fa-solid fa-gift"></i>
             <p class="mb-0">Gift</p>
         </button>
     </div>
     <div class="col-6 col-md-4">
-        <button type="button" class="btn btn-lg w-100 btn-success mr-2"><i class="fa-solid fa-money-bill"></i>
+        <button onclick="OpenExpensesDialog()" type="button" class="btn btn-lg w-100 btn-success mr-2"><i class="fa-solid fa-money-bill"></i>
             <p class="mb-0">Expenses</p>
         </button>
     </div>

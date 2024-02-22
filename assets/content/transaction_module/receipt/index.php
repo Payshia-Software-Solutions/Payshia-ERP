@@ -18,12 +18,7 @@ $receipts = GetReceipts($link);
 
 $ArrayCount = count($receipts);
 
-$PaymentTypes = [
-    ["id" => "0", "text" => "Cash"],
-    ["id" => "1", "text" => "Visa/Master"],
-    ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
-];
+$PaymentTypes = GetPaymentTypes();
 ?>
 
 <div class="row mt-5">
@@ -104,7 +99,10 @@ $PaymentTypes = [
                                             if ($selectedArray['is_active'] == 1) {
                                                 $active_status = "Active";
                                                 $color = "primary";
+                                            } else {
+                                                continue;
                                             }
+
                                             $locationId = $selectedArray['location_id'];
                                             $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
                                             $invoice_date = $selectedArray['invoice_date'];
@@ -112,12 +110,19 @@ $PaymentTypes = [
                                             $invoice_number = $selectedArray['invoice_number'];
                                             $paymentValue = GetReceiptsValueByInvoice($link, $invoice_number);
 
+                                            $returnSettlement =  GetInvoiceSettlement($selectedArray['invoice_number']);
+
                                             $CustomerID = $selectedArray['customer_code'];
                                             $invoiceValue = $selectedArray['grand_total'];
 
-                                            $balanceAmount = $invoiceValue - $paymentValue;
+                                            $settlementAmount = $paymentValue + $returnSettlement;
+                                            $balanceAmount = $invoiceValue - $settlementAmount;
 
                                             if ($paymentValue >= $invoiceValue) {
+                                                continue;
+                                            }
+
+                                            if ($balanceAmount <= 0) {
                                                 continue;
                                             }
 
@@ -204,7 +209,7 @@ $PaymentTypes = [
                                                     <p class="mb-0"><?= $customerName ?></p>
                                                 </td>
                                                 <td class="text-end"><?= formatAccountBalance($rec_amount) ?></td>
-                                                <td><button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="PrintPN('<?= $rec_number ?>')"><i class="fa-solid fa-print"></i> Print</button></td>
+                                                <td><button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="PrintReceipt('<?= $rec_number ?>')"><i class="fa-solid fa-print"></i> Print</button></td>
                                             </tr>
 
                                     <?php

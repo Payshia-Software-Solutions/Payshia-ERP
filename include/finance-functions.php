@@ -5,6 +5,7 @@ $accountsReceivableAccountId = 3; // AccountReceivable
 $accountsPayableAccountId = 2; // Account Payable
 $inventoryAccountId = 4; // Inventory Account
 $costOfGoodsAccountId = 18; // COGS
+$expenseAccountId = 29;
 
 
 include __DIR__ . '/config.php';

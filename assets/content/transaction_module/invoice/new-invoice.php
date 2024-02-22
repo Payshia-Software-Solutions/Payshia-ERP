@@ -30,163 +30,165 @@ if (!empty($TempOrder)) {
 ?>
 <div class="row my-4">
     <div class="col-12">
-        <div class="add-class-form" id="">
+        <div class="card" id="">
+            <div class="card-body">
 
-            <div class="row">
-                <div class="col-12 text-end"><button class="btn-warning btn" onclick="NewInvoice()">
-                        <i class="clickable fa-solid fa-rotate-right"></i>
-                    </button>
-                    <button class="btn-success btn" onclick="OpenIndex()">
-                        <i class="clickable fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-            </div>
-            <h1 class="site-title">Invoice</h1>
-            <h4 class="mb-4 border-bottom pb-2">Order Details</h4>
 
-            <div class="mb-3">
-                <form id="action-form" method="post">
-                    <div class="row mb-3">
-                        <div class="col-4 col-md-2">
-                            <label class="form-label">Date</label>
-                        </div>
-                        <div class="col-8 col-md-5">
-                            <input type="date" class="form-control" id="po-date" name="po-date" value="<?= $order_date ?>" readonly>
-                        </div>
-
-                        <div class="col-4 col-md-2 mt-3 mt-md-0">
-                            <label class="form-label text-md-end">Currency</label>
-                        </div>
-                        <div class="col-8 col-md-3 mt-3 mt-md-0">
-                            <input type="text" name="currency" id="currency" class="form-control" value="<?= $Currency ?>" readonly>
-                        </div>
+                <div class="row">
+                    <div class="col-12 text-end"><button class="btn-warning btn" onclick="NewInvoice()">
+                            <i class="clickable fa-solid fa-rotate-right"></i>
+                        </button>
+                        <button class="btn-success btn" onclick="OpenIndex()">
+                            <i class="clickable fa-solid fa-xmark"></i>
+                        </button>
                     </div>
+                </div>
+                <h1 class="card-title border-bottom pb-2" style="font-size: 40px;">Invoice</h1>
 
-                    <div class="row mb-1">
-                        <div class="col-4 col-md-2">
-                            <label class="form-label">Location</label>
+                <div class="mb-3">
+                    <form id="action-form" method="post">
+                        <div class="row mb-3">
+                            <div class="col-4 col-md-2">
+                                <label class="form-label">Date</label>
+                            </div>
+                            <div class="col-8 col-md-5">
+                                <input type="date" class="form-control" id="po-date" name="po-date" value="<?= $order_date ?>" readonly>
+                            </div>
+
+                            <div class="col-4 col-md-2 mt-3 mt-md-0">
+                                <label class="form-label text-md-end">Currency</label>
+                            </div>
+                            <div class="col-8 col-md-3 mt-3 mt-md-0">
+                                <input type="text" name="currency" id="currency" class="form-control" value="<?= $Currency ?>" readonly>
+                            </div>
                         </div>
-                        <div class="col-8 col-md-5">
-                            <select class="form-select" name="location_id" id="location_id" required autocomplete="off" onchange="GetCustomerList() ">
-                                <option value="">Select Location</option>
-                                <?php
-                                if (!empty($Locations)) {
-                                    foreach ($Locations as $SelectedArray) {
-                                        if ($SelectedArray['is_active'] != 1) {
-                                            continue;
+
+                        <div class="row mb-1">
+                            <div class="col-4 col-md-2">
+                                <label class="form-label">Location</label>
+                            </div>
+                            <div class="col-8 col-md-5">
+                                <select class="form-select" name="location_id" id="location_id" required autocomplete="off" onchange="GetCustomerList() ">
+                                    <option value="">Select Location</option>
+                                    <?php
+                                    if (!empty($Locations)) {
+                                        foreach ($Locations as $SelectedArray) {
+                                            if ($SelectedArray['is_active'] != 1) {
+                                                continue;
+                                            }
+                                    ?>
+
+                                            <option <?= ($SelectedArray['location_id'] == $location_id) ? 'selected' : '' ?> value="<?= $SelectedArray['location_id'] ?>"><?= $SelectedArray['location_name'] ?></option>
+                                    <?php
                                         }
-                                ?>
-
-                                        <option <?= ($SelectedArray['location_id'] == $location_id) ? 'selected' : '' ?> value="<?= $SelectedArray['location_id'] ?>"><?= $SelectedArray['location_name'] ?></option>
-                                <?php
                                     }
-                                }
-                                ?>
-                            </select>
+                                    ?>
+                                </select>
+                            </div>
+
+
+                            <div class="col-4 col-md-2 mt-3 mt-md-0">
+                                <label class="form-label  text-md-end">Due Date</label>
+                            </div>
+                            <div class="col-8 col-md-3 mt-3 mt-md-0">
+                                <input type="date" class="form-control" id="po-date" name="po-date" value="<?= $order_date ?>">
+                            </div>
                         </div>
 
+                        <div class="row">
+                            <div class="col-4 col-md-2">
+                                <label class="form-label">Select Customer</label>
+                            </div>
+                            <div class="col-8 col-md-5">
+                                <select class="form-control" name="customer_select" id="customer_select" required autocomplete="off">
+                                    <option value="">Select Customer</option>
+                                </select>
+                            </div>
 
+
+                            <div class="col-4 col-md-2 mt-3 mt-md-0">
+                                <label class="form-label  text-md-end">Invoice Type</label>
+                            </div>
+                            <div class="col-8 col-md-3 mt-3 mt-md-0">
+                                <select class="form-control" name="invoice_type" id="invoice_type" required autocomplete="off">
+                                    <option value="-1">Retail</option>
+                                    <option value="-2">Delivery</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector"></div>
+                    </form>
+
+
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover  border-top border-3 mt-4" id="order-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Item/Service</th>
+                                            <th class="text-center" scope="col">Quantity</th>
+                                            <th class="text-center" scope="col">Unit</th>
+                                            <th class="text-end" scope="col">Per Unit Rate</th>
+                                            <th class="text-end" scope="col">Amount</th>
+                                            <th class="text-center" scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inv_content">
+
+
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="6" class="text-end" scope="col">Sub Total</th>
+                                            <th colspan="2" class="text-end" scope="col" id="sub_total_value">0.00</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="5" class="text-end" scope="col">Discount (%)</th>
+                                            <th class="text-center" scope="col" id="discount">
+                                                <input onchange="updateDiscount()" class="border-secondary rounded-3 text-center" style="max-width: 120px;" type="number" step="0.01" id="dis_percentage" name="dis_percentage" placeholder="0.00"> %
+                                            </th>
+                                            <th colspan="2" class="text-end" scope="col" id="discount_value">0.00</th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="6" class="text-end" scope="col">Grand Total</th>
+                                            <th colspan="2" class="text-end" scope="col" id="grand_total_value">0.00</th>
+                                        </tr>
+
+
+                                        <input type="hidden" id="tax_rate_hidden" value="0">
+                                        <input type="hidden" id="tax_amount_hidden" value="0">
+                                        <input type="hidden" id="sub_total_hidden" value="">
+                                        <input type="hidden" id="discount_percentage_hidden" value="">
+                                        <input type="hidden" id="discount_value_hidden" value="">
+                                        <input type="hidden" id="grand_total_hidden" value="">
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row mb-3 mt-3">
                         <div class="col-4 col-md-2 mt-3 mt-md-0">
-                            <label class="form-label  text-md-end">Due Date</label>
+                            <label class="form-label">Remark</label>
                         </div>
-                        <div class="col-8 col-md-3 mt-3 mt-md-0">
-                            <input type="date" class="form-control" id="po-date" name="po-date" value="<?= $order_date ?>">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-4 col-md-2">
-                            <label class="form-label">Select Customer</label>
-                        </div>
-                        <div class="col-8 col-md-5">
-                            <select class="form-control" name="customer_select" id="customer_select" required autocomplete="off">
-                                <option value="">Select Customer</option>
-                            </select>
-                        </div>
-
-
-                        <div class="col-4 col-md-2 mt-3 mt-md-0">
-                            <label class="form-label  text-md-end">Invoice Type</label>
-                        </div>
-                        <div class="col-8 col-md-3 mt-3 mt-md-0">
-                            <select class="form-control" name="invoice_type" id="invoice_type" required autocomplete="off">
-                                <option value="-1">Retail</option>
-                                <option value="-2">Delivery</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="p-3 border border-2 bg-light rounded-4 mt-4" id="product-selector"></div>
-                </form>
-
-
-                <div class="row mb-2">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered table-hover  border-top border-3 mt-4" id="order-table">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Item/Service</th>
-                                        <th class="text-center" scope="col">Quantity</th>
-                                        <th class="text-center" scope="col">Unit</th>
-                                        <th class="text-end" scope="col">Per Unit Rate</th>
-                                        <th class="text-end" scope="col">Amount</th>
-                                        <th class="text-center" scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="inv_content">
-
-
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th colspan="6" class="text-end" scope="col">Sub Total</th>
-                                        <th colspan="2" class="text-end" scope="col" id="sub_total_value">0.00</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="5" class="text-end" scope="col">Discount (%)</th>
-                                        <th class="text-center" scope="col" id="discount">
-                                            <input onchange="updateDiscount()" class="text-center" style="max-width: 120px;" type="number" step="0.01" id="dis_percentage" name="dis_percentage" placeholder="0.00"> %
-                                        </th>
-                                        <th colspan="2" class="text-end" scope="col" id="discount_value">0.00</th>
-                                    </tr>
-                                    <tr>
-                                        <th colspan="6" class="text-end" scope="col">Grand Total</th>
-                                        <th colspan="2" class="text-end" scope="col" id="grand_total_value">0.00</th>
-                                    </tr>
-
-
-                                    <input type="hidden" id="tax_rate_hidden" value="0">
-                                    <input type="hidden" id="tax_amount_hidden" value="0">
-                                    <input type="hidden" id="sub_total_hidden" value="">
-                                    <input type="hidden" id="discount_percentage_hidden" value="">
-                                    <input type="hidden" id="discount_value_hidden" value="">
-                                    <input type="hidden" id="grand_total_hidden" value="">
-                                </tfoot>
-                            </table>
+                        <div class="col-8 col-md-10 mt-3 mt-md-0">
+                            <input type="text" class="form-control" placeholder="Add Comment and Instruction here" name="remarks" id="remarks">
                         </div>
                     </div>
                 </div>
 
 
-                <div class="row mb-3 mt-3">
-                    <div class="col-4 col-md-2 mt-3 mt-md-0">
-                        <label class="form-label">Remark</label>
-                    </div>
-                    <div class="col-8 col-md-10 mt-3 mt-md-0">
-                        <input type="text" class="form-control" placeholder="Add Comment and Instruction here" name="remarks" id="remarks">
+                <div class="row mb-3 mt-5">
+                    <div class="col-12 text-end">
+                        <button class="mt-0 mb-1 btn  btn-success view-button" type="button" onclick="CreateReceipt(0,2)"><i class="fa-solid fa-check"></i> Proceed to Payment</button>
                     </div>
                 </div>
+
             </div>
-
-
-            <div class="row mb-3 mt-5">
-                <div class="col-12 text-end">
-                    <button class="mt-0 mb-1 btn  btn-success view-button" type="button" onclick="CreateReceipt(0,2)"><i class="fa-solid fa-check"></i> Proceed to Payment</button>
-                </div>
-            </div>
-
 
         </div>
     </div>

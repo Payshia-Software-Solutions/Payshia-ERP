@@ -16,12 +16,10 @@ $locationType = $Locations[$LocationID]['location_type'];
 
 <div class="row mt-3">
     <div class="col-12 text-end">
-
-        <button type="button" id="hold-list" class="btn refresh-button mr-2" onclick="GetHoldInvoices ('<?= $LocationID ?>', 0)">
-            <i class="fa-solid fa-bars"></i> Hold Bills </button>
+        <button onclick="OpenReturnBox(0)" type="button" class="btn btn-warning text-white"><i class="fa-solid fa-right-left m-0"></i> Return</button>
+        <button onclick="OpenRefund(0)" type="button" class="btn btn-danger"><i class="fa-solid fa-money-bill-trend-up"></i> Refund</button>
+        <button type="button" id="hold-list" class="btn refresh-button mr-2" onclick="GetHoldInvoices ('<?= $LocationID ?>', 0)"> <i class="fa-solid fa-bars"></i> Hold Bills </button>
         <button type="button" onclick="toggleFullscreen()" class="btn refresh-button mr-2"><i class="fa-solid fa-expand"></i></button>
-        <button type="button" onclick="OpenIndex()" class="btn refresh-button mr-2"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button type="button" onclick="PromptCloseApp(0)" class="btn refresh-button mr-2"><i class="fa-solid fa-power-off"></i> Exit</button>
     </div>
 </div>
 
@@ -50,14 +48,16 @@ $locationType = $Locations[$LocationID]['location_type'];
         </div>
     </div>
 </div>
+<?php
 
-<div class="row mt-3">
-    <h5>Set Table</h5>
-</div>
+if (!empty($MainDataArray)) {
+?>
+    <div class="row mt-3">
+        <h5>Set Table</h5>
+    </div>
 
-<div class="row mt-3">
-    <?php
-    if (!empty($MainDataArray)) {
+    <div class="row mt-3">
+        <?php
         foreach ($MainDataArray as $SelectArray) {
             $active_status = "Deleted";
             $color = "warning";
@@ -81,7 +81,7 @@ $locationType = $Locations[$LocationID]['location_type'];
                 $availability_color = "success";
             }
 
-    ?>
+        ?>
             <div class="col-6 col-md-3 mb-3 d-flex">
                 <div class="card bg-<?= $card_color ?> table-card flex-fill shadow-sm clickable" onclick="SetTableValue ('<?= $SelectArray['id'] ?>', '<?= $SelectArray['table_name'] ?>')">
                     <div class="card-body p-0">
@@ -95,23 +95,52 @@ $locationType = $Locations[$LocationID]['location_type'];
             </div>
         <?php
         }
-    } else {
         ?>
-        <div class="col-12">
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-                    <p class="mb-0 text-secondary">No Tables in this Location</p>
-                </div>
+
+    </div>
+<?php
+} else {
+?>
+    <div class="col-12">
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+                <p class="mb-0 text-secondary">No Tables in this Location</p>
             </div>
         </div>
-    <?php
-    }
-    ?>
-</div>
+    </div>
+<?php
+}
+?>
 
 <div class="row">
     <div class="col-12 text-end">
-        <a href="./choice-location" type="button" class="btn btn-secondary mr-2">
-            <i class="fa-solid fa-location-dot"></i> Change Branch </a>
+        <a href="./choice-location" onclick="handleLinkClick(this)" type="button" id="changeLocationLink" class="btn btn-secondary mr-2">
+            <i class="fa-solid fa-location-dot"></i> Change Location </a>
     </div>
 </div>
+
+<script>
+    // Define the function to handle the link click event
+    function handleLinkClick(event) {
+        showOverlay()
+        // Prevent the default behavior of following the link
+        event.preventDefault();
+
+        // Retrieve the href attribute of the clicked link
+        var href = event.currentTarget.getAttribute('href');
+
+        // Perform any additional actions here, for example, logging the href
+        console.log('Link clicked:', href);
+
+        // You can also redirect to the href if needed
+        window.location.href = href;
+    }
+</script>
+
+<script>
+    function openURL(url) {
+        showOverlay()
+        // Open the URL in a new window
+        window.location.href = url;
+    }
+</script>

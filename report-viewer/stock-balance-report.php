@@ -107,6 +107,9 @@ $reportTitle = "Stock Balance Report";
 
                             $product_id = $selectedArray['product_id'];
                             $stockBalance = GetStockBalanceByProductByLocationToDate($link, $product_id, $location_id, $dateInput);
+                            if ($stockBalance == 0) {
+                                continue;
+                            }
                             $costPrice = GetCostPrice($link, $product_id);
                             $sellingPrice = GetSellingPrice($link, $product_id);
                             $stockValue = $stockBalance * $costPrice;

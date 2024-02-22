@@ -424,6 +424,15 @@ if (isset($defaultLocation) && $defaultLocation != "") {
 
                             if ($readAccess == 1) {
                         ?>
+
+                                <li class="nav-item">
+                                    <a class="nav-link submenu-item" href="./batch-production">
+
+                                        <i class="fa-solid  fa-tarp-droplet menu-icon"></i>
+                                        Production Sheet
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link submenu-item" href="./production-note">
 
@@ -805,6 +814,13 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                     </a>
                     <ul class="submenu">
                         <li class="nav-item">
+                            <a class="nav-link" href="./lms-master">
+                                <i class="fa-solid fa-laptop-file menu-icon"></i>
+                                LMS Master
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
                             <a class="nav-link" href="./course-management">
                                 <i class="fa-solid fa-award  menu-icon"></i>
                                 Course Management
@@ -829,6 +845,8 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                                 LMS Reports
                             </a>
                         </li>
+
+
 
                     </ul>
                 </li>

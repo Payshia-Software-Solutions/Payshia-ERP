@@ -11,6 +11,13 @@ $Product = GetProducts($link)[$ProductID];
 $Units = GetUnit($link);
 $itemDiscounts = MostUsedDiscounts($link, $ProductID);
 
+$getHoldQty = GetHoldItemQtyNew($link, $LocationID);
+$cartItemsByLocation = GetCartByLocation($link, $LocationID);
+
+$holdItemQty = (isset($getHoldQty[$ProductID])) ? $getHoldQty[$ProductID] : 0;
+$cartItemQty = (isset($cartItemsByLocation[$ProductID])) ? $cartItemsByLocation[$ProductID]['total_quantity'] : 0;
+$totalHoldQty = $holdItemQty + $cartItemQty;
+
 if ($Product['image_path'] == 'no-image.png') {
     $file_path = "../assets/images/products/no-image.png";
 } else {
@@ -20,6 +27,8 @@ $recipeType = $Product['recipe_type'];
 $ItemType = $Product['item_type'];
 $currentStock = GetStockBalanceByProductByLocation($link, $ProductID, $LocationID);
 $item_unit = $Units[$Product['measurement']]['unit_name'];
+
+$actualAvailableQty = $currentStock - $totalHoldQty;
 
 $profitPercentage = (($Product['selling_price'] - $Product['cost_price']) / $Product['cost_price']) * 100;
 $profit_ratio = number_format($profitPercentage, 2) . "%";
@@ -59,7 +68,7 @@ $barcode = GenerateNormalBarcode($ProductCode);
             </div>
             <div class="col-3 col-md-3 mb-2">
                 <p class="mb-0">Stock</p>
-                <h6 class="mb-0"><?= $currentStock ?></h6>
+                <h6 class="mb-0"><?= $currentStock ?> (Hold: <?= $totalHoldQty ?>)</h6>
             </div>
             <div class="col-3 col-md-3 mb-2">
                 <p class="mb-0">Unit</p>
@@ -87,11 +96,7 @@ $barcode = GenerateNormalBarcode($ProductCode);
             </div>
             <div class="col-3 col-md-3 mb-2 d-none d-md-block">
                 <p class="mb-0">Barcode</p>
-                <img class="logo-image p-0" src="data:image/png;base64,<?= $barcode; ?>" alt="Barcode" style="height:20px; width:100%;">
             </div>
-
-
-
 
 
         </div>
@@ -153,7 +158,7 @@ $barcode = GenerateNormalBarcode($ProductCode);
         <div class="row mt-3">
             <div class="col-12">
                 <?php
-                if ($currentStock > 0 || $recipeType == "1" || $ItemType == "SService") { ?>
+                if ($actualAvailableQty > 0 || $recipeType == "1" || $ItemType == "SService") { ?>
                     <button onclick="ValidateStockToCart('<?= $recipeType ?>', '<?= $LocationID ?>', '<?= $ProductID ?>', '<?= $ItemType ?>')" class="add-button text-white w-100 btn btn-dark hold-button btn-lg p-4"><i class="fa-solid fa-plus btn-icon"></i> Add</button>
                 <?php
                 } else {

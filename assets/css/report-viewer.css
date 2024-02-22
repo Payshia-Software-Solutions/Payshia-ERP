@@ -5,6 +5,10 @@ body {
     margin: 0px
 }
 
+.landscape {
+    width: 297mm !important;
+}
+
 @media screen and (min-width: 768px) {
 
     html,

@@ -19,7 +19,7 @@ if ($fromDate === null || $toDate === null || $location_id === null) {
 }
 
 $itemWiseSale = GetItemWiseSale($link, $fromDate, $toDate, $location_id);
-
+$returnItems = GetReturnByRange($link, $fromDate, $toDate, $location_id);
 $subTotal = $discountAmount = $serviceCharge = $grandTotal  = 0;
 $invoiceSales = getInvoicesByDateRangeAll($link, $fromDate, $toDate, $location_id);
 
@@ -37,6 +37,7 @@ $reportDate = $generateDate->format('d/m/Y H:i:s');
 $pageTitle = "Item Wise Sale - " . $location_name;
 $reportTitle = "Item Wise Sale";
 
+$totalReturn = 0;
 
 if (!empty($invoiceSales)) {
     foreach ($invoiceSales as $selectedArray) {
@@ -120,12 +121,13 @@ if (!empty($invoiceSales)) {
                             $quantity = $selectedArray['total_quantity'];
                             $costPrice = $selectedArray['cost_price'];
                             $itemPrice = $selectedArray['item_price'];
-                            $itemDiscount = $selectedArray['total_discounts'];
+                            $itemDiscount = $selectedArray['total_discounts'] * $quantity;
                             $totalValue = $quantity * $itemPrice;
                             $totalCostValue += $quantity * $costPrice;
 
+                            $lineTotal = $totalValue - $itemDiscount;
                             // Total
-                            $totalSale += $totalValue;
+                            $totalSale += $lineTotal;
                             $totalDiscount += $itemDiscount;
                             $rowCount++;
                     ?>
@@ -135,7 +137,7 @@ if (!empty($invoiceSales)) {
                                 <td class="" style="max-width: 200px;"><?= $quantity ?></td>
                                 <td class="text-end"><?= number_format($itemPrice, 3) ?></td>
                                 <td class="text-end"><?= number_format($itemDiscount, 3) ?></td>
-                                <td class="text-end text-bold"><?= number_format($totalValue, 3) ?></td>
+                                <td class="text-end text-bold"><?= number_format($lineTotal, 3) ?></td>
                             </tr>
 
                     <?php
@@ -169,13 +171,52 @@ if (!empty($invoiceSales)) {
                     </tr>
 
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Total Cost</td>
-                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalCostValue) ?></td>
+                        <td colspan="6" class="text-bold-extra" scope="col">Return Items</td>
+                    </tr>
+                    <tr>
+                        <td class="text-bold" scope="col">#</td>
+                        <td class="text-bold" colspan="2" scope="col">Product Name</td>
+                        <td class="text-bold" scope="col">Quantity</td>
+                        <td class="text-bold" scope="col">Item Price</td>
+                        <td class="text-bold" scope="col">Total</td>
+                    </tr>
+
+                    <?php
+                    if (!empty($returnItems)) {
+                        $rowCount = 0;
+                        foreach ($returnItems as $selectedArray) {
+                            $product_name = $Products[$selectedArray['product_id']]['product_name'];
+                            $quantity = $selectedArray['item_qty'];
+                            $itemPrice = $selectedArray['item_rate'];
+                            $totalValue = $quantity * $itemPrice;
+                            $totalCostValue += $quantity * $costPrice;
+                            // Total
+                            $totalReturn += $totalValue;
+                            $rowCount++;
+                    ?>
+                            <tr>
+                                <td class=""><?= $rowCount ?></td>
+                                <td colspan="2" class=""><?= MakeFormatProductCode($selectedArray['product_id']) ?> - <?= $product_name ?></td>
+                                <td class="" style="max-width: 200px;"><?= $quantity ?></td>
+                                <td class="text-end"><?= number_format($itemPrice, 2) ?></td>
+                                <td class="text-end text-bold"><?= number_format($totalValue, 2) ?></td>
+                            </tr>
+
+                    <?php
+
+                        }
+                    }
+
+                    $netSale = $grandTotalSale - $totalReturn;
+                    ?>
+                    <tr>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Total Return</td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalReturn) ?></td>
                     </tr>
 
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Profit</td>
-                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($profitValue) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5">Net Sale</td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($netSale) ?></td>
                     </tr>
 
 

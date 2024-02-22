@@ -17,7 +17,8 @@ $PaymentTypes = [
     ["id" => "0", "text" => "Cash"],
     ["id" => "1", "text" => "Visa/Master"],
     ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
+    ["id" => "3", "text" => "GV"],
+    ["id" => "4", "text" => "Bank Transfer"]
 ];
 ?>
 

@@ -1,5 +1,6 @@
 <?php
 // include __DIR__ . './../vendor/phpqrcode/qrlib.php';
+include __DIR__ . '/config.php';
 date_default_timezone_set("Asia/Colombo");
 
 function generateQRCode($text)
@@ -901,6 +902,26 @@ function GetHoldItemQty($link, $LocationID)
     return $ArrayResult;
 }
 
+function GetHoldItemQtyNew($link, $LocationID)
+{
+    $ArrayResult = array();
+    $sql = "SELECT product_id, SUM(quantity) AS total_quantity
+            FROM transaction_invoice_items AS tii
+            INNER JOIN transaction_invoice AS ti ON tii.invoice_number = ti.invoice_number
+            WHERE ti.invoice_status = '1' AND ti.is_active = 1 AND ti.location_id = '$LocationID'
+            GROUP BY product_id";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['product_id']] = $row['total_quantity'];
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
 function GetHoldCart($link, $LoggedUser, $invoice_number)
 {
     $ArrayResult = array();
@@ -1215,6 +1236,20 @@ function GetByInvoicesDate($link, $Date, $LocationID)
     return $ArrayResult;
 }
 
+function GetInvoicesByCustomer($link, $customerId)
+{
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_invoice` WHERE `customer_code` LIKE '$customerId' ORDER BY `id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['invoice_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
 
 
 function GetInvoiceItems($link, $invoice_number)
@@ -1302,6 +1337,9 @@ function CreateReceipt($link, $rec_number, $type, $is_active, $date, $amount, $c
 
 function CreateStockEntry($link, $type, $quantity, $product_id, $reference, $location_id, $created_by, $is_active, $ref_id)
 {
+
+    global $link;
+
     $error = array();
     $current_time = date("Y-m-d H:i:s");
 
@@ -2727,6 +2765,7 @@ function CreateQuote($link, $quote_number, $quote_date, $quote_amount, $grand_to
     }
     return json_encode($error);
 }
+
 function getPageTable($link)
 {
     $ArrayResult = array();
@@ -2850,13 +2889,42 @@ function GetCustomerCreditLimit($link, $customer_id)
 function getCustomerBalance($link, $customerId)
 {
     $customerBalance = 0;
-    $sql = "SELECT SUM(`inv_amount`) AS `invoiceTotal` FROM `transaction_invoice` WHERE `is_active` LIKE 1 AND `customer_code` LIKE '$customerId'";
+    $sql = "SELECT SUM(`inv_amount`) AS `invoiceTotal` FROM `transaction_invoice` WHERE `is_active` LIKE 1 AND `invoice_status` LIKE 2 AND `customer_code` LIKE '$customerId'";
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $invoiceTotal = $row['invoiceTotal'];
         }
     }
+
+    $returnValue =  GetCustomerReturnAmount($customerId);
+
+
+    $sql = "SELECT SUM(`amount`) AS `receiptAmount` FROM `transaction_receipt` WHERE `is_active` LIKE 1 AND `customer_id` LIKE '$customerId'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $receiptAmount = $row['receiptAmount'];
+        }
+    }
+
+    $customerBalance = $invoiceTotal - $receiptAmount - $returnValue;
+    return $customerBalance;
+}
+
+function getCustomerBalanceDetailed($link, $customerId)
+{
+    $customerBalance = 0;
+    $sql = "SELECT SUM(`inv_amount`) AS `invoiceTotal` FROM `transaction_invoice` WHERE `is_active` LIKE 1 AND `invoice_status` LIKE 2 AND `customer_code` LIKE '$customerId'";
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $invoiceTotal = $row['invoiceTotal'];
+        }
+    }
+
+    $returnValue =  GetCustomerReturnAmount($customerId);
+    $GetSettlementTotal = GetSettlementTotal($customerId);
 
 
     $sql = "SELECT SUM(`amount`) AS `receiptAmount` FROM `transaction_receipt` WHERE `is_active` LIKE 1 AND `customer_id` LIKE '$customerId'";
@@ -2868,8 +2936,11 @@ function getCustomerBalance($link, $customerId)
     }
 
     $customerBalance = $invoiceTotal - $receiptAmount;
-    return $customerBalance;
+    $balanceArray = array('customerBalance' => $customerBalance, 'invoiceTotal' => $invoiceTotal, 'receiptAmount' => $receiptAmount, 'returnValue' => $returnValue, 'GetSettlementTotal' => $GetSettlementTotal);
+
+    return $balanceArray;
 }
+
 
 
 function GetRegions($link)
@@ -2983,6 +3054,702 @@ function RemovedItemsByInvoice($link, $invNumber)
     $ArrayResult = array();
 
     $sql = "SELECT `id`, `ref_id`, `remark`, `user_id`, `created_by`, `created_at`, `location_id`, `product_id`, SUM(item_quantity) AS `item_quantity` FROM `transaction_removal_remark` WHERE `ref_id` LIKE '$invNumber' GROUP BY `product_id`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+function generateRTNNumber()
+{
+    // Query to get the count of transactions for the current date
+    global $pdo; // assuming you have a PDO connection object
+
+    $sql = "SELECT COUNT(*) as count FROM transaction_return";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $rowCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+    // Increment the count by 1 and pad with leading zeros to ensure 3 digits
+    $incrementalNumber = str_pad($rowCount + 1, 4, '0', STR_PAD_LEFT);
+
+    // Generate the RTN number
+    $rtnNumber = "RTN" . $incrementalNumber;
+
+    return $rtnNumber;
+}
+
+// Function to insert data into transaction_return table and return the status
+function insertIntoReturnTable($customer_id, $location_id, $updated_by, $reason, $refund_id, $tableData, $isActive, $ref_invoice, $return_amount)
+{
+    global $pdo;
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+        $rtnNumber = generateRTNNumber();
+
+        $stmt = $pdo->prepare("INSERT INTO transaction_return (rtn_number, customer_id, location_id, created_at, updated_by, reason, refund_id, is_active, ref_invoice, return_amount) VALUES (:rtn_number, :customer_id, :location_id, :created_at, :updated_by, :reason, :refund_id, :is_active, :ref_invoice, :return_amount)");
+
+        $stmt->bindParam(':rtn_number', $rtnNumber);
+        $stmt->bindParam(':customer_id', $customer_id);
+        $stmt->bindParam(':location_id', $location_id);
+        $stmt->bindParam(':created_at', $current_time);
+        $stmt->bindParam(':updated_by', $updated_by);
+        $stmt->bindParam(':reason', $reason);
+        $stmt->bindParam(':refund_id', $refund_id);
+        $stmt->bindParam(':is_active', $isActive);
+        $stmt->bindParam(':ref_invoice', $ref_invoice);
+        $stmt->bindParam(':return_amount', $return_amount);
+
+        $stmt->execute();
+
+        if (!empty($tableData)) {
+            foreach ($tableData as $selectedRaw) {
+
+                $product_id = $selectedRaw['productId'];
+                $item_rate = $selectedRaw['rate'];
+                $item_qty = $selectedRaw['qty'];
+
+                $insertResult = insertReturnItems($rtnNumber, $location_id, $product_id, $item_rate, $item_qty, $updated_by, $isActive);
+            }
+        }
+
+        return array('status' => 'success', 'message' => 'Return Note Saved successfully', 'rtnNumber' => $rtnNumber);
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+// Function to insert product items into the transaction_return_items table
+function insertReturnItems($rtn_number, $location_id, $product_id, $item_rate, $item_qty, $updated_by, $isActive)
+{
+    global $pdo;
+    global $link;
+
+    $Products = GetProducts($link);
+    $current_time = date("Y-m-d H:i:s");
+    try {
+        // Prepare the SQL statement for insertion
+        $stmt = $pdo->prepare("INSERT INTO transaction_return_items (rtn_number, location_id, product_id, item_rate, item_qty, updated_at, update_by, is_active) 
+                               VALUES (:rtn_number, :location_id, :product_id, :item_rate, :item_qty, :updated_at, :updated_by, :is_active)");
+
+        // Bind parameters and execute the statement
+        $stmt->bindParam(':rtn_number', $rtn_number);
+        $stmt->bindParam(':location_id', $location_id);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':item_rate', $item_rate);
+        $stmt->bindParam(':item_qty', $item_qty);
+        $stmt->bindParam(':updated_by', $updated_by);
+        $stmt->bindParam(':updated_at', $current_time);
+        $stmt->bindParam(':is_active', $isActive);
+        $stmt->execute();
+
+        $type = "DEBIT";
+
+        $sub_product_name = $Products[$product_id]['product_name'];
+        $reference = $type . " : " . $item_qty . " " . $sub_product_name . "(s) is Debited to " . $rtn_number . " | Return Debit";
+        $stockEntryResult = CreateStockEntry($link, $type, $item_qty, $product_id, $reference, $location_id, $updated_by, $isActive, $rtn_number);
+
+        return array('status' => 'success', 'message' => 'Item inserted successfully');
+    } catch (PDOException $e) {
+        // Handle errors, you can log or throw the exception
+
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
+function GetReturns()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `rtn_number`, `customer_id`, `location_id`, `created_at`, `updated_by`, `reason`, `refund_id`, `is_active`, `ref_invoice`, `return_amount` FROM `transaction_return`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['rtn_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetCustomerReturnAmount($customerId)
+{
+    global $pdo;
+    global $link;
+    $returnValue = 0;
+
+    $sql = "SELECT SUM(`return_amount`) AS `return_amount` FROM `transaction_return` WHERE `customer_id` LIKE '$customerId' AND `is_active` LIKE 1";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $returnValue = $row['return_amount'];
+        }
+    }
+    return $returnValue;
+}
+
+function GetUnsettledReturns($customerId)
+{
+    global $pdo;
+    global $link;
+
+    // Fetch return settlements outside the main loop
+    $returnSettlements = GetReturnSettlements($customerId);
+
+    $ArrayResult = array();
+
+    // Construct SQL query to fetch transaction returns for the given customer
+    $sql = "SELECT `id`, `rtn_number`, `customer_id`, `location_id`, `created_at`, `updated_by`, `reason`, `refund_id`, `is_active`, `ref_invoice`, `return_amount` FROM `transaction_return` WHERE `customer_id` = ?";
+
+    // Prepare and execute the SQL statement
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$customerId]);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Iterate through the fetched rows
+    foreach ($rows as $row) {
+        $settlementAmount = 0;
+
+        // Check if there are return settlements for the current return number
+        foreach ($returnSettlements as $selectedArray) {
+            $settleRtnNumber = $selectedArray['rtn_number'];
+
+            if ($row['rtn_number'] == $settleRtnNumber) {
+                $settlementAmount += $selectedArray['settled_amount'];
+            }
+        }
+
+        // Only add the return to the result array if settlement amount is less than or equal to return amount
+        if ($settlementAmount <= $row['return_amount']) {
+            $ArrayResult[$row['rtn_number']] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+function GetSettledAmount($rtn_number)
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = 0;
+
+    $sql = "SELECT SUM(`settled_amount`) AS `settled_amount` FROM `translation_return_settlement` WHERE `is_active` LIKE 1 AND `rtn_number` LIKE '$rtn_number'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['settled_amount'];
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetSettlementTotal($customerId)
+{
+    global $pdo;
+    global $link;
+
+    $ArrayResult = 0;
+
+    $sql = "SELECT SUM(`settled_amount`) AS `settled_amount` FROM `translation_return_settlement` WHERE `is_active` LIKE 1 AND `customer_id` LIKE '$customerId'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['settled_amount'];
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetReturnSettlements($customerId)
+{
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `rtn_number`, `invoice_number`, `customer_id`, `settled_amount`, `is_active`, `updated_by`, `updated_at`, `location_id` FROM `translation_return_settlement` WHERE `is_active` LIKE 1 AND `customer_id` LIKE '$customerId'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetInvoiceSettlement($invoiceNumber)
+{
+    global $pdo;
+    global $link;
+    $returnValue = 0;
+
+    $sql = "SELECT SUM(`settled_amount`) AS `settled_amount` FROM `translation_return_settlement` WHERE `invoice_number` LIKE '$invoiceNumber' AND `is_active` LIKE 1";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $returnValue = $row['settled_amount'];
+        }
+    }
+    return $returnValue;
+}
+
+function GetUnsettledReturnBalance($customerId)
+{
+
+    global $pdo;
+    global $link;
+    $returnValue = 0;
+
+    $sql = "SELECT SUM(`return_amount`) AS `return_amount` FROM `transaction_return` WHERE `customer_id` LIKE '$customerId' AND `is_active` LIKE 1 AND (`settled_invoice` = '' OR `settled_invoice` IS NULL)";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $returnValue = $row['return_amount'];
+        }
+    }
+    return $returnValue;
+}
+
+function GetReturnItems($rtn_number)
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `rtn_number`, `location_id`, `product_id`, `item_rate`, SUM(`item_qty`) AS `item_qty`, `updated_at`, `update_by`, `is_active` FROM `transaction_return_items` WHERE `rtn_number` LIKE '$rtn_number' GROUP BY `product_id`,`item_rate`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetReturnItemsPrint($rtn_number)
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `rtn_number`, `location_id`, `product_id`, `item_rate`, `item_qty`, `updated_at`, `update_by`, `is_active` FROM `transaction_return_items` WHERE `rtn_number` LIKE '$rtn_number'";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetReturnItemsByInvoice($invoiceNumber)
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT tri.id AS item_id, tri.rtn_number AS item_rtn_number, tri.location_id AS item_location_id, tri.product_id, tri.item_rate, SUM(tri.item_qty) AS `item_qty`, tri.updated_at AS item_updated_at, tri.update_by AS item_update_by, tri.is_active AS item_is_active, tr.id AS return_id, tr.rtn_number AS return_rtn_number, tr.customer_id, tr.location_id AS return_location_id, tr.created_at AS return_created_at, tr.updated_by AS return_updated_by, tr.reason, tr.refund_id, tr.is_active AS return_is_active, tr.ref_invoice FROM transaction_return_items tri JOIN transaction_return tr ON tri.rtn_number = tr.rtn_number WHERE tr.ref_invoice = '$invoiceNumber' GROUP BY tri.product_id, tri.item_rate;
+    ";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['product_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+// Refund
+
+
+
+function generateRefundNumber()
+{
+    // Query to get the count of transactions for the current date
+    global $pdo; // assuming you have a PDO connection object
+
+    $sql = "SELECT COUNT(*) as count FROM transaction_refund";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $rowCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+    // Increment the count by 1 and pad with leading zeros to ensure 3 digits
+    $incrementalNumber = str_pad($rowCount + 1, 4, '0', STR_PAD_LEFT);
+
+    // Generate the RTN number
+    $rtnNumber = "RFD" . $incrementalNumber;
+
+    return $rtnNumber;
+}
+
+
+// Function to insert data into transaction_return table and return the status
+function insertIntoRefundTable($customer_id, $rtn_number, $refund_amount, $is_active, $update_by, $rtn_location, $current_location)
+{
+    global $link;
+    global $pdo;
+    global $cashAccountId;
+    global $salesRevenueAccountId;
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+        $refund_id = generateRefundNumber();
+
+        $stmt = $pdo->prepare("INSERT INTO transaction_refund (`refund_id`, `rtn_number`, `refund_amount`, `refund_datetime`, `is_active`, `update_by`, `customer_id`, `rtn_location`, `current_location`) VALUES (:refund_id, :rtn_number, :refund_amount, :refund_datetime, :is_active, :update_by, :customer_id, :rtn_location, :current_location)");
+
+        $stmt->bindParam(':refund_id', $refund_id);
+        $stmt->bindParam(':rtn_number', $rtn_number);
+        $stmt->bindParam(':refund_amount', $refund_amount);
+        $stmt->bindParam(':refund_datetime', $current_time);
+        $stmt->bindParam(':is_active', $is_active);
+        $stmt->bindParam(':update_by', $update_by);
+        $stmt->bindParam(':customer_id', $customer_id);
+        $stmt->bindParam(':rtn_location', $rtn_location);
+        $stmt->bindParam(':current_location', $current_location);
+
+        $stmt->execute();
+        $refundUpdate = UpdateRefundId($refund_id, $rtn_number);
+
+        // Journal Entry (Debit then Credit)
+        $CurrentLocationName = GetLocations($link)[$current_location]['location_name'];
+        $description = "Refund - " . $refund_id . " @ " . $CurrentLocationName;
+        $journal_entry = addDoubleEntryTransaction($salesRevenueAccountId, $cashAccountId, $refund_amount, $current_time, $description, $refund_id, $update_by, $current_location);
+
+
+        return array('status' => 'success', 'message' => 'Refund Processed successfully', 'refund_id' => $refund_id, 'refundIdResult' => $refundUpdate, 'journalResult' => $journal_entry);
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
+function UpdateRefundId($refund_id, $rtnNumber)
+{
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare("UPDATE transaction_return SET `refund_id` = :refund_id WHERE rtn_number LIKE :rtn_number");
+        $stmt->bindParam(':refund_id', $refund_id);
+        $stmt->bindParam(':rtn_number', $rtnNumber);
+        $stmt->execute();
+
+        return array('status' => 'success', 'message' => 'Refund ID Updated successfully');
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
+function GetRefundList()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `id`, `refund_id`, `rtn_number`, `refund_amount`, `refund_datetime`, `is_active`, `update_by`, `customer_id`, `rtn_location`, `current_location` FROM `transaction_refund`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['refund_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+function GetExpensesTypes()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `type`, `is_active` FROM `transaction_expenses_types`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GetExpenseList()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_expenses`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['expense_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function generateExpenseNumber()
+{
+    // Query to get the count of transactions for the current date
+    global $pdo; // assuming you have a PDO connection object
+
+    $sql = "SELECT COUNT(*) as count FROM transaction_expenses";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+    $rowCount = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+    // Increment the count by 1 and pad with leading zeros to ensure 3 digits
+    $incrementalNumber = str_pad($rowCount + 1, 4, '0', STR_PAD_LEFT);
+
+    // Generate the RTN number
+    $rtnNumber = "EX" . $incrementalNumber;
+
+    return $rtnNumber;
+}
+
+
+function SaveExpense($ex_type, $ex_description, $amount, $update_by, $location_id, $is_active)
+{
+    global $link;
+    global $pdo;
+
+    global $cashAccountId;
+    global $expenseAccountId;
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+        $expenseId = generateExpenseNumber();
+
+        $stmt = $pdo->prepare("INSERT INTO transaction_expenses (`expense_id`, `ex_type`, `ex_description`, `amount`, `updated_by`, `updated_at`, `location_id`, `is_active`) VALUES (:expense_id, :ex_type, :ex_description, :amount, :updated_by, :updated_at, :location_id, :is_active)");
+
+        $stmt->bindParam(':expense_id', $expenseId);
+        $stmt->bindParam(':ex_type', $ex_type);
+        $stmt->bindParam(':ex_description', $ex_description);
+        $stmt->bindParam(':amount', $amount);
+        $stmt->bindParam(':updated_by', $update_by);
+        $stmt->bindParam(':updated_at', $current_time);
+        $stmt->bindParam(':location_id', $location_id);
+        $stmt->bindParam(':is_active', $is_active);
+
+        $stmt->execute();
+
+        // Journal Entry (Debit then Credit)
+        $CurrentLocationName = GetLocations($link)[$location_id]['location_name'];
+        $description = "Expense - " . $expenseId . " @ " . $ex_description . "-" . $CurrentLocationName;
+        $journal_entry = addDoubleEntryTransaction($expenseAccountId, $cashAccountId, $amount, $current_time, $description, $expenseId, $update_by, $location_id);
+
+
+        return array('status' => 'success', 'message' => 'Expense Saved successfully', 'expenseId' => $expenseId, 'journalResult' => $journal_entry);
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
+function SaveReturnSettlement($rtn_number, $invoice_number, $settled_amount, $is_active, $updated_by, $location_id, $customer_id)
+{
+    global $link;
+    global $pdo;
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+        $expenseId = generateExpenseNumber();
+
+        $stmt = $pdo->prepare("INSERT INTO translation_return_settlement (`rtn_number`, `invoice_number`, `settled_amount`, `is_active`, `updated_by`, `updated_at`, `location_id`, `customer_id`) VALUES (:rtn_number, :invoice_number, :settled_amount, :is_active, :updated_by, :updated_at, :location_id, :customer_id)");
+
+        $stmt->bindParam(':rtn_number', $rtn_number);
+        $stmt->bindParam(':invoice_number', $invoice_number);
+        $stmt->bindParam(':settled_amount', $settled_amount);
+        $stmt->bindParam(':is_active', $is_active);
+        $stmt->bindParam(':updated_by', $updated_by);
+        $stmt->bindParam(':updated_at', $current_time);
+        $stmt->bindParam(':location_id', $location_id);
+        $stmt->bindParam(':customer_id', $customer_id);
+
+        $stmt->execute();
+
+        return array('status' => 'success', 'message' => $invoice_number . ' Settled Saved successfully', 'expenseId' => $expenseId);
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+function GetPaymentTypes()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `text`, `is_active` FROM `payment_types`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function generateBatchNumber($prefix, $forwardVal)
+{
+    // Connect to your database
+
+    global $pdo;
+    global $link;
+
+    // SQL query to count existing batch numbers with the prefix
+    $sql = "SELECT COUNT(*) AS count FROM transaction_batch WHERE batch_number LIKE '$prefix%'";
+
+    // Execute the query
+    $result = $link->query($sql);
+
+    if ($result->num_rows > 0) {
+        // If there are rows, fetch the count
+        $row = $result->fetch_assoc();
+        $count = $row['count'];
+        $count += $forwardVal;
+
+        // Generate the new batch number with count + 1 and padded numeric part
+        $newBatchNumber = $prefix . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+    } else {
+        // If no rows found, start from 1
+        $newBatchNumber = $prefix . '0001';
+    }
+    return $newBatchNumber;
+}
+
+// Function to save data for transaction batch
+function SaveTransactionBatch($batch_number, $target_qty, $production_qty, $batch_product, $remarks, $production_date, $update_by, $cost_per_kg, $location_id, $production_cost)
+{
+    global $pdo; // Assuming $pdo is your PDO connection object
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+
+        $stmt = $pdo->prepare("INSERT INTO transaction_batch (`batch_number`, `target_qty`, `production_qty`, `batch_product`, `remarks`, `production_date`, `update_by`, `update_at`, `cost_per_kg`, `location_id`, `production_cost`) VALUES (:batch_number, :target_qty, :production_qty, :batch_product, :remarks, :production_date, :update_by, :update_at, :cost_per_kg, :location_id, :production_cost)");
+
+        $stmt->bindParam(':batch_number', $batch_number);
+        $stmt->bindParam(':target_qty', $target_qty);
+        $stmt->bindParam(':production_qty', $production_qty);
+        $stmt->bindParam(':batch_product', $batch_product);
+        $stmt->bindParam(':remarks', $remarks);
+        $stmt->bindParam(':production_date', $production_date);
+        $stmt->bindParam(':update_by', $update_by);
+        $stmt->bindParam(':update_at', $current_time);
+        $stmt->bindParam(':cost_per_kg', $cost_per_kg);
+        $stmt->bindParam(':location_id', $location_id);
+        $stmt->bindParam(':production_cost', $production_cost);
+
+        $stmt->execute();
+
+        return array('status' => 'success', 'message' => 'Batch Production saved successfully', 'batchNumber' => $batch_number);
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+// Function to save data for transaction batch item list
+function SaveTransactionBatchItemList($batch_number, $product_id, $product_qty, $cost_price, $calculated_unit, $update_by, $location_id)
+{
+    global $pdo; // Assuming $pdo is your PDO connection object
+
+    try {
+        $current_time = date("Y-m-d H:i:s");
+
+        $stmt = $pdo->prepare("INSERT INTO transaction_batch_item_list (`batch_number`, `product_id`, `product_qty`, `cost_price`, `calculated_unit`, `update_at`, `update_by`, `location_id`) VALUES (:batch_number, :product_id, :product_qty, :cost_price, :calculated_unit, :update_at, :update_by, :location_id)");
+
+        $stmt->bindParam(':batch_number', $batch_number);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':product_qty', $product_qty);
+        $stmt->bindParam(':cost_price', $cost_price);
+        $stmt->bindParam(':calculated_unit', $calculated_unit);
+        $stmt->bindParam(':update_at', $current_time);
+        $stmt->bindParam(':update_by', $update_by);
+        $stmt->bindParam(':location_id', $location_id);
+
+        $stmt->execute();
+
+        return array('status' => 'success', 'message' => 'Transaction Batch Item List saved successfully');
+    } catch (PDOException $e) {
+        return array('status' => 'error', 'message' => 'Something went wrong: ' . $e->getMessage());
+    }
+}
+
+
+function GetBatchProduction()
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_batch`";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['batch_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetBatchProductionItems($batchNumber)
+{
+
+    global $pdo;
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `transaction_batch_item_list` WHERE `batch_number` LIKE '$batchNumber'";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {

@@ -18,18 +18,34 @@ $printedStatus = $rawStockStatus = $holdMaterialsQty = $getHoldQty = $currentCar
 $Product = $Products[$ProductID];
 $recipeType = $Product['recipe_type'];
 $mainProductName = $Products[$ProductID]['product_name'];
+$getHoldQty = GetHoldItemQtyNew($link, $LocationID);
+$cartItemsByLocation = GetCartByLocation($link, $LocationID);
 
-if ($recipeType == 1) {
-    $getHoldQty = GetHoldItemQty($link, $LocationID);
-    $cartItemsByLocation = GetCartByLocation($link, $LocationID);
+if ($currentCartQty == "") {
+    $currentCartQty = 0;
+}
 
-    if ($currentCartQty == "") {
-        $currentCartQty = 0;
+if ($getHoldQty == "") {
+    $getHoldQty = 0;
+}
+
+if ($recipeType == '0') {
+    $requiredQuantity = $Quantity;
+    $currentStock = GetStockBalanceByProductByLocation($link, $ProductID, $LocationID);
+    $holdItemQty = (isset($getHoldQty[$ProductID])) ? $getHoldQty[$ProductID] : 0;
+    $cartItemQty = (isset($cartItemsByLocation[$ProductID])) ? $cartItemsByLocation[$ProductID]['total_quantity'] : 0;
+    $totalHoldQty = $holdItemQty + $cartItemQty;
+
+    $availableStock = $currentStock - $totalHoldQty;
+    if ($availableStock < $requiredQuantity) {
+        $rawStockStatus += 1;
     }
 
-    if ($getHoldQty == "") {
-        $getHoldQty = 0;
-    }
+    $htmlOutput = '
+<h4 class="">' . $mainProductName . '</h4>
+<div class="alert alert-warning mb-0"><b>Not Enough due to Hold Bills</b></div>
+<button class="btn btn-dark mt-2 w-100 btn-lg p-2" onclick="ClosePopUP()">Close</div>';
+} else {
 
 
     $htmlOutput = '
@@ -61,13 +77,14 @@ if ($recipeType == 1) {
 
                     if (!empty($getHoldQty)) {
                         $getHoldQtyValue = 0;
-                        foreach ($getHoldQty as $holdItem) {
-                            if ($innerArray['main_product'] == $holdItem['product_id']) {
-                                $getHoldQtyValue += $holdItem['total_quantity'];
-                                $holdMaterialsQty += $innerArray['qty'] * $holdItem['total_quantity'];
+                        foreach ($getHoldQty as $productId => $holdQty) {
+                            if ($innerArray['main_product'] == $productId) {
+                                $getHoldQtyValue += $holdQty;
+                                $holdMaterialsQty += $innerArray['qty'] * $holdQty;
                             }
                         }
                     }
+
 
                     if (!empty($cartItemsByLocation)) {
                         $currentCartQty = 0;
@@ -108,9 +125,15 @@ if ($recipeType == 1) {
 <button class="btn btn-dark mt-2 w-100 btn-lg p-2" onclick="ClosePopUP()">Close</div>';
 }
 
+
 if ($rawStockStatus == 0) {
     $result = AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $LocationID);
 } else {
-    $result = json_encode(array('status' => 'error', 'message' => 'Not Enough Raw Materials!', 'htmlOutput' => $htmlOutput, 'holdMaterial' => $holdMaterialsQty));
+
+    if ($recipeType == '0') {
+        $result = json_encode(array('status' => 'error', 'message' => 'Not Enough Raw Materials!', 'htmlOutput' => $htmlOutput, 'holdMaterial' => $holdMaterialsQty));
+    } else {
+        $result = json_encode(array('status' => 'error', 'message' => 'Not Enough Raw Materials!', 'htmlOutput' => $htmlOutput, 'holdMaterial' => $holdMaterialsQty));
+    }
 }
 echo $result;

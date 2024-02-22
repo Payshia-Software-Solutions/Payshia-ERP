@@ -226,12 +226,40 @@ $ArrayCount = count($ChartOfAccounts);
                                     ?>
 
                                     <tr>
+                                        <td>Customer Statement</td>
+                                        <td>Sale</td>
+                                        <td class="text-end">
+                                            <button class="mb-0 btn btn-sm btn-success view-button" type="button" onclick="CustomerStatement()"><i class="fa-solid fa-eye"></i> Open</button>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Credit Sale Report</td>
+                                        <td>Sale</td>
+                                        <td class="text-end">
+                                            <button class="mb-0 btn btn-sm btn-success view-button" type="button" onclick="CreditSaleReport()"><i class="fa-solid fa-eye"></i> Open</button>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>Invoice Report</td>
+                                        <td>Sale</td>
+                                        <td class="text-end">
+                                            <button class="mb-0 btn btn-sm btn-success view-button" type="button" onclick="InvoiceReport()"><i class="fa-solid fa-eye"></i> Open</button>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
                                         <td>Charge Report</td>
                                         <td>Sale</td>
                                         <td class="text-end">
                                             <button class="mb-0 btn btn-sm btn-success view-button" type="button" onclick="ChargeReport()"><i class="fa-solid fa-eye"></i> Open</button>
                                         </td>
                                     </tr>
+
+
+
 
                                 </tbody>
                             </table>

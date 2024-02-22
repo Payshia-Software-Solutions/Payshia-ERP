@@ -8,6 +8,7 @@ $costOfGoodsAccountId = 18; // COGS
 
 
 include __DIR__ . '/config.php';
+include __DIR__ . '/sms-API.php';
 // Enable MySQLi error reporting
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -30,12 +31,30 @@ function getLmsBatches()
     return $ArrayResult;
 }
 
+function GetDefaultCourseValue($sessionUser)
+{
+    global $lms_link;
+    $EnrolledCourseCode = "";
+    // Get Default Course
+    $sql = "SELECT `id`, `index_number`, `title`, `value` FROM `default_values` WHERE `index_number` LIKE '$sessionUser' AND `title` LIKE 'Course'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $title = $row["title"];
+            $EnrolledCourseCode = $row["value"];
+        }
+    }
+
+    return  $EnrolledCourseCode;
+}
+
+
 function GetLmsStudents()
 {
     $ArrayResult = array();
     global $lms_link;
 
-    $sql = "SELECT `id`, `student_id`, `username`, `civil_status`, `first_name`, `last_name`, `gender`, `address_line_1`, `address_line_2`, `city`, `district`, `postal_code`, `telephone_1`, `telephone_2`, `nic`, `e_mail`, `birth_day`, `updated_by`, `updated_at`, `full_name`, `name_with_initials`, `name_on_certificate` FROM `user_full_details` ORDER BY `id` DESC";
+    $sql = "SELECT * FROM `user_full_details` ORDER BY `id` DESC";
     $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
@@ -611,4 +630,109 @@ function UpdateTempUserDetails($Email, $status_id, $fname, $lname, $password, $N
 
     // Return the error as a JSON-encoded string
     return json_encode($error);
+}
+
+
+function GetCertificatePrintStatus()
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `user_certificate_print_status` WHERE `type` LIKE 'Certificate'";
+
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $certificateId = $row['certificate_id'];
+            $userId = $row['student_number'];
+            $ArrayResult[$certificateId . '-' . $userId] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GetTranscriptPrintStatus()
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `user_certificate_print_status` WHERE `type` LIKE 'Transcript'";
+
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $certificateId = $row['certificate_id'];
+            $userId = $row['student_number'];
+            $ArrayResult[$certificateId . '-' . $userId] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GenerateLMSReceiptNumber()
+{
+
+    $recPrefix = 'CPCREC';
+    global $lms_link;
+
+    $sql = "SELECT COUNT(receipt_number) FROM student_payment;";
+    $result = $lms_link->query($sql);
+    while ($row = $result->fetch_assoc()) {
+        $previous_code = $row["COUNT(receipt_number)"];
+        $previous_code = $previous_code + 1;
+        $receiptNumber = $recPrefix . $previous_code;
+    }
+
+    return $receiptNumber;
+}
+
+
+function insertStudentPayment($courseCode, $studentNumber, $paymentMethod, $paymentValue, $LoggedUser, $discountAmount)
+{
+    global $lms_pdo;
+
+    $receiptNumber = GenerateLMSReceiptNumber();
+    $courseName = getLmsBatches()[$courseCode]['course_name'];
+    $selectedStudent = GetLmsStudentsByUserName($studentNumber);
+    $studentId = $selectedStudent['student_id'];
+    $stdFirstName = $selectedStudent['first_name'];
+    $stdLastName = $selectedStudent['last_name'];
+    $telephoneNumber = $selectedStudent['telephone_1'];
+    $senderId = 'Pharma C.';
+    $paymentStatus = 'Paid';
+
+    $currentDate = date("Y-m-d");
+    $currentDateTime = date("Y-m-d H:i:s");
+    $sql = "INSERT INTO `student_payment`(`course_code`, `student_id`, `payment_status`, `payment_type`, `paid_amount`, `paid_date`, `created_by`, `receipt_number`, `discount_amount`, `created_at`) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    try {
+        $stmt = $lms_pdo->prepare($sql);
+        $success = $stmt->execute([$courseCode, $studentId, $paymentStatus, $paymentMethod, $paymentValue, $currentDate, $LoggedUser, $receiptNumber, $discountAmount, $currentDateTime]);
+
+        if (!$success) {
+            throw new Exception("Error executing SQL statement.");
+        }
+
+        // Load message from text file
+        $messageFilePath = __DIR__ . '/../assets/sms-templates/lms-payment.txt';
+        $message = file_get_contents($messageFilePath);
+        // You may want to add error handling here in case the file cannot be read
+
+        // Replace placeholders in the message with actual values
+        $message = str_replace(
+            ['{{first_name}}', '{{last_name}}', '{{payment_value}}', '{{course_name}}'],
+            [$stdFirstName, $stdLastName, number_format($paymentValue, 2), $courseName],
+            $message
+        );
+
+        // Additional actions after successful insertion
+        $phone_number = (strlen($telephoneNumber) == 10) ? $telephoneNumber : '0' . $telephoneNumber;
+        // SentSMS($phone_number, $senderId, $message);
+
+        return array('status' => 'success', 'message' => 'Payment inserted successfully');
+    } catch (Exception $e) {
+        return array('status' => 'error', 'message' => $e->getMessage());
+    }
 }

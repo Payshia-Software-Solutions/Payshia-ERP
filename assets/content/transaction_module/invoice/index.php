@@ -61,56 +61,58 @@ $InactiveCount = 0;
         <div class="row">
             <div class="col-12 mb-3 d-flex">
                 <div class="card flex-fill">
-                    <div class="card-body">
-                        <table class="table table-striped table-hover" id="purchase-order-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Invoice #</th>
-                                    <th scope="col">Location</th>
-                                    <th scope="col">Customer</th>
-                                    <th scope="col">Value</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                if (!empty($Invoices)) {
-                                    $RowNumber = 0;
-                                    foreach ($Invoices as $selectedArray) {
-                                        $active_status = "Deleted";
-                                        $color = "warning";
-                                        if ($selectedArray['is_active'] == 1) {
-                                            $active_status = "Active";
-                                            $color = "primary";
+                    <div class="card-body ">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="purchase-order-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Invoice #</th>
+                                        <th scope="col">Location</th>
+                                        <th scope="col">Customer</th>
+                                        <th scope="col">Value</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    if (!empty($Invoices)) {
+                                        $RowNumber = 0;
+                                        foreach ($Invoices as $selectedArray) {
+                                            $active_status = "Deleted";
+                                            $color = "warning";
+                                            if ($selectedArray['is_active'] == 1) {
+                                                $active_status = "Active";
+                                                $color = "primary";
+                                            }
+                                            $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
+                                            $invoice_date = $selectedArray['invoice_date'];
+
+                                            $invoice_number = $selectedArray['invoice_number'];
+                                            $CustomerID = $selectedArray['customer_code'];
+                                            $invoiceValue = $selectedArray['grand_total'];
+                                            $customerName =  GetCustomerName($link, $CustomerID);
+                                            $RowNumber++;
+                                    ?>
+                                            <tr>
+                                                <th><?= $invoice_number ?></th>
+                                                <td><?= $LocationName ?></td>
+                                                <td><?= $customerName ?></td>
+                                                <th class="text-end"><?= number_format($invoiceValue, 2) ?></th>
+                                                <td class="text-end"><span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span></td>
+                                                <td class="text-end">
+
+                                                    <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="PrintInvoice ('<?= $invoice_number ?>')"><i class="fa-solid fa-print"></i> Print</button>
+
+                                                </td>
+                                            </tr>
+                                    <?php
                                         }
-                                        $LocationName = $Locations[$selectedArray['location_id']]['location_name'];
-                                        $invoice_date = $selectedArray['invoice_date'];
-
-                                        $invoice_number = $selectedArray['invoice_number'];
-                                        $CustomerID = $selectedArray['customer_code'];
-                                        $invoiceValue = $selectedArray['grand_total'];
-                                        $customerName =  GetCustomerName($link, $CustomerID);
-                                        $RowNumber++;
-                                ?>
-                                        <tr>
-                                            <th><?= $invoice_number ?></th>
-                                            <td><?= $LocationName ?></td>
-                                            <td><?= $customerName ?></td>
-                                            <th class="text-end"><?= number_format($invoiceValue, 2) ?></th>
-                                            <td class="text-end"><span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span></td>
-                                            <td class="text-end">
-
-                                                <button class="mt-0 btn btn-sm btn-dark view-button" type="button" onclick="PrintInvoice ('<?= $invoice_number ?>')"><i class="fa-solid fa-print"></i> Print</button>
-
-                                            </td>
-                                        </tr>
-                                <?php
                                     }
-                                }
-                                ?>
-                            </tbody>
-                        </table>
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 

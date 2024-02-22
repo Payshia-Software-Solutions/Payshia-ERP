@@ -29,6 +29,7 @@ $Cities = GetCities($link);
             if (!empty($CustomerList)) {
                 foreach ($CustomerList as $SelectArray) {
 
+
                     if ($SelectArray['is_active'] != 1) {
                         continue;
                     }

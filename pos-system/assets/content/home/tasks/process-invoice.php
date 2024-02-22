@@ -88,15 +88,18 @@ if ($invoice_number) {
                 $orderQuantity = $item_quantity;
                 $ProductRecipe = GetItemRecipe($link, $product_id);
                 $product_name = $Products[$product_id]['product_name'];
-                if (!empty($ProductRecipe)) {
-                    foreach ($ProductRecipe as $SelectedArray) {
-                        $product_id = $SelectedArray['recipe_product'];
-                        $item_quantity = $orderQuantity * $SelectedArray['qty'];
 
-                        $sub_product_name = $Products[$product_id]['product_name'];
-                        $stock_type = "CREDIT";
-                        $reference = $stock_type . " : " . $item_quantity . " " . $sub_product_name . "(s) is Credited to " . $invoice_number . " | INV-CREDIT - " . $product_name;
-                        $stock_result = CreateStockEntry($link, $stock_type, $item_quantity, $product_id, $reference, $location_id, $LoggedUser, 1, $invoice_number);
+                if ($recipe_type == 1) {
+                    if (!empty($ProductRecipe)) {
+                        foreach ($ProductRecipe as $SelectedArray) {
+                            $product_id = $SelectedArray['recipe_product'];
+                            $item_quantity = $orderQuantity * $SelectedArray['qty'];
+
+                            $sub_product_name = $Products[$product_id]['product_name'];
+                            $stock_type = "CREDIT";
+                            $reference = $stock_type . " : " . $item_quantity . " " . $sub_product_name . "(s) is Credited to " . $invoice_number . " | INV-CREDIT - " . $product_name;
+                            $stock_result = CreateStockEntry($link, $stock_type, $item_quantity, $product_id, $reference, $location_id, $LoggedUser, 1, $invoice_number);
+                        }
                     }
                 }
             }

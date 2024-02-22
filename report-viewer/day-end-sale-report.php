@@ -21,6 +21,7 @@ $Products = GetProducts($link);
 $Units = GetUnit($link);
 
 $LocationID = 1;
+$otherTypesSale = 0;
 $dateTime = new DateTime($date);
 $formattedDate = $dateTime->format('d/m/Y');
 
@@ -31,13 +32,14 @@ $LocationName = $Locations[$LocationID]['location_name'];
 $pageTitle = "Day End Sale Report - " . $date;
 $reportTitle = "Day End Sale Report";
 
-
 $creditCardReceipts = $cashReceipts = $creditSales = $invoiceSales = $refundAmount = $cashInHand = 0;
 
 $Locations = GetLocations($link);
-
 $invoiceSales = getInvoicesByDate($link, $date, $location_id);
 $receipts =  getReceiptsByDate($link, $date, $location_id);
+$CreditCollection =  getReceiptsCollection($link, $date, $location_id);
+
+$returnAmounts = GetUnsettledReturnValuesTotal($link, $date, $date, $location_id);
 
 if (isset($receipts[0])) {
     $cashReceipts = $receipts[0];
@@ -46,9 +48,30 @@ if (isset($receipts[0])) {
 if (isset($receipts[1])) {
     $creditCardReceipts = $receipts[1];
 }
-$creditSales = $invoiceSales - $cashReceipts - $creditCardReceipts;
+
+if (!empty($receipts)) {
+    foreach ($receipts as $type => $amount) {
+        if ($type == 0 || $type == 1) {
+            continue;
+        }
+
+        $otherTypesSale += $amount;
+    }
+}
+
+
+$dayReceipts = $cashReceipts - $CreditCollection;
+$returnAmount = $returnAmounts['return_amount'];
+$settledReturnAmount = $returnAmounts['total_settled_amount'];
+$unsettled_amount = $returnAmounts['unsettled_amount'];
+
+$creditSales = $invoiceSales - ($dayReceipts + $creditCardReceipts + $settledReturnAmount + $otherTypesSale);
 $cashInHand = $cashReceipts - $refundAmount;
 $location_name = $Locations[$location_id]['location_name'];
+
+if ($creditSales < 0) {
+    $creditSales = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -97,37 +120,165 @@ $location_name = $Locations[$location_id]['location_name'];
 
 
         <p style="font-weight:600;margin-top:10px; margin-bottom:0px">Report is generated on <?= $reportDate ?></p>
+
         <div id="container" class="section-4">
             <table>
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Location</th>
-                        <th scope="col">Total Sale</th>
-                        <th scope="col">Cash</th>
-                        <th scope="col">Credit Card</th>
-                        <th scope="col">Credit</th>
-                        <th scope="col">Refund</th>
-                        <th scope="col">Cash In Hand</th>
-                    </tr>
-                </thead>
                 <tbody>
                     <tr>
-                        <td class="border-bottom"><?= $date ?></td>
-                        <td class="border-bottom"><?= $location_name ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($invoiceSales) ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($cashReceipts) ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($creditCardReceipts) ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($creditSales) ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($refundAmount) ?></td>
-                        <td class="text-end border-bottom"><?= formatAccountBalance($cashInHand) ?></td>
+                        <th class="text-start">Invoice Sale Summary</th>
+                        <th>Amount</th>
+                        <th>Total</th>
+                    </tr>
+
+                    <tr>
+                        <td>Total Invoice Value</td>
+                        <td class="text-end"><?= formatAccountBalance($invoiceSales) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>Return Settlement Value</td>
+                        <td class="text-end"><?= formatAccountBalance(-$settledReturnAmount) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="border-bottom text-end text-bold-extra">Net Day End Sale Value</td>
+                        <td class="border-bottom text-end text-bold-extra"><?= formatAccountBalance($invoiceSales - $settledReturnAmount) ?></td>
 
                     </tr>
+
+                    <tr>
+                        <td colspan="2"></td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-start">Payment Summary</th>
+                        <th>Amount</th>
+                        <th>Total</th>
+                    </tr>
+
+                    <tr>
+                        <td>Cash Sale Value</td>
+                        <td class="text-end"><?= formatAccountBalance($dayReceipts) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>Credit Card Sale Value</td>
+                        <td class="text-end"><?= formatAccountBalance($creditCardReceipts) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td>Credit Sale Value</td>
+                        <td class="text-end"><?= formatAccountBalance($creditSales) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td class="">Other Sale Value</td>
+                        <td class="text-end"><?= formatAccountBalance($otherTypesSale) ?></td>
+                        <td></td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="border-bottom text-end text-bold-extra">Total Sale</td>
+                        <td class="border-bottom text-end text-bold-extra"><?= formatAccountBalance($dayReceipts + $creditCardReceipts + $creditSales + $otherTypesSale) ?></td>
+
+                    </tr>
+
+
+                    <tr>
+                        <td colspan="2"></td>
+                    </tr>
+
+                    <tr>
+                        <th class="text-start">Collection Summary</th>
+                        <th>Amount</th>
+                    </tr>
+
+                    <tr>
+                        <td>Credit Collection Value</td>
+                        <td class="text-end"><?= formatAccountBalance($CreditCollection) ?></td>
+                    </tr>
+
+
+                    <tr>
+                        <td>Refund Amount</td>
+                        <td class="text-end"><?= formatAccountBalance(-$refundAmount) ?></td>
+                    </tr>
+
+                    <tr>
+                        <td class="">Unsettled Return Value</td>
+                        <td class="text-end"><?= formatAccountBalance(-$unsettled_amount) ?></td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="border-bottom">Cash in Hand Value</td>
+                        <td class="border-bottom text-end text-bold-extra"><?= formatAccountBalance($cashInHand) ?></td>
+                    </tr>
+
 
 
                 </tbody>
             </table>
         </div>
+        <!-- <div id="container" class="section-4">
+
+
+
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td rowspan="6" class="border-bottom  border-top text-bold-extra"><?= $location_name ?></td>
+                        <td class="text-bold-extra  border-top" scope="col">Total Sale</td>
+                        <td class="text-bold-extra  border-top" scope="col">Settled Return</td>
+                        <td class="text-bold-extra  border-top" scope="col">Unsettled Return</td>
+                        <td class="text-bold-extra  border-top" scope="col">Net Sale</td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($invoiceSales) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($settledReturnAmount) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($unsettled_amount) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($invoiceSales - $returnAmount) ?></td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="text-bold-extra" scope="col">Cash Sale</td>
+                        <td class="text-bold-extra" scope="col">Credit Card Sale</td>
+                        <td class="text-bold-extra" scope="col">Credit Sale</td>
+                        <td class="text-bold-extra" scope="col">Other Sale</td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($dayReceipts) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($creditCardReceipts) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($creditSales) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($otherTypesSale) ?></td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="text-bold-extra" scope="col">Credit Collection</td>
+                        <td class="text-bold-extra" scope="col">Refund</td>
+                        <td colspan="2" class="text-bold-extra" scope="col">Cash In Hand</td>
+                    </tr>
+
+                    <tr>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($CreditCollection) ?></td>
+                        <td class="text-end border-bottom" scope="col"><?= formatAccountBalance($refundAmount) ?></td>
+                        <td colspan="2" class="text-end border-bottom" scope="col"><?= formatAccountBalance($cashInHand) ?></td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </div> -->
 
         <script>
             window.print();

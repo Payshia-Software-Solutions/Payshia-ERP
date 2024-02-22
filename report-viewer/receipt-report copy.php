@@ -24,12 +24,8 @@ $Products = GetProducts($link);
 $Units = GetUnit($link);
 $receipts = GetReceiptsByLocation($link, $fromQueryDate, $toQueryDate, $location_id);
 $location_name = $Locations[$location_id]['location_name'];
-$PaymentTypes = [
-    ["id" => "0", "text" => "Cash"],
-    ["id" => "1", "text" => "Visa/Master"],
-    ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
-];
+
+$PaymentTypes = GetPaymentTypes();
 
 
 $LocationID = $location_id;

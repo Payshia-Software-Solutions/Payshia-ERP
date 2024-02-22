@@ -1,0 +1,6 @@
+Dear {{first_name}} {{last_name}},
+
+Payment Received: LKR {{payment_value}} received for {{course_name}}.
+
+Thank you.
+Ceylon Pharma College, www.pharmacollege.lk

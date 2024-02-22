@@ -76,6 +76,7 @@ function getOrderTable() {
 function GetProductInfo(ProductID) {
     var location_id = document.getElementById('location_id').value
     var customer_select = document.getElementById('customer_select').value
+    var selectedProduct = document.getElementById('select_product');
 
     function fetch_data() {
         $.ajax({
@@ -117,6 +118,8 @@ function GetProductInfo(ProductID) {
         fetch_data()
     } else {
         OpenAlert('error', 'Error!', 'Please Select Location & Customer')
+        selectedProduct.value = ''
+        getProductSelector()
     }
 
 }

@@ -137,13 +137,91 @@ function GetDaySaleSummaryReport() {
     fetch_data()
 }
 
-
 function PrintDaySaleSummaryReport() {
     var fromQueryDate = document.getElementById('from-date-input').value
     var toQueryDate = document.getElementById('to-date-input').value
     var location_id = document.getElementById('location_id').value
         // Open a new tab with the printPage.html and pass the po_number as a query parameter
     var printWindow = window.open('report-viewer/sale-summary-report?location_id=' + encodeURIComponent(location_id) + '&fromQueryDate=' + encodeURIComponent(fromQueryDate) + '&toQueryDate=' + encodeURIComponent(toQueryDate), '_blank');
+
+    // Focus on the new tab
+    if (printWindow) {
+        printWindow.focus();
+    }
+}
+
+
+// Invoice Report
+function InvoiceReport() {
+    document.getElementById('report-index').innerHTML = InnerLoader
+
+    function fetch_data() {
+        showOverlay()
+        $.ajax({
+            url: 'assets/content/reporting_module/invoice-report/index.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                default_location: default_location
+            },
+            success: function(data) {
+                $('#report-index').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+
+}
+
+function CustomerStatement() {
+    document.getElementById('report-index').innerHTML = InnerLoader
+
+    function fetch_data() {
+        showOverlay()
+        $.ajax({
+            url: 'assets/content/reporting_module/customer-statement/index.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                default_location: default_location
+            },
+            success: function(data) {
+                $('#report-index').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+function PrintCustomerStatement() {
+    var fromQueryDate = document.getElementById('from-date-input').value
+    var toQueryDate = document.getElementById('to-date-input').value
+    var customerId = document.getElementById('customerId').value
+
+    if (customerId != "") {
+        // Open a new tab with the printPage.html and pass the po_number as a query parameter
+        var printWindow = window.open('report-viewer/customer-statement?customerId=' + encodeURIComponent(customerId) + '&fromQueryDate=' + encodeURIComponent(fromQueryDate) + '&toQueryDate=' + encodeURIComponent(toQueryDate), '_blank');
+    } else {
+        alert('Please Select Customer!')
+    }
+    // Focus on the new tab
+    if (printWindow) {
+        printWindow.focus();
+    }
+
+}
+
+
+function PrintDayInvoiceReport() {
+    var fromQueryDate = document.getElementById('from-date-input').value
+    var toQueryDate = document.getElementById('to-date-input').value
+    var location_id = document.getElementById('location_id').value
+        // Open a new tab with the printPage.html and pass the po_number as a query parameter
+    var printWindow = window.open('report-viewer/invoice-report?location_id=' + encodeURIComponent(location_id) + '&fromQueryDate=' + encodeURIComponent(fromQueryDate) + '&toQueryDate=' + encodeURIComponent(toQueryDate), '_blank');
 
     // Focus on the new tab
     if (printWindow) {
@@ -605,6 +683,70 @@ function PrintChargeReport() {
     var location_id = document.getElementById('location_id').value
         // Open a new tab with the printPage.html and pass the po_number as a query parameter
     var printWindow = window.open('report-viewer/charge-report?location_id=' + encodeURIComponent(location_id) + '&from-date-input=' + encodeURIComponent(fromQueryDate) + '&to-date-input=' + encodeURIComponent(toQueryDate), '_blank');
+
+    // Focus on the new tab
+    if (printWindow) {
+        printWindow.focus();
+    }
+}
+
+
+// Sale Summary Report
+function CreditSaleReport() {
+    document.getElementById('report-index').innerHTML = InnerLoader
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/reporting_module/credit-sale-report/index.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                default_location: default_location
+            },
+            success: function(data) {
+                $('#report-index').html(data)
+                GetCreditSaleReport()
+            }
+        })
+    }
+    fetch_data()
+
+}
+
+function GetCreditSaleReport() {
+    document.getElementById('report-view').innerHTML = InnerLoader
+    var form = document.getElementById('report-form')
+    var formData = new FormData(form)
+    formData.append('LoggedUser', LoggedUser)
+    formData.append('UserLevel', UserLevel)
+    formData.append('company_id', company_id)
+    formData.append('default_location', default_location)
+
+    function fetch_data() {
+        showOverlay()
+        $.ajax({
+            url: 'assets/content/reporting_module/credit-sale-report/credit-sale-summary-report.php',
+            method: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(data) {
+                $('#report-view').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+
+function PrintCreditSaleReport() {
+    var fromQueryDate = document.getElementById('from-date-input').value
+    var toQueryDate = document.getElementById('to-date-input').value
+    var location_id = document.getElementById('location_id').value
+        // Open a new tab with the printPage.html and pass the po_number as a query parameter
+    var printWindow = window.open('report-viewer/credit-sale-summary-report?location_id=' + encodeURIComponent(location_id) + '&fromQueryDate=' + encodeURIComponent(fromQueryDate) + '&toQueryDate=' + encodeURIComponent(toQueryDate), '_blank');
 
     // Focus on the new tab
     if (printWindow) {

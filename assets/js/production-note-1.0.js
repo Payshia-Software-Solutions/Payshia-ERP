@@ -188,8 +188,8 @@ function ProcessProduction(pnNumber, poStatus) {
                 var response = JSON.parse(data)
                 if (response.status === 'success') {
                     var result = response.message
-                    var newPnNumber = response.pn_number
-                    PrintPN(newPnNumber)
+                    var pnNumber = response.pnNumber
+                    PrintPN(pnNumber)
                     OpenIndex()
                     OpenAlert('success', 'Done!', result)
                 } else {

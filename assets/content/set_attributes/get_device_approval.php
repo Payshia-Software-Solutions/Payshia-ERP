@@ -26,7 +26,6 @@ if ($result->num_rows <= 0) {
         $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
     }
 } else {
-
     $sql = "SELECT * FROM `approved_device_list` WHERE `unique_identifier` LIKE '$uniqueIdentifier' AND `user_name` LIKE '$LoggedUser' AND `approve_status` LIKE 1";
     $result = $approveLink->query($sql);
     if ($result->num_rows > 0) {

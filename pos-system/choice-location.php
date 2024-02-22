@@ -62,12 +62,10 @@ $Locations = GetLocations($link);
     </div>
     <div class="container" style="margin-top:80px" id="index-content">
 
-        <div class="row mt-5">
+        <div class="row my-5">
             <div class="card">
-                <div class="card-body">
-                    <div class="row mt-3">
-                        <h5>Set Location</h5>
-                    </div>
+                <div class="card-body ">
+                    <h2 class="bg-light p-2 mt-3 rounded-3 text-center mb-3">Set Location</h2>
                     <div class="row">
                         <?php
                         if (!empty($Locations)) {
@@ -87,12 +85,21 @@ $Locations = GetLocations($link);
                                     continue;
                                 }
 
+                                if ($Location['logo_path'] == 'no-image.png') {
+                                    $file_path = "./assets/images/pos-logo.png";
+                                } else {
+                                    $file_path = "./assets/images/location/" . $Location['location_id'] . "/" . $Location['logo_path'];
+                                }
+
                         ?>
-                                <div class="col-6 col-md-6 col-lg-4 mb-3 d-flex">
+                                <div class="col-md-6 col-lg-4 mb-3 d-flex">
                                     <div class="card flex-fill clickable table-card" onclick="openURL('./?last_invoice=true&display_invoice_number=0&location_id=<?= $location_id ?>')">
-                                        <div class="card-body p-2 pb-2">
-                                            <span class="badge mt-2 bg-<?= $color ?>"><?= $active_status ?></span>
+                                        <div class="card-body p-2 pb-2 text-center">
+                                            <div class="logo-box text-center mt-2">
+                                                <img style="max-height: 85px;" class="shadow rounded-3 bg-light p-3" src="<?= $file_path ?>" onerror="this.src='./assets/images/pos-logo.png';">
+                                            </div>
                                             <h1 class="tutor-name mt-2"><?= $location_name ?></h1>
+                                            <span class="badge my-2 bg-<?= $color ?>"><?= $active_status ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -169,8 +176,21 @@ $Locations = GetLocations($link);
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
     <script>
         function openURL(url) {
+            showOverlay()
             // Open the URL in a new window
             window.location.href = url;
+        }
+
+        // JavaScript to show the overlay
+        function showOverlay() {
+            var overlay = document.querySelector(".overlay");
+            overlay.style.display = "block";
+        }
+
+        // JavaScript to hide the overlay
+        function hideOverlay() {
+            var overlay = document.querySelector(".overlay");
+            overlay.style.display = "none";
         }
     </script>
 

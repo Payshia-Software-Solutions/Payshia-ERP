@@ -36,7 +36,7 @@ $LocationName = $Locations[$LocationID]['location_name'];
 $pageTitle = "Sale Summary Report - " . $fromQueryDate . " - " . $toQueryDate;
 $reportTitle = "Sale Summary Report";
 
-$subTotal = $discountAmount = $serviceCharge = $grandTotal  = 0;
+$subTotal = $discountAmount = $serviceCharge = $grandTotal  = $returnTotal = 0;
 
 $invoiceSales = getInvoicesByDateRangeAll($link, $fromQueryDate, $toQueryDate, $location_id);
 $location_name = $Locations[$location_id]['location_name'];
@@ -100,10 +100,11 @@ $location_name = $Locations[$location_id]['location_name'];
                         <th scope="col">Date</th>
                         <th scope="col">Invoice #</th>
                         <th scope="col">Customer</th>
-                        <th scope="col">Ref #</th>
+                        <!-- <th scope="col">Ref #</th> -->
                         <th scope="col">Sub Total</th>
                         <th scope="col">Discount</th>
-                        <th scope="col">Tax</th>
+                        <th scope="col">Charge</th>
+                        <th scope="col">Return</th>
                         <th scope="col">Grand Total</th>
                     </tr>
                 </thead>
@@ -112,14 +113,18 @@ $location_name = $Locations[$location_id]['location_name'];
                     if (!empty($invoiceSales)) {
                         foreach ($invoiceSales as $selectedArray) {
                             $referenceText = "";
+
+                            $returnSettlement =  GetInvoiceSettlement($selectedArray['invoice_number']);
+
                             $invoice_date = date("Y-m-d H:i", strtotime($selectedArray['current_time']));
                             $invoice_date = date("Y-m-d", strtotime($selectedArray['current_time']));
                             $subTotal += $selectedArray['inv_amount'];
                             $ref_hold = $selectedArray['ref_hold'];
                             $discountAmount += $selectedArray['discount_amount'];
                             $serviceCharge += $selectedArray['service_charge'];
-                            $grandTotal += $selectedArray['grand_total'];
 
+                            $returnTotal += $returnSettlement;
+                            $grandTotal += ($selectedArray['grand_total'] - $returnSettlement);
 
                             $CustomerID = $selectedArray['customer_code'];
                             $Customer = GetCustomersByID($link, $CustomerID);
@@ -144,11 +149,12 @@ $location_name = $Locations[$location_id]['location_name'];
                                 <td><?= $invoice_date ?></td>
                                 <td><?= $selectedArray['invoice_number'] ?></td>
                                 <td><?= $Customer['customer_first_name'] ?> <?= $Customer['customer_last_name'] ?></td>
-                                <td><?= $referenceText ?></td>
+                                <!-- <td><?= $referenceText ?></td> -->
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['inv_amount']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['discount_amount']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['service_charge']) ?></td>
-                                <td class="text-end"><?= formatAccountBalance($selectedArray['grand_total']) ?></td>
+                                <td class="text-end"><?= formatAccountBalance($returnSettlement) ?></td>
+                                <td class="text-end"><?= formatAccountBalance($selectedArray['grand_total'] - $returnSettlement) ?></td>
                             </tr>
 
                     <?php
@@ -156,9 +162,10 @@ $location_name = $Locations[$location_id]['location_name'];
                     }
                     ?>
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="5"><?= formatAccountBalance($subTotal) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="4"><?= formatAccountBalance($subTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($discountAmount) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($serviceCharge) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($returnTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($grandTotal) ?></td>
                     </tr>
                 </tbody>

@@ -55,6 +55,9 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
             font-size: 12px !important;
         } */
     </style>
+
+    <link href='../vendor/select2/dist/css/select2.min.css' rel='stylesheet'>
+    <link href='../assets/css/select2.css' rel='stylesheet'>
 </head>
 
 <body>
@@ -78,9 +81,17 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
                                 </div>
                                 <div class="col-8 col-md-10 text-end button-set" id="button-set" style="display: flex-box;justify-content: space-between;">
 
-                                    <button type="button" class="btn btn-sm btn-warning mr-2  text-white d-none d-lg-inline ">
+                                    <button onclick="OpenReturnBox()" type="button" class="btn btn-sm btn-warning mr-2  text-white d-none d-lg-inline ">
                                         <i class="fa-solid fa-right-left m-0"></i>
                                         <p class="m-0">Return</p>
+                                    </button>
+                                    <button onclick="OpenRefund()" type="button" class="btn btn-sm btn-danger mr-2  text-white d-none d-lg-inline ">
+                                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                                        <p class="m-0">Refund</p>
+                                    </button>
+                                    <button onclick="OpenReceipt()" type="button" class="btn btn-sm btn-dark mr-2  text-white d-none d-lg-inline ">
+                                        <i class="fa-solid fa-receipt"></i>
+                                        <p class="m-0">Receipt</p>
                                     </button>
                                     <button type="button" onclick="OpenRemovalNotices()" class="btn btn-sm  btn-danger mr-2  d-none d-lg-inline "><i class="fa-solid fa-bars"></i>
                                         <p class="mb-0">Remarks</p>
@@ -88,7 +99,7 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
                                     <button id="fullscreenButton" onclick="toggleFullscreen()" type="button" class="btn btn-sm  btn-secondary mr-2  d-none d-lg-inline "><i class="fa-solid fa-expand"></i>
                                         <p class="mb-0">Full</p>
                                     </button>
-                                    <button type="button" class="btn btn-sm  btn-success mr-2  d-none d-lg-inline "><i class="fa-solid fa-money-bill"></i>
+                                    <button onclick="OpenExpensesDialog()" type="button" class="btn btn-sm  btn-success mr-2  d-none d-lg-inline "><i class="fa-solid fa-money-bill"></i>
                                         <p class="mb-0">Expenses</p>
                                     </button>
                                     <button onclick="AddCustomer()" type="button" class="btn btn-sm  btn-primary mr-2   d-none d-lg-inline "><i class="fa-solid fa-user-plus"></i>
@@ -134,12 +145,17 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
 
                                 <a href="./choice-location" class="list-group-item list-group-item-action text-center">
                                     <i class="fa-solid fa-location-dot fs-3  d-block mx-auto"></i>
-                                    Branch
+                                    Location
                                 </a>
 
                                 <a href="./logout" class="list-group-item list-group-item-action text-center">
                                     <i class="fa-solid fa-right-from-bracket fs-3  d-block mx-auto"></i>
                                     Logout
+                                </a>
+
+                                <a href="#" onclick="AboutUsOpen()" class="list-group-item list-group-item-action text-center">
+                                    <i class="fa-solid fa-circle-info fs-3  d-block mx-auto"></i>
+                                    About
                                 </a>
 
                                 <a href="#" class="list-group-item list-group-item-action text-center" onclick="PromptCloseApp(1)">
@@ -192,6 +208,9 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
             </div>
         </div>
     </div>
+
+
+    <script src="../vendor/select2/dist/js/select2.min.js"></script>
 </body>
 
 </html>

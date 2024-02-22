@@ -16,20 +16,11 @@ $created_by = $Receipt['created_by'];
 $ref_id = $Receipt['ref_id'];
 $location_id = $Receipt['location_id'];
 
-
 $SelectedInvoiceArray = GetInvoiceByNumber($link, $ref_id);
 $customer_code = $SelectedInvoiceArray['customer_code'];
-
 $process_time = date("Y-m-d H:i:s", strtotime($current_time));
 
-
-$PaymentTypes = [
-    ["id" => "0", "text" => "Cash"],
-    ["id" => "1", "text" => "Visa/Master"],
-    ["id" => "2", "text" => "Cheque"],
-    ["id" => "3", "text" => "GV"]
-];
-
+$PaymentTypes = GetPaymentTypes();
 
 $created_by =  $Receipt['created_by'];
 if (!empty($created_by)) {

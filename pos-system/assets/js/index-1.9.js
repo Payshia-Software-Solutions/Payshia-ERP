@@ -1415,3 +1415,754 @@ function OpenButtonSet() {
 
     fetch_data();
 }
+
+function OpenReturnBox(closeButtonStatus = 1) {
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/set-return.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function GetProductInfo(ProductID) {
+
+    showOverlay()
+    var customer_select = document.getElementById('customer_select').value
+    var selectedProduct = document.getElementById('select_product');
+
+    function fetch_data() {
+        $.ajax({
+            url: '../assets/content/transaction_module/invoice/product-info.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                ProductID: ProductID,
+                location_id: LocationID
+            },
+            success: function(data) {
+                var response = JSON.parse(data)
+                if (response.status === 'success') {
+                    var unit_name = response.unit_name
+                    var cost_price = response.cost_price
+                    var selling_price = response.selling_price
+                    var minimum_price = response.minimum_price
+                    var wholesale_price = response.wholesale_price
+                    var price_2 = response.price_2
+                    var stockBalance = response.stockBalance
+
+                    $("#order_Unit").val(unit_name)
+                    $("#new_rate").val(selling_price)
+                    $("#stockBalance").val(stockBalance)
+
+                    document.getElementById('new_quantity').focus()
+                    document.getElementById('new_quantity').select()
+
+                } else {
+                    var result = response.message
+                    showNotification(result)
+                }
+
+                hideOverlay()
+            }
+        })
+    }
+
+    if (customer_select != "") {
+        fetch_data()
+    } else {
+        showNotification('Please Select Customer')
+        $('#select_product').val('')
+
+        $('#select_product').select2('destroy');
+        $('#select_product').select2({
+            width: 'resolve'
+        });
+    }
+}
+
+function GetCustomerList() {
+
+    showOverlay()
+
+    function fetch_data() {
+        $.ajax({
+            url: '../assets/content/transaction_module/invoice/request/customer-select.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                location_id: LocationID
+            },
+            success: function(data) {
+                $('#customer_select').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+
+function SaveReturn(PrinterName, PrintMethod) {
+    // Get table data
+
+    showOverlay()
+    var reprintStatus = 0;
+
+    var tableRows = document.querySelectorAll("#return-items tbody tr");
+    var data = [];
+
+    tableRows.forEach(function(row) {
+        var productId = row.cells[0].textContent;
+        var qty = row.cells[2].textContent;
+        var rate = row.cells[3].textContent;
+        var amount = row.cells[4].textContent;
+
+        data.push({
+            productId: productId,
+            qty: qty,
+            rate: parseFloat(rate.replace(/,/g, '')),
+            amount: parseFloat(amount.replace(/,/g, ''))
+        });
+    });
+
+    if (data.length === 0) {
+        showNotification("Please add items to Return!");
+        hideOverlay()
+        return
+    }
+
+    // Get additional data
+    var customer_id = document.getElementById("customer_select").value;
+    var invoiceNumber = document.getElementById('select_invoice').value;
+    var reason = document.getElementById("reason").value;
+    var totalAmount = parseFloat(document.getElementById("totalAmount").textContent.replace(/,/g, '')).toFixed(2);
+    var refund_id = null; // Assuming refund_id is not used or it's null
+
+    var requestData = {
+        customer_id: customer_id,
+        location_id: LocationID,
+        updated_by: LoggedUser,
+        reason: reason,
+        refund_id: refund_id,
+        invoiceNumber: invoiceNumber,
+        return_amount: totalAmount,
+        tableData: data
+    };
+
+    if (reason == "") {
+        showNotification("Reason is needed!");
+        hideOverlay()
+        return
+    }
+
+    // Send data to server using jQuery AJAX
+    $.ajax({
+        url: 'assets/content/home/tasks/save-return.php',
+        method: 'POST',
+        data: requestData, // Pass the requestData object directly
+        success: function(response) {
+            var data = JSON.parse(response);
+            if (data.status === 'success') {
+                var message = data.message;
+                var rtnNumber = data.rtnNumber;
+                PrintReturnNote(rtnNumber, PrinterName, LocationID, reprintStatus, PrintMethod = "Popup Window")
+                showNotification(message);
+                OpenIndex()
+            } else {
+                var message = data.message;
+                showNotification(message);
+            }
+
+
+            hideOverlay()
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            // Handle error
+            showNotification(error);
+            hideOverlay()
+        }
+    });
+}
+
+function getInvoiceLIstByCustomer(customerId) {
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/home/tasks/get-invoices-by-customer.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                location_id: LocationID,
+                customerId: customerId
+            },
+            success: function(data) {
+                $('#select_invoice').html(data)
+            }
+        })
+    }
+    fetch_data()
+    GetReturnContent()
+}
+
+
+function getReturnItemsByInvoice(invoiceNumber) {
+
+    showOverlay()
+    $('#return-content').html('Loading Product List..')
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/home/tasks/get-return-invoice-items.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                location_id: LocationID,
+                invoiceNumber: invoiceNumber
+            },
+            success: function(data) {
+                $('#return-content').html(data)
+
+                hideOverlay()
+                document.getElementById('reason').focus()
+            }
+        })
+    }
+    if (invoiceNumber != '') {
+        fetch_data()
+    } else {
+        GetReturnContent()
+    }
+
+}
+
+function GetReturnContent() {
+    showOverlay()
+    $('#return-content').html('Loading Product List..')
+    var reasonElement = document.getElementById("reason");
+    if (reasonElement) {
+        reasonElement.value = "";
+    }
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/home/tasks/return-content.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                location_id: LocationID
+            },
+            success: function(data) {
+                $('#return-content').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+function validateInput(input) {
+    // Convert the input value to a string and check its length
+    if (input.value.length > 10) {
+        // If the length exceeds 10, trim the input value
+        input.value = input.value.slice(0, 10);
+    }
+}
+
+function PrintReturnNote(rtnNumber, PrinterName, locationID, reprintStatus, PrintMethod = "Popup Window") {
+    // Replace 'kot-print.php' with the actual URL of your PHP script
+    var url =
+        "return-note-print.php?rtnNumber=" +
+        rtnNumber +
+        "&PrinterName=" +
+        PrinterName +
+        "&locationID=" +
+        locationID +
+        "&reprintStatus=" +
+        reprintStatus;
+
+    // Navigate to the KOT URL in the same window
+    // if (PrinterName != 'default') {
+    //     window.location.href = url;
+    // } else {
+    //     window.open(url, '_blank');
+    // }
+
+    // window.open(url, "_blank");
+    DoPrinting(PrintMethod, url)
+}
+
+function OpenRefund(closeButtonStatus = 1) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/set-refund.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function OpenRefundConfirmation(rtnNumber, closeButtonStatus = 1) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/refund-confirmation.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                rtnNumber: rtnNumber,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+                document.getElementById('pinDigits').focus()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function SaveRefund(PrinterName, PrintMethod, reprintStatus) {
+    var form = document.getElementById('refund-form')
+
+    if (form.checkValidity()) {
+        showOverlay()
+        var formData = new FormData(form)
+        formData.append('LoggedUser', LoggedUser)
+        formData.append('UserLevel', UserLevel)
+        formData.append('company_id', company_id)
+        formData.append('LocationID', LocationID)
+
+        function fetch_data() {
+            $.ajax({
+                url: "assets/content/home/tasks/save-refund.php",
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    var response = JSON.parse(data)
+                    if (response.status === 'success') {
+                        var message = response.message
+                        var refundNumber = response.refund_id
+                        showNotification(message);
+                        PrintRefund(refundNumber, PrinterName, LocationID, reprintStatus, PrintMethod = "Popup Window");
+                        OpenIndex()
+                    } else {
+                        var message = response.message
+                        showNotification(message);
+
+                    }
+                    hideOverlay()
+                }
+            })
+        }
+        fetch_data()
+    } else {
+        message = 'Please Enter PIN'
+        showNotification(message);
+    }
+}
+
+function PrintRefund(refundNumber, PrinterName, locationID, reprintStatus, PrintMethod = "Popup Window") {
+    // Replace 'kot-print.php' with the actual URL of your PHP script
+    var url =
+        "refund-print.php?refundNumber=" +
+        refundNumber +
+        "&PrinterName=" +
+        PrinterName +
+        "&locationID=" +
+        locationID +
+        "&reprintStatus=" +
+        reprintStatus;
+
+    // Navigate to the KOT URL in the same window
+    // if (PrinterName != 'default') {
+    //     window.location.href = url;
+    // } else {
+    //     window.open(url, '_blank');
+    // }
+
+    // window.open(url, "_blank");
+    DoPrinting(PrintMethod, url)
+}
+
+
+function OpenExpensesDialog(closeButtonStatus = 1) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/expenses/set-expenses.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function SaveExpense(PrinterName, PrintMethod, reprintStatus = 0) {
+    var form = document.getElementById('expense-form')
+
+    if (form.checkValidity()) {
+        showOverlay()
+        var formData = new FormData(form)
+        formData.append('LoggedUser', LoggedUser)
+        formData.append('UserLevel', UserLevel)
+        formData.append('company_id', company_id)
+        formData.append('LocationID', LocationID)
+
+        function fetch_data() {
+            $.ajax({
+                url: "assets/content/home/expenses/save-expense.php",
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    var response = JSON.parse(data)
+                    if (response.status === 'success') {
+                        var message = response.message
+                        var expenseId = response.expenseId
+                        showNotification(message);
+                        FinishExpense(expenseId, 0);
+                    } else {
+                        var message = response.message
+                        showNotification(message);
+                    }
+                    hideOverlay()
+                }
+            })
+        }
+        fetch_data()
+    } else {
+        message = 'Please Enter PIN'
+        showNotification(message);
+    }
+}
+
+function FinishExpense(expenseId, closeButtonStatus) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/expenses/finish-expense.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                expenseId: expenseId,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function OpenReceipt(closeButtonStatus = 1) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/receipt/new-receipt.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                closeButtonStatus: closeButtonStatus
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function getInvoiceLIstByCustomerReceipts(customerId) {
+    showOverlay()
+    $('#due-invoices').html(InnerLoader)
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/home/receipt/get-invoices-by-customer.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                location_id: LocationID,
+                customerId: customerId
+            },
+            success: function(data) {
+                $('#due-invoices').html(data)
+                hideOverlay()
+            }
+        })
+    }
+    fetch_data()
+}
+
+
+
+function CreateReceipt(invoiceNumber, invoiceStatus, payableAmount, customerId, location_id) {
+
+    var grandTotal = payableAmount
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/home/receipt/receipt.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                invoiceNumber: invoiceNumber,
+                invoiceStatus: invoiceStatus,
+                grandTotal: grandTotal,
+                customerId: customerId,
+                location_id: location_id
+            },
+            success: function(data) {
+                $('#pop-content').html(data)
+                OpenPopup()
+            }
+        })
+    }
+
+    fetch_data()
+}
+
+function ProcessReceipt(invoiceNumber, customerId, location_id, PrinterName = "Receipt-Printer", PrintMethod = "Popup Window") {
+
+    var paymentMethod = document.getElementById('payment_type').value
+    var payment_amount = document.getElementById('payment_amount').value
+
+    function fetch_data() {
+        showOverlay()
+        $.ajax({
+            url: '../assets/content/transaction_module/receipt/process-receipt.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                invoiceNumber: invoiceNumber,
+                customerId: customerId,
+                location_id: location_id,
+                paymentMethod: paymentMethod,
+                payment_amount: payment_amount
+            },
+            success: function(data) {
+                var response = JSON.parse(data)
+                if (response.status === 'success') {
+                    var result = response.message
+                    var rec_number = response.rec_number
+                    showNotification(result);
+                    PrintPaymentReceipt(rec_number, invoiceNumber, PrinterName, location_id, PrintMethod)
+
+                    OpenIndex();
+                } else {
+                    var result = response.message
+                    showNotification(result);
+                }
+
+                hideOverlay()
+
+            }
+        })
+    }
+
+    if (paymentMethod != -1 && payment_amount > 0) {
+        fetch_data()
+    }
+}
+
+
+
+function OpenSetoffInvoice(customerId) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/receipt/set-off-returns.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                customerId: customerId
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function SettleReturn(invNumber, customerId, rtnNumber) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/receipt/settle-return.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                customerId: customerId,
+                invNumber: invNumber,
+                rtnNumber: rtnNumber
+            },
+            success: function(data) {
+                var response = JSON.parse(data)
+                if (response.status === 'success') {
+                    var result = response.message
+                    showNotification(result);
+                    OpenReceipt();
+                    getInvoiceLIstByCustomerReceipts(customerId)
+                } else {
+                    var result = response.message
+                    showNotification(result);
+                }
+
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function OpenSettlementInvoices(customerId, rtnNumber) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/receipt/settle-invoices.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                customerId: customerId,
+                rtnNumber: rtnNumber
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}
+
+function AboutUsOpen(exitButtonStatus = 1) {
+    showOverlay()
+    OpenPopup();
+    document.getElementById("pop-content").innerHTML = InnerLoader;
+
+    function fetch_data() {
+        $.ajax({
+            url: "assets/content/home/about-us.php",
+            method: "POST",
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                company_id: company_id,
+                LocationID: LocationID,
+                exitButtonStatus: exitButtonStatus,
+            },
+            success: function(data) {
+                $("#pop-content").html(data);
+                hideOverlay()
+            },
+        });
+    }
+
+    fetch_data();
+}

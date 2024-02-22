@@ -132,7 +132,8 @@
                     <img src="./assets/images/pos-logo.png" style="height: 40px">
                 </div>
                 <div class="col-4 text-end mb-2">
-                    <button class="btn btn-sm btn-light x-button" onclick="ClosePopUP()"><i class="fa-solid fa-xmark"></i></button>
+                    <button class="btn btn-sm btn-light refresh-button rounded-5" onclick="OpenIndex()"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    <button class="btn btn-sm btn-light x-button rounded-5" onclick="ClosePopUP()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
             <div id="pop-content"></div>

@@ -1,0 +1,12 @@
+[05-Feb-2024 13:10:30 Asia/Colombo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/payshiac/inspirelk.payshia.com/include/function-update.php:3021
+Stack trace:
+#0 /home/payshiac/inspirelk.payshia.com/include/function-update.php(3041): generateRTNNumber()
+#1 /home/payshiac/inspirelk.payshia.com/pos-system/assets/content/home/tasks/save-return.php(18): insertIntoReturnTable('9', '1', 'Admin', 'Expired Items', '', Array, 1, '', '75.00')
+#2 {main}
+  thrown in /home/payshiac/inspirelk.payshia.com/include/function-update.php on line 3021
+[05-Feb-2024 13:10:39 Asia/Colombo] PHP Fatal error:  Uncaught Error: Call to a member function prepare() on null in /home/payshiac/inspirelk.payshia.com/include/function-update.php:3021
+Stack trace:
+#0 /home/payshiac/inspirelk.payshia.com/include/function-update.php(3041): generateRTNNumber()
+#1 /home/payshiac/inspirelk.payshia.com/pos-system/assets/content/home/tasks/save-return.php(18): insertIntoReturnTable('9', '1', 'Admin', 'Expired Items', '', Array, 1, '', '75.00')
+#2 {main}
+  thrown in /home/payshiac/inspirelk.payshia.com/include/function-update.php on line 3021

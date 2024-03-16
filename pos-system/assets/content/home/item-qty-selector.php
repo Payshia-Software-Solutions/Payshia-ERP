@@ -43,7 +43,8 @@ if ($recipeType == 0) {
 
 $ProductCode = $Product['product_code'];
 $productSpecificBarcode = $Product['barcode'];
-$barcode = GenerateNormalBarcode($ProductCode);
+// $barcode = GenerateNormalBarcode($ProductCode);
+$barcode = "";
 ?>
 
 <style>

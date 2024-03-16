@@ -34,3 +34,18 @@ $studentCount = count($accountDetails);
 
 
 </div>
+
+<div class="row g-3">
+    <div class="col-12 mb-4">
+        <h5 class="table-title">Master Operations</h5>
+    </div>
+
+    <div class="col-md-3 col-6 col-xxl-2">
+        <div class="card clickable">
+            <div class="card-body text-center">
+                <i class="fa-solid fa-certificate icon-card"></i>
+                <h5 class="mb-0">Certificate Print</h5>
+            </div>
+        </div>
+    </div>
+</div>

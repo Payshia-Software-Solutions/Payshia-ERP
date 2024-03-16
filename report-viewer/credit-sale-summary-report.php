@@ -107,10 +107,13 @@ $location_name = $Locations[$location_id]['location_name'];
                         <th scope="col">Grand Total</th>
                         <th scope="col">Settled</th>
                         <th scope="col">Balance</th>
+                        <th scope="col">Agin</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
+                    // Current date
+                    $current_date = date("Y-m-d");
                     if (!empty($invoiceSales)) {
                         foreach ($invoiceSales as $selectedArray) {
 
@@ -122,6 +125,13 @@ $location_name = $Locations[$location_id]['location_name'];
                             $ref_hold = $selectedArray['ref_hold'];
                             $CustomerID = $selectedArray['customer_code'];
                             $Customer = GetCustomersByID($link, $CustomerID);
+
+
+                            // Calculating the difference between the current date and the invoice date
+                            $datetime1 = new DateTime($invoice_date);
+                            $datetime2 = new DateTime($current_date);
+                            $interval = $datetime1->diff($datetime2);
+                            $aging_days = $interval->days;
 
                             if ($ref_hold == '0') {
                                 // $referenceText = "Take Away";
@@ -162,7 +172,7 @@ $location_name = $Locations[$location_id]['location_name'];
 
                     ?>
                             <tr>
-                                <td><?= $invoice_date ?></td>
+                                <td style="white-space: nowrap;"><?= $invoice_date ?></td>
                                 <td><?= $selectedArray['invoice_number'] ?></td>
                                 <td><?= $Customer['customer_first_name'] ?> <?= $Customer['customer_last_name'] ?></td>
                                 <!-- <td><?= $referenceText ?></td> -->
@@ -172,6 +182,7 @@ $location_name = $Locations[$location_id]['location_name'];
                                 <td class="text-end"><?= formatAccountBalance($selectedArray['grand_total']) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($settlementAmount) ?></td>
                                 <td class="text-end"><?= formatAccountBalance($balanceAmount) ?></td>
+                                <td class="text-end"><?= $aging_days ?></td>
                             </tr>
 
                     <?php
@@ -179,12 +190,14 @@ $location_name = $Locations[$location_id]['location_name'];
                     }
                     ?>
                     <tr>
-                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="4"><?= formatAccountBalance($subTotal) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra" colspan="3"></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($subTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($discountAmount) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($serviceCharge) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($grandTotal) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalSettled) ?></td>
                         <td scope="col" class="text-end border-bottom text-bold-extra"><?= formatAccountBalance($totalBalance) ?></td>
+                        <td scope="col" class="text-end border-bottom text-bold-extra"></td>
                     </tr>
                 </tbody>
             </table>

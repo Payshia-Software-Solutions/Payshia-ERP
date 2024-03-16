@@ -112,6 +112,27 @@ function GetPrescriptions()
 }
 
 
+function GetPrescriptionAllCoversDpad()
+{
+    global $lms_link;
+    $ArrayResult = array();
+    // Fetch the next prescription ID
+    $nextIdQuery = "SELECT `prescription_id`, `drugs_list` FROM `prescription`";
+    $nextIdResult = $lms_link->query($nextIdQuery);
+
+
+    if ($nextIdResult->num_rows > 0) {
+        while ($row = $nextIdResult->fetch_assoc()) {
+            $drugs_list = $row['drugs_list'];
+            $drugListArray = explode(', ', $drugs_list);
+
+            $ArrayResult[$row['prescription_id']] = $drugListArray;
+        }
+    }
+    return $ArrayResult;
+}
+
+
 function GetPrescriptionCoversDpad($prescriptionId)
 {
     global $lms_link;
@@ -518,6 +539,29 @@ function GetSubmittedAnswersByUser($loggedUser)
     $sql = "SELECT `id`, `answer_id`, `pres_id`, `cover_id`, `date`, `name`, `drug_name`, `drug_type`, `drug_qty`, `morning_qty`, `afternoon_qty`, `evening_qty`, `night_qty`, `meal_type`, `using_type`, `at_a_time`, `hour_qty`, `additional_description`, `created_at`, `created_by`, `answer_status`, `score` 
     FROM `prescription_answer_submission`  
     WHERE `created_by` = '$loggedUser'";
+
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+
+function GetSubmittedAnswersByAllUser($courseCode)
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT pas.*, pas.answer_id, sc.course_code
+    FROM prescription_answer_submission pas
+    JOIN user_full_details ufd ON pas.created_by = ufd.username
+    JOIN student_course sc ON ufd.student_id = sc.student_id
+    WHERE sc.course_code LIKE '$courseCode'";
 
     $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {

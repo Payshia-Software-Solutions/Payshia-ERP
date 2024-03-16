@@ -821,7 +821,14 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./course-management">
+                            <a class="nav-link" href="./lms-certification">
+                                <i class="fa-solid fa-certificate menu-icon"></i>
+                                LMS Certification
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./lms-course-management">
                                 <i class="fa-solid fa-award  menu-icon"></i>
                                 Course Management
                             </a>

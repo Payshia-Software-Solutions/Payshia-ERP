@@ -906,3 +906,23 @@ function createDateRangeArray($startDate, $endDate)
 
     return $dates;
 }
+
+
+function GetRefundsByDateRangeTotal($fromDate, $toDate, $location_id)
+{
+
+    global $link;
+
+    $ArrayResult = 0;
+    $sql = "SELECT SUM(refund_amount) AS `refund_amount` FROM `transaction_refund` WHERE DATE(`refund_datetime`) BETWEEN '$fromDate' AND '$toDate' AND `is_active` = 1 AND `current_location` LIKE '$location_id'";
+
+    $result = $link->query($sql);
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult = $row['refund_amount']; // Append each row to the result array
+        }
+    }
+
+    return $ArrayResult;
+}

@@ -40,6 +40,8 @@ $receipts =  getReceiptsByDate($link, $date, $location_id);
 $CreditCollection =  getReceiptsCollection($link, $date, $location_id);
 
 $returnAmounts = GetUnsettledReturnValuesTotal($link, $date, $date, $location_id);
+$refundAmount = GetRefundsByDateRangeTotal($date, $date, $location_id);
+
 
 if (isset($receipts[0])) {
     $cashReceipts = $receipts[0];

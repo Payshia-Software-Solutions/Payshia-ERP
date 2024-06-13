@@ -2,14 +2,14 @@
 $server = "localhost";
 $username = "root";
 $password = "";
-$database = "uni_erp";
+$database = "payshia_erp";
 $database_error = "";
+
 
 /* Attempt to connect to MySQL database */
 $link = mysqli_connect($server, $username, $password, $database);
 
 // Check connection
-
 if ($link === false) {
     die("ERROR: Could not connect. " . mysqli_connect_error());
 } else {
@@ -69,3 +69,16 @@ mysqli_set_charset($link, "utf8");
 date_default_timezone_set("Asia/Colombo");
 $date_now = date('F j, Y H:i:s');
 $SiteTitle = "Payshia ERP";
+
+
+$modeTheme = 'dark';
+$bodyColorClass = 'back_dark';
+
+$iconColor = 'text-dark';
+$bgColor = 'bg-dark';
+if ($modeTheme = 'dark') {
+    $iconColor = 'text-light';
+}
+if ($modeTheme == 'light') {
+    $bgColor = 'bg-white';
+}

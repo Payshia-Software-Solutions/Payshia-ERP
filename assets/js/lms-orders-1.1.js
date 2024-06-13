@@ -52,6 +52,28 @@ function OpenOrder(ref_id, studentBatch, orderType) {
     fetch_data()
 }
 
+function RemoveOrder(ref_id, studentBatch, orderType) {
+    OpenPopup()
+    document.getElementById('loading-popup').innerHTML = InnerLoader
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/lms-management/orders/remove-order.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                ref_id: ref_id
+            },
+            success: function(data) {
+                $('#loading-popup').html(data)
+                OpenIndex(studentBatch, orderType)
+            }
+        })
+    }
+    fetch_data()
+}
+
 function PrintShippingLabel(ref_id) {
 
     var trackingNumber = $('#trackingNumber').val()
@@ -147,6 +169,28 @@ function GetUploadExcel(studentBatch = 0, orderType = 0) {
     function fetch_data() {
         $.ajax({
             url: 'assets/content/lms-management/orders/get-upload-excel.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                studentBatch: studentBatch,
+                orderType: orderType
+            },
+            success: function(data) {
+                $('#loading-popup').html(data)
+            }
+        })
+    }
+    fetch_data()
+}
+
+function GetUploadExcelNew(studentBatch = 0, orderType = 0) {
+    OpenPopup()
+    document.getElementById('loading-popup').innerHTML = InnerLoader
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/lms-management/orders/get-upload-excel-new.php',
             method: 'POST',
             data: {
                 LoggedUser: LoggedUser,

@@ -121,8 +121,49 @@ function OpenPopup() {
     document.getElementById('loading-popup').style.display = 'flex'
 }
 
-function ClosePopUP() {
-    document.getElementById('loading-popup').style.display = 'none'
+function ClosePopUP(closeType = 0) {
+    if (closeType == 1) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Close it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('loading-popup').style.display = 'none'
+            }
+        });
+    } else if (closeType == 0) {
+        document.getElementById('loading-popup').style.display = 'none'
+    }
+
+}
+
+function OpenPopupRight() {
+    document.getElementById('loading-popup-right').style.display = 'flex'
+}
+
+function ClosePopUPRight(closeType = 0) {
+    if (closeType == 1) {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Close it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('loading-popup-right').style.display = 'none'
+            }
+        });
+    } else if (closeType == 0) {
+        document.getElementById('loading-popup-right').style.display = 'none'
+    }
 }
 
 const InnerLoader = document.getElementById('inner-preloader-content').innerHTML
@@ -253,4 +294,83 @@ function SelectCategory(sectionId, departmentId, selectedCategory = 0) {
         })
     }
     fetch_data()
+}
+
+
+function toggleDarkMode() {
+    const htmlElement = document.documentElement;
+    const currentTheme = htmlElement.getAttribute("data-bs-theme");
+    toggleBackgrounds()
+
+    if (currentTheme === "dark") {
+        htmlElement.setAttribute("data-bs-theme", "light");
+        document.getElementById('userTheme').value = 'light'
+        var iconSet = document.querySelectorAll('.top-icon')
+        iconSet.forEach(element => {
+            element.classList.add('text-dark')
+            element.classList.remove('text-light')
+        });
+
+    } else {
+        htmlElement.setAttribute("data-bs-theme", "dark");
+        document.getElementById('userTheme').value = 'dark'
+
+        var iconSet = document.querySelectorAll('.top-icon')
+        iconSet.forEach(element => {
+            element.classList.add('text-light')
+            element.classList.remove('text-dark')
+        });
+    }
+
+
+}
+
+
+function toggleBackgrounds() {
+    // Toggle background for the navigation element
+    const body = document.getElementById('body');
+    toggleBackground(body);
+
+
+    const loadingPop = document.getElementById('loading-popup-content');
+    toggleBackground(loadingPop);
+
+    const loadingPopRight = document.getElementById('loading-popup-content-right');
+    toggleBackground(loadingPopRight);
+
+    const allSelectElements = document.querySelectorAll('select');
+    allSelectElements.forEach(selectElement => {
+        // Perform operations on each selectElement
+        toggleBackground(selectElement);
+        // alert()
+    });
+
+
+
+
+}
+
+function toggleBackground(element) {
+
+    // Ensure element is defined and has a classList property
+    if (!element || !element.classList) {
+        console.error('Invalid element provided:', element);
+        return;
+    }
+
+
+    // Check if 'bg-light' class is present, then toggle to 'bg-dark'
+    if (element.classList.contains('bg-light')) {
+        element.classList.remove('bg-light');
+    } else if (element.classList.contains('backlight')) {
+        element.classList.remove('backlight')
+        element.classList.add('back_dark');
+    } else if (element.classList.contains('back_dark')) {
+        element.classList.remove('back_dark')
+        element.classList.add('backlight');
+    } else {
+        // Otherwise, toggle to 'bg-light'
+        element.classList.remove('bg-dark');
+        element.classList.add('bg-light');
+    }
 }

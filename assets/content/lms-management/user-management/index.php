@@ -59,6 +59,11 @@ $InactiveCount = 0;
         <div class="table-title font-weight-bold mb-4 mt-0">Not Approved List</div>
         <div class="card">
             <div class="card-body">
+                <div class="row">
+                    <div class="col-12 text-end">
+                        <button class="btn btn-primary btn-sm" type="button" onclick="OpenPendingUser()">Download List</button>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table id="userTable" class="table table-striped" style="width:100%">
                         <thead>

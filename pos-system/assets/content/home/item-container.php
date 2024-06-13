@@ -107,7 +107,7 @@ $barcodeDisplay = GetSetting($link, $LocationID, 'barcodeDisplay');
                         </h4>
                         <?php
                         if ($barcodeDisplay == 1 && $barcode != "") {
-                            $imgCodeBarcode = GenerateNormalBarcode($barcode);
+                            // $imgCodeBarcode = GenerateNormalBarcode($barcode);
                         ?>
                             <div class="text-center">
                                 <img class="logo-image p-0 text-center" src="data:image/png;base64,<?= $imgCodeBarcode; ?>" alt="Barcode" style="height:20px; width:50%;">

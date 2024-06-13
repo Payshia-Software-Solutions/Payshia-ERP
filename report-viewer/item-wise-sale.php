@@ -114,9 +114,10 @@ if (!empty($invoiceSales)) {
                 </thead>
                 <tbody>
                     <?php
-                    $totalSale = $totalDiscount = $rowCount = $totalCostValue = 0;
+                    $totalSale = $totalDiscount = $rowCount = $totalCostValue = $preProductId = $uniqueCount = 0;
                     if (!empty($itemWiseSale)) {
                         foreach ($itemWiseSale as $selectedArray) {
+                            $currentProductId = $selectedArray['product_id'];
                             $product_name = $Products[$selectedArray['product_id']]['product_name'];
                             $quantity = $selectedArray['total_quantity'];
                             $costPrice = $selectedArray['cost_price'];
@@ -129,11 +130,17 @@ if (!empty($invoiceSales)) {
                             // Total
                             $totalSale += $lineTotal;
                             $totalDiscount += $itemDiscount;
-                            $rowCount++;
+
+                            if ($currentProductId == $preProductId) {
+                                $uniqueCount += $quantity;
+                            } else {
+                                $uniqueCount = 0;
+                                $rowCount++;
+                            }
                     ?>
                             <tr>
-                                <td class=""><?= $rowCount ?></td>
-                                <td class=""><?= MakeFormatProductCode($selectedArray['product_id']) ?> - <?= $product_name ?></td>
+                                <td class=""><?= ($currentProductId != $preProductId) ? $rowCount : '' ?></td>
+                                <td class=""><?= ($currentProductId != $preProductId) ? $product_name . ' - ' . MakeFormatProductCode($selectedArray['product_id']) : '' ?> </td>
                                 <td class="" style="max-width: 200px;"><?= $quantity ?></td>
                                 <td class="text-end"><?= number_format($itemPrice, 3) ?></td>
                                 <td class="text-end"><?= number_format($itemDiscount, 3) ?></td>
@@ -141,7 +148,7 @@ if (!empty($invoiceSales)) {
                             </tr>
 
                     <?php
-
+                            $preProductId = $selectedArray['product_id'];
                         }
                     }
 
@@ -196,7 +203,7 @@ if (!empty($invoiceSales)) {
                     ?>
                             <tr>
                                 <td class=""><?= $rowCount ?></td>
-                                <td colspan="2" class=""><?= MakeFormatProductCode($selectedArray['product_id']) ?> - <?= $product_name ?></td>
+                                <td colspan="2" class=""><?= $product_name ?> - <?= MakeFormatProductCode($selectedArray['product_id']) ?> </td>
                                 <td class="" style="max-width: 200px;"><?= $quantity ?></td>
                                 <td class="text-end"><?= number_format($itemPrice, 2) ?></td>
                                 <td class="text-end text-bold"><?= number_format($totalValue, 2) ?></td>

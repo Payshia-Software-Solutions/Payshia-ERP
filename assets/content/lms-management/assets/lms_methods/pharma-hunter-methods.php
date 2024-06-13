@@ -236,3 +236,68 @@ function GetHunterProAttemptCount($lms_link, $IndexNumber)
     }
     return $ArrayResult;
 }
+
+
+function HunterMedicines()
+{
+    global $lms_link;
+
+    $sql = "SELECT * FROM `hunter_medicine` WHERE `active_status` NOT LIKE 'Deleted'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function HunterSavedAnswers()
+{
+    global $lms_link;
+
+    $sql = "SELECT 
+                `index_number`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' THEN 1 ELSE 0 END) AS `correct_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Wrong' THEN 1 ELSE 0 END) AS `incorrect_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' AND `score_type` LIKE 'Jem' THEN  1 ELSE 0 END) AS `gem_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' AND `score_type` LIKE 'Coin' THEN 1 ELSE 0 END) AS `coin_count` 
+            FROM 
+                `hunter_saveanswer` 
+            GROUP BY 
+                `index_number`";
+
+    $result = $lms_link->query($sql);
+    $ArrayResult = array(); // Initialize the array
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['index_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function HunterSavedAnswersByUser($studentNumber)
+{
+    global $lms_link;
+
+    $sql = "SELECT 
+                `index_number`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' THEN 1 ELSE 0 END) AS `correct_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Wrong' THEN 1 ELSE 0 END) AS `incorrect_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' AND `score_type` LIKE 'Jem' THEN  1 ELSE 0 END) AS `gem_count`, 
+                SUM(CASE WHEN `answer_status` LIKE 'Correct' AND `score_type` LIKE 'Coin' THEN 1 ELSE 0 END) AS `coin_count` 
+            FROM 
+                `hunter_saveanswer` 
+            WHERE
+                `index_number` LIKE '$studentNumber'";
+
+    $result = $lms_link->query($sql);
+    $ArrayResult = array(); // Initialize the array
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['index_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}

@@ -667,7 +667,7 @@ function GetRawProducts($link)
 {
 
     $ArrayResult = array();
-    $sql = "SELECT `product_id`, `product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `price_2` , `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type` FROM `master_product` WHERE `item_type` LIKE 'Raw' OR `item_type` LIKE 'SItem' OR `item_type` LIKE 'RawnSell' ORDER BY `active_status` DESC, `product_id` DESC";
+    $sql = "SELECT * FROM `master_product` WHERE `item_type` LIKE 'Raw' OR `item_type` LIKE 'SItem' OR `item_type` LIKE 'RawnSell' ORDER BY `active_status` DESC, `product_id` DESC";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {
@@ -679,37 +679,74 @@ function GetRawProducts($link)
 }
 
 
-function SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList)
+function SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList, $openingStock)
 {
     $error = array();
     $created_at = date("Y-m-d H:i:s");
 
     if ($UpdateKey == 0) {
-        $sql = "INSERT INTO `master_product` (`product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type`, `barcode`, `location_list`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO `master_product` (`product_code`, `product_name`, `display_name`, `print_name`, `section_id`, `department_id`, `category_id`, `brand_id`, `measurement`, `reorder_level`, `lead_days`, `cost_price`, `selling_price`, `minimum_price`, `wholesale_price`, `item_type`, `item_location`, `image_path`, `created_by`, `created_at`, `active_status`, `generic_id`, `supplier_list`, `size_id`, `color_id`, `product_description`, `name_si`, `name_ti`, `price_2`, `recipe_type`, `barcode`, `location_list`, `opening_stock`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     } else {
-        $sql = "UPDATE `master_product` SET `product_code` = ?, `product_name` = ?, `display_name` = ?, `print_name` = ?, `section_id` = ?, `department_id` = ?, `category_id` = ?, `brand_id` = ?, `measurement` = ?, `reorder_level` = ?, `lead_days` = ?, `cost_price` = ?, `selling_price` = ?, `minimum_price` = ?, `wholesale_price` = ?, `item_type` = ?, `item_location` = ?, `image_path` = ?, `created_by` = ?, `created_at` = ?, `active_status` = ?, `generic_id` = ?, `supplier_list` = ?,  `size_id` = ?, `color_id`= ?, `product_description` = ?, `name_si` = ?, `name_ti` = ? , `price_2` = ?, `recipe_type` = ?, `barcode` = ?, `location_list` = ? WHERE `product_id` = ?";
+        $sql = "UPDATE `master_product` SET `product_code` = ?, `product_name` = ?, `display_name` = ?, `print_name` = ?, `section_id` = ?, `department_id` = ?, `category_id` = ?, `brand_id` = ?, `measurement` = ?, `reorder_level` = ?, `lead_days` = ?, `cost_price` = ?, `selling_price` = ?, `minimum_price` = ?, `wholesale_price` = ?, `item_type` = ?, `item_location` = ?, `image_path` = ?, `created_by` = ?, `created_at` = ?, `active_status` = ?, `generic_id` = ?, `supplier_list` = ?,  `size_id` = ?, `color_id`= ?, `product_description` = ?, `name_si` = ?, `name_ti` = ? , `price_2` = ?, `recipe_type` = ?, `barcode` = ?, `location_list` = ?, `opening_stock` = ? WHERE `product_id` = ?";
     }
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
         if ($UpdateKey != 0) {
-            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList, $UpdateKey);
+            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList, $openingStock, $UpdateKey);
         } else {
-            mysqli_stmt_bind_param($stmt_sql, "ssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList);
+            mysqli_stmt_bind_param($stmt_sql, "sssssssssssssssssssssssssssssssss", $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $image_path, $created_by, $created_at, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $locationList, $openingStock);
         }
 
         if (mysqli_stmt_execute($stmt_sql)) {
             if ($UpdateKey == 0) {
                 $UpdateKey = mysqli_insert_id($link); // Get the last inserted ID
+
             }
             $error = array('status' => 'success', 'message' => 'Product saved successfully', 'last_inserted_id' => $UpdateKey);
         } else {
             $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later.' . $link->error);
         }
+
+        $stock_result = UpdateOpeningBalance($UpdateKey, $openingStock, $product_name, $item_location, $created_by);
+        // var_dump($stock_result);
+
         mysqli_stmt_close($stmt_sql);
     } else {
         $error = array('status' => 'error', 'message' => 'Something went wrong. ' . $brand_id . $link->error);
     }
     return json_encode($error);
+}
+
+function UpdateOpeningBalance($ProductKey, $openingStock, $product_name, $item_location, $created_by)
+{
+    global $link;
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `type`, `quantity`, `product_id`, `reference`, `location_id`, `created_by`, `created_at`, `is_active`, `ref_id` FROM `transaction_stock_entry` WHERE `product_id` LIKE '$ProductKey' AND `ref_id` LIKE 'OB' AND `is_active` = 1";
+
+    $result = $link->query($sql);
+    if ($result->num_rows > 0) {
+        // Update Opening Stock
+        $sql = "UPDATE `transaction_stock_entry` SET `quantity` = ? WHERE WHERE `product_id` LIKE '$ProductKey' AND `ref_id` LIKE 'OB' AND `is_active` = 1";
+
+        if ($stmt_sql = mysqli_prepare($link, $sql)) {
+            mysqli_stmt_bind_param($stmt_sql, "s", $openingStock);
+            if (mysqli_stmt_execute($stmt_sql)) {
+                $stock_result = array('status' => 'success', 'message' => 'Opening Stock Updated successfully');
+            } else {
+                $stock_result = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            }
+            mysqli_stmt_close($stmt_sql);
+        } else {
+            $stock_result = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        }
+    } else {
+        // Insert Opening Stock
+        $stock_type = "DEBIT";
+        $reference = $stock_type . " : " . $openingStock . " " . $product_name . " | Opening Stock";
+        $stock_result = CreateStockEntry($link, $stock_type, $openingStock, $ProductKey, $reference, $item_location, $created_by, 1, 'OB');
+    }
+    return $stock_result;
 }
 
 
@@ -3758,4 +3795,281 @@ function GetBatchProductionItems($batchNumber)
         }
     }
     return $ArrayResult;
+}
+
+
+function GetThemeModel($userTheme = 'light')
+{
+    $bgColor = 'bg-light';
+    if ($userTheme == 'dark') {
+        $bgColor = 'bg-dark';
+    }
+
+    return $bgColor;
+}
+
+
+
+function convertToCamelCase($string)
+{
+    // Convert to array of words
+    $words = explode(' ', strtolower($string));
+    // Capitalize each word except the first one and concatenate
+    $camel_case = $words[0];
+    for ($i = 1; $i < count($words); $i++) {
+        $camel_case .= ucfirst($words[$i]);
+    }
+
+    return $camel_case;
+}
+
+function convertToSnakeCase($string)
+{
+    return strtolower(str_replace(' ', '_', $string));
+}
+
+// Function to sanitize input
+function sanitizeInput($data)
+{
+    return htmlspecialchars(stripslashes(trim($data)));
+}
+
+function getDefaultValue($element)
+{
+    if (empty($element['default_value'])) {
+        return $element['element_type'] === 'number' ? '' : ($element['element_type'] === 'date' ? date('Y-m-d') : '');
+    }
+    return $element['default_value'];
+}
+
+function getUserTheme($userThemeInput = null)
+{
+    if ($userThemeInput) {
+        return GetThemeModel(sanitizeInput($userThemeInput));
+    }
+    return GetThemeModel();
+}
+
+function renderForm($elementArray, $form_name)
+{
+
+    foreach ($elementArray as $element) {
+        $elementName = convertToCamelCase($element['element_name']);
+        $$elementName = getDefaultValue($element);
+    }
+
+    ob_start(); // Start output buffering
+?>
+    <form action="#" id="<?= $form_name ?>" method="post">
+        <div class="row g-3">
+            <?php foreach ($elementArray as $element) :
+            ?>
+                <div class="<?= htmlspecialchars($element['class_list']) ?>">
+                    <?php
+                    $elementName = htmlspecialchars($element['element_name']);
+                    $camelCase = convertToCamelCase($elementName);
+                    $snakeCase = convertToSnakeCase($elementName);
+                    ?>
+                    <?php if ($element['element_type'] == 'select') : ?>
+
+                        <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+                        <select <?= $element['require_status'] ?> name="<?= $snakeCase ?>" id="<?= $snakeCase ?>">
+                            <?php foreach ($element['select_values'] as $data) : ?>
+                                <option value="<?= htmlspecialchars($data['id']) ?>" <?= ($data['id'] == $element['default_value']) ? 'selected' : '' ?>><?= htmlspecialchars($data['value']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+
+                    <?php elseif ($element['element_type'] == 'checkbox') : ?>
+                        <div class="border-bottom mb-2"></div>
+                        <label for="<?= $snakeCase ?>" class="mb-2"><?= $elementName ?></label>
+                        <div class="row g-2">
+                            <?php foreach ($element['select_values'] as $data) :
+                                $isChecked = in_array($data['id'], $element['default_value']) ? 'checked' : ''; ?>
+                                <div class="col-4 col-md-3">
+                                    <div class="form-check form-check-primary">
+                                        <label class="form-check-label">
+                                            <input type="checkbox" name="<?= $snakeCase ?>[]" id="<?= $snakeCase ?>" class="form-check-input" value="<?= $data['id']; ?>" <?= $isChecked ?>>
+                                            <?= $data['value']; ?>
+                                            <i class="input-helper"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                    <?php elseif ($element['element_type'] == 'file') :
+                        $tempName = 'temp' . $camelCase ?>
+                        <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+                        <input <?= $element['require_status'] ?> class="form-control" type="<?= $element['element_type'] ?>" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+                        <!-- Temp File -->
+                        <input class="form-control" type="hidden" value="<?= $tempName ?>" name="temp_<?= $snakeCase ?>" id="temp_<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+                    <?php else : ?>
+                        <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+                        <input <?= $element['require_status'] ?> class="form-control" type="<?= $element['element_type'] ?>" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+
+        </div>
+
+
+    </form>
+
+    <script>
+        <?php foreach ($elementArray as $element) : ?>
+            <?php if ($element['element_type'] == 'select') : ?>
+                $('#<?= convertToSnakeCase($element['element_name']) ?>').select2();
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </script>
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
+}
+
+function convertSelectBox2DArray($inputArray, $keyValue, $valueName)
+{
+    $resultArray = array();
+    foreach ($inputArray as $data) {
+        $resultArray[] = array(
+            'id' => $data[$keyValue],
+            'value' => $data[$valueName],
+        );
+    }
+    return $resultArray;
+}
+
+function convertSelectBox1DArray($inputArray)
+{
+    $resultArray = array();
+    foreach ($inputArray as $data => $value) {
+        $resultArray[] = array(
+            'id' => $data + 1,
+            'value' => $value,
+        );
+    }
+    return $resultArray;
+}
+
+function convertSelectBox1DArrayValueOnly($inputArray)
+{
+    $resultArray = array();
+    foreach ($inputArray as $data => $value) {
+        $resultArray[] = array(
+            'id' => $value,
+            'value' => $value,
+        );
+    }
+    return $resultArray;
+}
+
+function ReturnTextInput($elementName, $requiredStatus, $classList, $defaultValue = '', $readOnlyStatus = null)
+{
+    $elementName = htmlspecialchars($elementName);
+    $camelCase = convertToCamelCase($elementName);
+    $snakeCase = convertToSnakeCase($elementName);
+
+    $$camelCase = $defaultValue;
+
+    ob_start(); // Start output buffering
+?>
+    <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+    <input <?= $requiredStatus ?> <?= $readOnlyStatus ?> class="<?= $classList ?>" type="text" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
+}
+
+
+
+function ReturnNumberInput($elementName, $requiredStatus, $classList, $defaultValue = '')
+{
+    $elementName = htmlspecialchars($elementName);
+    $camelCase = convertToCamelCase($elementName);
+    $snakeCase = convertToSnakeCase($elementName);
+
+    $$camelCase = $defaultValue;
+
+    ob_start(); // Start output buffering
+?>
+    <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+    <input <?= $requiredStatus ?> class="<?= $classList ?>" type="text" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
+}
+
+function ReturnDateInput($elementName, $requiredStatus, $classList, $defaultValue = null)
+{
+    $defaultValue = ($defaultValue == null) ? date('Y-m-d') : $defaultValue;
+    $elementName = htmlspecialchars($elementName);
+    $camelCase = convertToCamelCase($elementName);
+    $snakeCase = convertToSnakeCase($elementName);
+
+    $$camelCase = $defaultValue;
+
+    ob_start(); // Start output buffering
+?>
+    <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+    <input <?= $requiredStatus ?> class="<?= $classList ?>" type="date" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
+}
+
+
+function ReturnSelectInput($elementName, $requiredStatus, $classList, $defaultValue = 0, $dataList)
+{
+    $elementName = htmlspecialchars($elementName);
+    $camelCase = convertToCamelCase($elementName);
+    $snakeCase = convertToSnakeCase($elementName);
+
+    $$camelCase = $defaultValue;
+
+    ob_start(); // Start output buffering
+?>
+    <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+    <select <?= $requiredStatus ?> name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" class="<?= $classList ?>">
+        <option value="">Select <?= $elementName ?></option>
+        <?php foreach ($dataList as $data) : ?>
+            <option value="<?= htmlspecialchars($data['id']) ?>" <?= ($data['id'] == $defaultValue) ? 'selected' : '' ?>><?= htmlspecialchars($data['value']) ?></option>
+        <?php endforeach; ?>
+    </select>
+
+    <script>
+        $('#<?= $snakeCase ?>').select2();
+    </script>
+
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
+}
+
+
+
+function ReturnFileInput($elementName, $requiredStatus, $classList, $defaultValue = null)
+{
+    $elementName = htmlspecialchars($elementName);
+    $camelCase = convertToCamelCase($elementName);
+    $snakeCase = convertToSnakeCase($elementName);
+
+    $$camelCase = $defaultValue;
+    $tempName = 'temp' . $camelCase;
+    ob_start(); // Start output buffering
+?>
+    <label for="<?= $snakeCase ?>"><?= $elementName ?></label>
+    <input <?= $requiredStatus ?> class="<?= $classList ?>" type="file" value="<?= htmlspecialchars($$camelCase) ?>" name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+    <!-- Temp File -->
+    <input class="form-control" type="hidden" value="<?= $defaultValue ?>" name="temp_<?= $snakeCase ?>" id="temp_<?= $snakeCase ?>" placeholder="<?= $elementName ?>">
+
+
+<?php
+    $output = ob_get_clean(); // Get the buffered output and clean the buffer
+    return $output;
 }

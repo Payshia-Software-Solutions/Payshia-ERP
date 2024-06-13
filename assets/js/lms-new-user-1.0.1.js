@@ -154,3 +154,23 @@ function EditUserData(refId) {
         OpenAlert('error', 'Oops!', result)
     }
 }
+
+function OpenPendingUser() {
+    OpenPopup()
+    document.getElementById('loading-popup').innerHTML = InnerLoader
+
+    function fetch_data() {
+        $.ajax({
+            url: 'assets/content/lms-management/user-management/export-not-approved-list.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel
+            },
+            success: function(data) {
+                $('#loading-popup').html(data)
+            }
+        })
+    }
+    fetch_data()
+}

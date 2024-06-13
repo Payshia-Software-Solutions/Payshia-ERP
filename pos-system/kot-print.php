@@ -279,16 +279,16 @@ if ($guestReceiptLogoStatus == 1) {
                     myPrinter.paperName = '80(72.1) x 297 mm';
 
                     cpj.clientPrinter = myPrinter;
+
                     //Set content to print... 
                     var b64Prefix = "data:image/png;base64,";
                     var imgBase64DataUri = canvas.toDataURL("image/png");
                     var imgBase64Content = imgBase64DataUri.substring(b64Prefix.length, imgBase64DataUri.length);
 
                     var myImageFile = new JSPM.PrintFile(imgBase64Content, JSPM.FileSourceType.Base64, '<?= $invoice_number ?>.png', 1);
+
                     //add file to print job
                     cpj.files.push(myImageFile);
-
-
 
                     //Send print job to printer!
                     cpj.sendToClient();

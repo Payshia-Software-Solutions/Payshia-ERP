@@ -10,7 +10,7 @@ $pptxFile = './newPresentation.pptx';
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="<?= $modeTheme ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -22,7 +22,7 @@ $pptxFile = './newPresentation.pptx';
     <title><?= $pageTitle ?> | <?= $SiteTitle ?></title>
 </head>
 
-<body>
+<body id="body" class="<?= $bodyColorClass ?>">
     <div class="container-fluid">
         <div class="row">
             <?php include './include/header.php' ?>

@@ -12,8 +12,6 @@ if (isset($_POST['rtnCustomer'], $_POST['rtnAmount'], $_POST['rtnNumber'], $_POS
     $pinDigits = $_POST['pinDigits'];
     $LoggedUser = $_POST['LoggedUser'];
     $currentLocation = $_POST['LocationID'];
-
-
     $isActive = 1;
     $refundPin = 1111;
 

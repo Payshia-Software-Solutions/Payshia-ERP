@@ -6,7 +6,7 @@ $ActiveStatus = 1;
 $updateKey = 0;
 $ButtonText = "Save";
 $location_list = "";
-$product_code = $product_name = $print_name = $display_name = $productBarcode = $name_si = $name_ti = $product_section = $product_department = $product_category = $product_unit = $product_description = $ImgURL =  $supplier_list = $recipe_type = $item_type = "";
+$product_code = $product_name = $print_name = $display_name = $productBarcode = $name_si = $name_ti = $product_section = $product_department = $product_category = $product_unit = $product_description = $ImgURL =  $supplier_list = $recipe_type = $item_type = $openingStock = "";
 $ImgURL = "no-image.png";
 
 $cost_price = $min_price = $selling_price = $wholesale_price = $price_2 = 0;
@@ -36,6 +36,7 @@ if ($_POST['updateKey'] != 0) {
     $item_type = $Product['item_type'];
     $productBarcode = $Product['barcode'];
     $item_location = $Product['item_location'];
+    $openingStock = $Product['opening_stock'];
 }
 $SupplierArray = explode(",", $supplier_list);
 $locationArray = explode(",", $location_list);
@@ -155,6 +156,11 @@ $Categories = GetCategories($link);
                         <select class="form-select" name="category_id" id="category_id" required autocomplete="off">
                             <option value="">Select Category</option>
                         </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="">Opening Stock</label>
+                        <input type="text" class="form-control text-end" name="openingStock" id="openingStock" value="<?= $openingStock ?>" placeholder="0.00">
+
                     </div>
                 </div>
             </div>

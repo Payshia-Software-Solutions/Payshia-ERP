@@ -165,7 +165,7 @@ $LocationName = $Locations[$SelectedReport['location_id']]['location_name'];
                                 <td class="text-center"><?= $rawNumber ?></td>
                                 <td><?= $ProductID ?> - <?= $productName ?></td>
                                 <td class="text-center"><?= $OrderUnit ?></td>
-                                <td class="text-center"><?= number_format($received_qty, 2) ?></td>
+                                <td class="text-center"><?= number_format($received_qty, 3) ?></td>
                                 <td class="text-end"><?= number_format($PerRate, 2) ?></td>
                                 <td class="text-end total"><?= number_format($lineTotal, 2) ?></td>
                             </tr>

@@ -15,6 +15,7 @@ $defaultLocation = GetUserDefaultValue($link, $session_student_number, 'defaultL
 if (isset($defaultLocation) && $defaultLocation != "") {
     $default_location_name = $Locations[$defaultLocation]['location_name'];
 }
+
 ?>
 <input type="hidden" value="<?php echo $session_student_number; ?>" id="LoggedUser" name="LoggedUser">
 <input type="hidden" value="<?php echo $session_user_level; ?>" id="UserLevel" name="UserLevel">
@@ -23,6 +24,7 @@ if (isset($defaultLocation) && $defaultLocation != "") {
 <input type="hidden" value="<?php echo $default_location_name; ?>" id="default_location_name" name="default_location_name">
 <input type="hidden" value="" id="deviceFingerPrint" name="deviceFingerPrint">
 
+<input type="hidden" value="<?= $modeTheme ?>" id="userTheme" name="userTheme">
 
 
 <div class="overlay">
@@ -57,6 +59,7 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                 <a href="./pos-system" target="_blank" class="mx-1"><i class="fa-solid fa-cash-register text-white clickable"></i></a>
                 <a href="./logout.php" class="mx-1"><i class="fa-solid text-white fa-right-from-bracket"></i></a>
                 <span class="badge bg-danger mt-2"><?= $UserLevel ?></span>
+                <i class="fa-solid fa-circle-half-stroke clickable text-light" onclick="toggleDarkMode()"></i>
             </div>
             <div class="col-12 mb-1">
                 <p class="bg-success p-1 rounded-3 text-center text-white mt-3 clickable" onclick="ChoiceUserLocation('<?= $StudentNumber ?>', 1)"><i class="fa-solid px-1 fa-location-dot"></i> <?= $default_location_name ?></p>
@@ -718,12 +721,12 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
                         <i class="fa-solid fa-building-user menu-icon"></i>
-                        HRM <span class="mx-2 badge bg-primary" style="font-size: 10px;">Coming soon</span>
+                        HRM
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="employee-management">
                                 <i class="fa-solid fa-users menu-icon"></i>
                                 Employees
                             </a>
@@ -804,12 +807,45 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                 </li>
             <?php } ?>
 
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
+                        <i class="fa-solid fa-truck menu-icon"></i>
+                        Courier Portal <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        <i class="fas fa-chevron-right collapse-icon"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li class="nav-item">
+                            <a class="nav-link" href="./courier-services">
+                                <i class="fa-solid fa-list-ol menu-icon"></i>
+                                Courier Services
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-rectangle-list menu-icon"></i>
+                                Order Templates
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fa-solid fa-file-invoice menu-icon"></i>
+                                Order Details
+                            </a>
+                        </li>
+
+
+                    </ul>
+                </li>
+            <?php } ?>
 
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="toggleSubmenu(event)">
                         <i class="fa-solid fa-graduation-cap menu-icon"></i>
-                        LMS Management <span class="mx-2 badge bg-warning" style="font-size: 10px;">New</span>
+                        LMS Management
                         <i class="fas fa-chevron-right collapse-icon"></i>
                     </a>
                     <ul class="submenu">
@@ -821,7 +857,14 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" href="./course-management">
+                            <a class="nav-link" href="./lms-certification">
+                                <i class="fa-solid fa-certificate menu-icon"></i>
+                                LMS Certification
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="./lms-course-management">
                                 <i class="fa-solid fa-award  menu-icon"></i>
                                 Course Management
                             </a>
@@ -880,6 +923,14 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                 </li>
             <?php } ?>
 
+            <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
+                <li class="nav-item">
+                    <a class="nav-link" href="./ticket-management">
+                        <i class="fa-solid fa-ticket menu-icon"></i>
+                        Ticket Management
+                    </a>
+                </li>
+            <?php } ?>
 
             <?php if ($UserLevel == "Admin" || $UserLevel == "Officer" || $UserLevel == "Cashier") { ?>
                 <li class="nav-item">

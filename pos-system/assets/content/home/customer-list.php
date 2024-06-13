@@ -34,8 +34,10 @@ $Cities = GetCities($link);
                         continue;
                     }
 
-                    if ($SelectArray['location_id'] != $LocationID && $SelectArray['location_id'] != -1) {
-                        continue;
+                    if ($SelectArray['customer_id'] != 1) {
+                        if ($SelectArray['location_id'] != $LocationID && $SelectArray['location_id'] != -1) {
+                            continue;
+                        }
                     }
 
 

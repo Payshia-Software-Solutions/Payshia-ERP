@@ -39,6 +39,7 @@ $availableLocations = $_POST['availableLocation']; // This is an array, so you'l
 $item_type = $_POST['item_type'];
 $item_location = $_POST['item_location'];
 $barcode = $_POST['productBarcode'];
+$openingStock = $_POST['openingStock'];
 
 
 $name_si = $_POST['name_si'];
@@ -65,7 +66,7 @@ if ($file_name == "") {
     $file_name = $item_image_tmp;
 }
 
-$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $location_list);
+$QueryResult = SaveProduct($link, $product_code, $product_name, $display_name, $print_name, $section_id, $department_id, $category_id, $brand_id, $measurement, $reorder_level, $lead_days, $cost_price, $selling_price, $minimum_price, $wholesale_price, $item_type, $item_location, $file_name, $created_by, $active_status, $generic_id, $supplier_list, $size_id, $color_id,  $product_description, $UpdateKey, $name_si, $name_ti, $price_2, $recipe_type, $barcode, $location_list, $openingStock);
 
 // Decode the JSON response
 $response = json_decode($QueryResult);

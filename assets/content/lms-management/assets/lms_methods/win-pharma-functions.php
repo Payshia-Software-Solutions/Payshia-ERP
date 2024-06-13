@@ -6,10 +6,10 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 function GetSubmissionLevelCount($UserName, $batchCode)
 {
-    global $link;
+    global $lms_link;
 
     $sql = "SELECT COUNT(DISTINCT `level_id`) AS `LevelCount` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' AND `course_code` LIKE '$batchCode'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $LevelCount = $row['LevelCount'];
@@ -20,11 +20,11 @@ function GetSubmissionLevelCount($UserName, $batchCode)
 
 
 
-function GetGames($link)
+function GetGames($lms_link)
 {
     $ArrayResult = array();
     $sql = "SELECT `GameID`, `GameTitle`, `icon_path` FROM `games_list`";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['GameID']] = $row;
@@ -33,11 +33,11 @@ function GetGames($link)
     return $ArrayResult;
 }
 
-function GetGameByCourse($link, $CourseCode, $GameID)
+function GetGameByCourse($lms_link, $CourseCode, $GameID)
 {
     $ArrayResult = array();
     $sql = "SELECT `id`, `CourseCode`, `GameId`, `Status` FROM `care_center_game` WHERE `CourseCode` LIKE '$CourseCode' AND `GameId` LIKE '$GameID'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['GameId']] = $row;
@@ -47,11 +47,11 @@ function GetGameByCourse($link, $CourseCode, $GameID)
 }
 
 
-function StudentRegisteredCourses($link, $userid)
+function StudentRegisteredCourses($lms_link, $userid)
 {
     $ArrayResult = array();
     $sql = "SELECT `course_code` FROM `student_course` WHERE `student_id` LIKE '$userid'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['course_code']] = $row;
@@ -60,11 +60,11 @@ function StudentRegisteredCourses($link, $userid)
     return $ArrayResult;
 }
 
-function GetUserData($link)
+function GetUserData($lms_link)
 {
     $ArrayResult = array();
     $sql = "SELECT `id`, `status_id`, `userid`, `fname`, `lname`, `batch_id`, `username`, `phone`, `email`, `password`, `userlevel`, `status`, `created_by`, `created_at`, `batch_lock` FROM `users`";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['username']] = $row;
@@ -73,14 +73,14 @@ function GetUserData($link)
     return $ArrayResult;
 }
 
-function CoursePayments($link, $userid)
+function CoursePayments($lms_link, $userid)
 {
     $ArrayResult = array();
     $FinalArray = array();
     $paid_amount = $discount_amount = $due_amount = 0;
 
-    $StudentCourses = StudentRegisteredCourses($link, $userid);
-    $Courses = GetCourses($link);
+    $StudentCourses = StudentRegisteredCourses($lms_link, $userid);
+    $Courses = GetCourses($lms_link);
 
     if (!empty($StudentCourses)) {
         foreach ($StudentCourses as $StudentCourse) {
@@ -99,13 +99,13 @@ function CoursePayments($link, $userid)
             $due_amount = $course_fee + $registration_fee;
 
             $sql_inner = "SELECT `img_path` FROM `img_course` WHERE `course_code` LIKE '$course_code'";
-            $result_inner = $link->query($sql_inner);
+            $result_inner = $lms_link->query($sql_inner);
             while ($row = $result_inner->fetch_assoc()) {
                 $img_path = $row["img_path"];
             }
 
             $sql = "SELECT `id`, `receipt_number`, `course_code`, `student_id`, `paid_amount`, `discount_amount`, `payment_status`, `payment_type`, `paid_date`, `created_at`, `created_by` FROM `student_payment` WHERE `student_id` LIKE '$userid' AND `course_code` LIKE '$course_code'";
-            $result = $link->query($sql);
+            $result = $lms_link->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $payment_status = $row['payment_status'];
@@ -148,13 +148,13 @@ function CoursePayments($link, $userid)
     return $FinalArray;
 }
 
-function SaveLevel($link, $course_code, $level_name, $created_by)
+function SaveLevel($lms_link, $course_code, $level_name, $created_by)
 {
     $error = "";
     $CurrentTime = date("Y-m-d H:i:s");
     $is_active = 1;
     $sql = "INSERT INTO `win_pharma_level`(`course_code`, `level_name`, `is_active`, `created_at`, `created_by`) VALUES (?, ?, ?, ?, ?)";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sssss", $param_1, $param_2, $param_3, $param_4, $param_5);
 
@@ -169,24 +169,24 @@ function SaveLevel($link, $course_code, $level_name, $created_by)
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Level saved successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function UpdateLevel($link, $course_code, $level_name, $created_by, $LevelCode, $is_active)
+function UpdateLevel($lms_link, $course_code, $level_name, $created_by, $LevelCode, $is_active)
 {
     $error = "";
     $CurrentTime = date("Y-m-d H:i:s");
     $sql = "UPDATE `win_pharma_level` SET `course_code` = ?, `level_name` = ?, `is_active` = ?, `created_at` = ?, `created_by` = ? WHERE `level_id` LIKE '$LevelCode'";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sssss", $param_1, $param_2, $param_3, $param_4, $param_5);
 
@@ -201,23 +201,23 @@ function UpdateLevel($link, $course_code, $level_name, $created_by, $LevelCode, 
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Level Updated successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function GetLevels($link, $CourseCode)
+function GetLevels($lms_link, $CourseCode)
 {
     $ArrayResult = array();
     $sql = "SELECT `level_id`, `course_code`, `level_name`, `is_active`, `created_at`, `created_by` FROM `win_pharma_level` WHERE `course_code` LIKE '$CourseCode' ORDER BY `level_id`";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['level_id']] = $row;
@@ -226,11 +226,11 @@ function GetLevels($link, $CourseCode)
     return $ArrayResult;
 }
 
-function GetTasks($link, $LevelCode)
+function GetTasks($lms_link, $LevelCode)
 {
     $ArrayResult = array();
     $sql = "SELECT `resource_id`, `level_id`, `resource_title`, `resource_data`, `created_by`, `task_cover`, `is_active` FROM `win_pharma_level_resources` WHERE `level_id` LIKE '$LevelCode'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['resource_id']] = $row;
@@ -239,13 +239,13 @@ function GetTasks($link, $LevelCode)
     return $ArrayResult;
 }
 
-function SaveTask($link, $level_id, $resource_title, $resource_data, $created_by, $task_cover)
+function SaveTask($lms_link, $level_id, $resource_title, $resource_data, $created_by, $task_cover)
 {
     $error = "";
     $CurrentTime = date("Y-m-d H:i:s");
     $is_active = 1;
     $sql = "INSERT INTO `win_pharma_level_resources`(`level_id`, `resource_title`, `resource_data`, `created_by`, `task_cover`)  VALUES (?, ?, ?, ?, ?)";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sssss", $param_1, $param_2, $param_3, $param_4, $param_5);
 
@@ -260,25 +260,25 @@ function SaveTask($link, $level_id, $resource_title, $resource_data, $created_by
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Level Task saved successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function UpdateTask($link, $level_id, $resource_title, $resource_data, $created_by, $task_cover, $resource_id)
+function UpdateTask($lms_link, $level_id, $resource_title, $resource_data, $created_by, $task_cover, $resource_id)
 {
     $error = "";
     $CurrentTime = date("Y-m-d H:i:s");
     $is_active = 1;
     $sql = "UPDATE `win_pharma_level_resources` SET `level_id` = ?, `resource_title` = ?, `resource_data` = ?, `created_by` = ?, `task_cover` = ? WHERE `resource_id` LIKE '$resource_id'";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sssss", $param_1, $param_2, $param_3, $param_4, $param_5);
 
@@ -293,23 +293,23 @@ function UpdateTask($link, $level_id, $resource_title, $resource_data, $created_
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Level Task Updated successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function GetWinpharmaSubmissions($link, $UserName)
+function GetWinpharmaSubmissions($lms_link, $UserName)
 {
     $ArrayResult = array();
     $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `attempt`, `course_code`, `reason`, `update_by`, `update_at` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' ORDER BY CASE WHEN grade_status = 'Pending' THEN 0 ELSE 1 END, submission_id DESC";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[] = $row;
@@ -318,11 +318,11 @@ function GetWinpharmaSubmissions($link, $UserName)
     return $ArrayResult;
 }
 
-function GetWinpharmaSubmissionsByID($link, $submission_id)
+function GetWinpharmaSubmissionsByID($lms_link, $submission_id)
 {
     $ArrayResult = array();
     $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `attempt`, `course_code`, `reason`, `update_by`, `update_at` FROM `win_pharma_submission` WHERE `submission_id` LIKE '$submission_id'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[] = $row;
@@ -331,11 +331,11 @@ function GetWinpharmaSubmissionsByID($link, $submission_id)
     return $ArrayResult;
 }
 
-function GetWinpharmaSubmissionsByCourse($link, $CourseCode)
+function GetWinpharmaSubmissionsByCourse($lms_link, $CourseCode)
 {
     $ArrayResult = array();
     $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `attempt`, `course_code`,`date_time`, `reason`, `update_by`, `update_at`  FROM `win_pharma_submission` WHERE `course_code` LIKE '$CourseCode' ORDER BY CASE WHEN grade_status = 'Pending' THEN 0 ELSE 1 END, submission_id ASC";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[] = $row;
@@ -344,11 +344,11 @@ function GetWinpharmaSubmissionsByCourse($link, $CourseCode)
     return $ArrayResult;
 }
 
-function GetWinpharmaSubmissionsID($link, $UserName)
+function GetWinpharmaSubmissionsID($lms_link, $UserName)
 {
     $ArrayResult = array();
     $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `attempt`, `course_code`,`date_time`, `reason`, `update_by`, `update_at` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' ORDER BY `submission_id` DESC";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['submission_id']] = $row;
@@ -357,10 +357,10 @@ function GetWinpharmaSubmissionsID($link, $UserName)
     return $ArrayResult;
 }
 
-function GetAttemptCount($link, $UserName, $resource_id)
+function GetAttemptCount($lms_link, $UserName, $resource_id)
 {
     $sql = "SELECT COUNT(submission_id) AS `AttemptCount` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' AND `resource_id` LIKE '$resource_id'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $AttemptCount = $row['AttemptCount'];
@@ -369,11 +369,11 @@ function GetAttemptCount($link, $UserName, $resource_id)
     return $AttemptCount;
 }
 
-function GetTopLevel($link, $UserName, $CourseCode)
+function GetTopLevel($lms_link, $UserName, $CourseCode)
 {
     $level_id = -1;
     $sql = "SELECT `level_id` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' AND `course_code` LIKE '$CourseCode' ORDER BY `level_id` DESC";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $level_id = $row['level_id'];
@@ -385,11 +385,41 @@ function GetTopLevel($link, $UserName, $CourseCode)
 
 
 
-function GetCourseTopLevel($link, $course_code)
+function GetTopLevelAllUsers($lms_link, $CourseCode)
+{
+    $topLevels = []; // Array to store top levels for all users
+    $sql = "SELECT `index_number`, MAX(`level_id`) AS `top_level` FROM `win_pharma_submission` WHERE `course_code` = '$CourseCode' GROUP BY `index_number`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $indexNumber = $row['index_number'];
+            $topLevel = $row['top_level'];
+            $topLevels[$indexNumber] = $topLevel; // Store top level for each user
+        }
+    }
+    return $topLevels;
+}
+
+function GetTopLevelAllUsersCompleted($lms_link, $CourseCode)
+{
+    $topLevels = []; // Array to store top levels for all users
+    $sql = "SELECT `index_number`, MAX(`level_id`) AS `top_level` FROM `win_pharma_submission` WHERE `course_code` = '$CourseCode' AND `grade_status` LIKE 'Completed' GROUP BY `index_number`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $indexNumber = $row['index_number'];
+            $topLevel = $row['top_level'];
+            $topLevels[$indexNumber] = $topLevel; // Store top level for each user
+        }
+    }
+    return $topLevels;
+}
+
+function GetCourseTopLevel($lms_link, $course_code)
 {
     $level_id = -1;
     $sql = "SELECT `level_id`, `course_code`, `level_name`, `is_active`, `created_at`, `created_by` FROM `win_pharma_level` WHERE `course_code` LIKE '$course_code' ORDER BY `level_id` LIMIT 1";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $level_id = $row['level_id'];
@@ -402,10 +432,10 @@ function GetCourseTopLevel($link, $course_code)
 
 
 
-function GetLevelCount($link, $UserName, $CourseCode)
+function GetLevelCount($lms_link, $UserName, $CourseCode)
 {
     $sql = "SELECT COUNT(DISTINCT `level_id`) AS `LevelCount` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' AND `course_code` LIKE '$CourseCode'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $LevelCount = $row['LevelCount'];
@@ -414,11 +444,11 @@ function GetLevelCount($link, $UserName, $CourseCode)
     return $LevelCount;
 }
 
-function GetSubmitionResult($link, $UserName, $resource_id)
+function GetSubmitionResult($lms_link, $UserName, $resource_id)
 {
     $ArrayResult = array();
     $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `date_time`, `attempt`, `course_code`, `reason`, `update_by`, `update_at` FROM `win_pharma_submission` WHERE `index_number` LIKE '$UserName' AND `resource_id` LIKE '$resource_id' ORDER BY `submission_id` DESC";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[] = $row;
@@ -427,11 +457,11 @@ function GetSubmitionResult($link, $UserName, $resource_id)
     return $ArrayResult;
 }
 
-function GetButtonCounts($link, $CourseCode)
+function GetButtonCounts($lms_link, $CourseCode)
 {
     $ArrayResult = array();
     $sql = "SELECT `grade_status`, COUNT(`submission_id`) AS `EntriesCount` FROM `win_pharma_submission` WHERE `course_code` LIKE '$CourseCode' GROUP BY `grade_status`";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[$row['grade_status']] = $row;
@@ -440,12 +470,12 @@ function GetButtonCounts($link, $CourseCode)
     return $ArrayResult;
 }
 
-function RequestReCorrection($link, $index_number, $submission_id, $grade, $grade_status)
+function RequestReCorrection($lms_link, $index_number, $submission_id, $grade, $grade_status)
 {
     $error = "";
 
     $sql = "SELECT `recorrection_count` FROM `win_pharma_submission` WHERE `submission_id` LIKE '$submission_id'";
-    $result = $link->query($sql);
+    $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $recorrection_count = $row['recorrection_count'];
@@ -454,7 +484,7 @@ function RequestReCorrection($link, $index_number, $submission_id, $grade, $grad
     $recorrection_count += 1;
 
     $sql = "UPDATE `win_pharma_submission` SET `grade` = ?, `grade_status` = ?, `recorrection_count` = ? WHERE `index_number` LIKE '$index_number' AND `submission_id` = '$submission_id'";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sss", $param_1, $param_2, $param_3);
 
@@ -467,25 +497,25 @@ function RequestReCorrection($link, $index_number, $submission_id, $grade, $grad
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Recorrection Submitted successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function SaveGrade($link, $index_number, $submission_id, $grade, $grade_status, $reason, $update_by)
+function SaveGrade($lms_link, $index_number, $submission_id, $grade, $grade_status, $reason, $update_by)
 {
     $error = "";
     date_default_timezone_set("Asia/Colombo");
     $update_at = date("Y-m-d H:i:s");
     $sql = "UPDATE `win_pharma_submission` SET `grade` = ?, `grade_status` = ?, `reason` = ?, `update_by` = ?, `update_at` = ? WHERE `index_number` LIKE '$index_number' AND `submission_id` = '$submission_id'";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "sssss", $param_1, $param_2, $param_3, $param_4, $param_5);
 
@@ -500,26 +530,26 @@ function SaveGrade($link, $index_number, $submission_id, $grade, $grade_status, 
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Grade Updated successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;
 }
 
-function AddSubmission($link, $index_number, $level_id, $resource_id, $submission, $attempt, $course_code)
+function AddSubmission($lms_link, $index_number, $level_id, $resource_id, $submission, $attempt, $course_code)
 {
     date_default_timezone_set("Asia/Colombo");
     $error = "";
     $CurrentTime = date("Y-m-d H:i:s");
     $grade = 0;
     $sql = "INSERT INTO `win_pharma_submission`(`index_number`, `level_id`, `resource_id`, `submission`, `grade`, `date_time`, `attempt`, `course_code`)  VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    if ($stmt_sql = mysqli_prepare($link, $sql)) {
+    if ($stmt_sql = mysqli_prepare($lms_link, $sql)) {
         // Bind variables to the prepared statement as parameters
         mysqli_stmt_bind_param($stmt_sql, "ssssssss", $param_1, $param_2, $param_3, $param_4, $param_5, $param_6, $param_7, $param_8);
 
@@ -537,13 +567,13 @@ function AddSubmission($link, $index_number, $level_id, $resource_id, $submissio
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Submission successfully');
         } else {
-            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
         }
 
         // Close statement
         mysqli_stmt_close($stmt_sql);
     } else {
-        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $link->error);
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . $lms_link->error);
     }
 
     return $error;

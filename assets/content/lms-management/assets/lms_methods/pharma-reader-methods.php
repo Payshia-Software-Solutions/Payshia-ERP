@@ -5,12 +5,6 @@ include __DIR__ . '/../../../../../include/config.php'; // Database Configuratio
 // Enable MySQLi error reporting
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-
-
-
-// 
-
-
 function GetReaderPrescriptions()
 {
     global $lms_link;
@@ -234,4 +228,22 @@ function GetReaderOverallGrade($loggedUser)
     );
 
     return $GradeArray;
+}
+
+
+function GetAllUserReaderCounts()
+{
+
+    $arrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT * FROM `reader_attempts` GROUP BY `user_id`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $arrayResult[$row['user_id']] = $row;
+        }
+    }
+
+    return $arrayResult;
 }

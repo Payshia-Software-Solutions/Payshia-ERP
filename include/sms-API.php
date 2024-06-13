@@ -1,5 +1,5 @@
 <?php
-function SentSMS($mobile, $senderId = 'Pharma C.', $message)
+function SentSMS($mobile, $senderId = 'Pharma C.', $message = "Waiting..!")
 {
     $MSISDN = $mobile;
     $SRC = $senderId;

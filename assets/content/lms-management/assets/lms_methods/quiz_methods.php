@@ -7,22 +7,6 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 
 
-function GetQuizTopicsByCourse($courseCode)
-{
-    global $lms_link;
-    $ArrayResult = array();
-
-    // Get Default Course
-    $sql = "SELECT `id`, `topicID`, `CourseCode`, `created_at`, `created_by`, `active_status` FROM `quiz_topic_course` WHERE `CourseCode` LIKE '$courseCode'";
-    $result = $lms_link->query($sql);
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $ArrayResult[$row['topicID']] = $row;
-        }
-    }
-
-    return $ArrayResult;
-}
 
 function GetQuizTopics()
 {
@@ -97,6 +81,24 @@ function GetQuizSubmissionByUser($loggedUser)
 }
 
 
+function GetQuizTopicsByCourse($courseCode)
+{
+    global $lms_link;
+    $ArrayResult = array();
+
+    // Get Default Course
+    $sql = "SELECT `id`, `topicID`, `CourseCode`, `created_at`, `created_by`, `active_status` FROM `quiz_topic_course` WHERE `CourseCode` LIKE '$courseCode'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['topicID']] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+
 function GetOverallGrade($loggedUser, $courseCode)
 {
     $overallGrade = 0;
@@ -163,6 +165,8 @@ function GetOverallGrade($loggedUser, $courseCode)
 
     return $overallGrade;
 }
+
+
 
 function GetGradeByQuiz($quizId, $loggedUser)
 {
@@ -474,4 +478,41 @@ function SaveCourseTopic($topicId, $courseCode, $loggedUser)
     }
 
     return json_encode($error);
+}
+
+
+
+function GetQuizSubmissionByAllUser()
+{
+    global $lms_link;
+    $ArrayResult = array();
+
+    // Get Default Course
+    $sql = "SELECT `id`, `user_id`, `question_id`, `selected_answer`, `score`, `answer_status`, `created_at` FROM `lesson_questions_submition`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+function GetAllQuizzes()
+{
+    global $lms_link;
+    $ArrayResult = array();
+
+    // Get Default Course
+    $sql = "SELECT `id`, `lesson_id`, `course_code`, `question_id`, `question`, `created_by`, `created_at`, `question_status`, `question_content`, `answer_1`, `answer_2`, `answer_3`, `answer_4`, `correct_answer` FROM `lesson_questions`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['lesson_id'] . "-" . $row['question_id']] = $row;
+        }
+    }
+
+    return $ArrayResult;
 }

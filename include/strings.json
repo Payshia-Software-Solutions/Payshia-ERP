@@ -1,0 +1,8 @@
+{
+    "employeeType": ["Full-time", "Part-time", "Contract", "Intern"],
+    "workLocation": ["Onsite", "Hybrid", "Remote"],
+    "departmentList": ["IT", "Sales"],
+    "genderList": ["Male", "Female"],
+    "marriedList": ["Married", "Single"],
+    "statusValues": ["In-active", "Active", "Suspended"]
+}

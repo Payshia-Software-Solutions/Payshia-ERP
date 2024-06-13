@@ -140,6 +140,25 @@
         </div>
     </div>
 
+    <div class="loading-popup" id="payment-message" style="display: none;">
+        <div class="loading-popup-content">
+            <div class="row mb-4">
+                <div class="col-12 text-center">
+                    <img src="./assets/images/pos-logo.png" style="height: 40px">
+                </div>
+                <div class="border-bottom mt-3"></div>
+                <div class="text-center mt-3">
+                    <div class="alert alert-warning">
+                        <h5 class="mb-0">POS Service is disabled due to the overdue Payments</h5>
+                    </div>
+
+                    <h4>Please do the Payments to reactivate the service. this is an automated task.</h4>
+                    <h1>You Have to Pay <span> LKR 3,500 </span></h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="error-log"></div>
 
 

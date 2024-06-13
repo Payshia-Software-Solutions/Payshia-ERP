@@ -48,7 +48,22 @@ if ($current_status == 1) {
     $color = "dark";
     $readOnlyStatus = 'readonly = "readonly"';
     $deliveryItemValue = $cod_amount;
+} else if ($current_status == 4) {
+    $active_status = "Removed";
+    $color = "danger";
+    $readOnlyStatus = 'readonly = "readonly"';
+    $deliveryItemValue = $cod_amount;
 }
+
+
+if ($trackingNumber == "") {
+    $trackingNumber = 'DEF' . count(GetOrders()) + 1;
+}
+
+if ($package_weight == "") {
+    $package_weight = 1;
+}
+
 
 $qrText = "https://pharmacollege.lk/track-order?trackingNumber=" . $trackingNumber;
 $deliveryItem = $Deliveries[$delivery_id]['delivery_title'];
@@ -115,6 +130,7 @@ $courseDetails = getLmsBatchByCourse($course_code);
                             <?php
                             if ($trackingNumber != "") {
                             ?>
+
                                 <button onclick="PrintShippingLabel('<?= $ref_id ?>')" class="btn btn-light mt-2" type="button"><i class="fa-solid fa-print"></i> Print Delivery Label</button>
                             <?php
                             }
@@ -124,6 +140,9 @@ $courseDetails = getLmsBatchByCourse($course_code);
                         <div class="col-12 col-md-4">
                             <p class="mb-0 text-secondary">Order Item</p>
                             <h4 class="mb-0"><?= $deliveryItem ?></h4>
+                            <button class="btn btn-danger view-button mt-2" type="button" onclick="UpdateStatusOrder('<?= $ref_id ?>', 4, '<?= $studentBatch ?>', '<?= $orderType ?>')">
+                                <i class="fa-solid fa-trash"></i> Remove
+                            </button>
                         </div>
 
                         <div class="col-12 col-md-4">
@@ -141,7 +160,6 @@ $courseDetails = getLmsBatchByCourse($course_code);
                     <?php if ($trackingNumber != "") {
                     ?>
                         <p class="mb-0 text-secondary">QR Code</p>
-                        <img src="<?= generateQRCode($qrText) ?>" style="width: 100px">
                     <?php
                     }
                     ?>

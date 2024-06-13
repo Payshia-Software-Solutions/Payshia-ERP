@@ -2,6 +2,8 @@
     "require": {
         "picqer/php-barcode-generator": "^0.3.0",
         "bacon/bacon-qr-code": "^2.0",
-        "giggsey/libphonenumber-for-php": "^8.13"
+        "giggsey/libphonenumber-for-php": "^8.13",
+        "phpoffice/phpspreadsheet": "^2.0",
+        "tecnickcom/tcpdf": "^6.7"
     }
 }

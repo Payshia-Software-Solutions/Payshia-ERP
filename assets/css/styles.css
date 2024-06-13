@@ -1,6 +1,14 @@
 body {
-    background-color: #f0f3f4 !important;
+    /* background-color: #f0f3f4 !important; */
     padding: 5px;
+}
+
+.backlight {
+    background-color: #f0f3f4 !important;
+}
+
+.back_dark {
+    background-color: #1c1c1f;
 }
 
 .sidebar {
@@ -789,15 +797,6 @@ a {
     /* Change the order to move the column to the right */
 }
 
-@media only screen and (max-width: 768px) {
-    .loading-popup-content {
-        width: 100% !important;
-        height: 100% !important;
-        max-height: 100vh !important;
-        max-width: 100% !important;
-    }
-}
-
 @media only screen and (max-width: 992px) {
     .login {
         padding: 0px;
@@ -957,7 +956,8 @@ a {
 
 /* Loading popup styles */
 
-.loading-popup {
+.loading-popup,
+.loading-popup-right {
     display: none;
     position: fixed;
     top: 0;
@@ -971,6 +971,14 @@ a {
     align-items: center;
 }
 
+.loading-popup {
+    z-index: 999;
+}
+
+.flex-end {
+    justify-content: flex-end !important;
+}
+
 .loading-popup-content {
     max-height: 90vh;
     max-width: 90%;
@@ -981,6 +989,50 @@ a {
     border-radius: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
     animation: popupFade 0.3s ease-in-out;
+}
+
+.loading-popup-content-full {
+    height: 100vh;
+    width: 100%;
+    right: 0px !important;
+    overflow-y: auto;
+    background-color: #fff;
+    padding: 25px;
+    min-width: 50%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    animation: popupFade 0.3s ease-in-out;
+}
+
+.loading-popup-content-right {
+    height: 100vh;
+    width: 70%;
+    right: 0px !important;
+    overflow-y: auto;
+    background-color: #fff;
+    padding: 25px;
+    z-index: 996;
+    min-width: 50%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    animation: RightToLeft 0.3s ease-in-out;
+    align-items: end;
+}
+
+@media only screen and (max-width: 768px) {
+    .loading-popup-content {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+        max-width: 100% !important;
+    }
+
+    .loading-popup-content-right {
+        width: 100% !important;
+        height: 100% !important;
+        max-height: 100vh !important;
+        max-width: 100% !important;
+    }
 }
 
 
@@ -1002,8 +1054,27 @@ a {
     }
 }
 
+@keyframes RightToLeft {
+    from {
+        opacity: 0.5;
+        transform: translateX(100%) scale(1);
+        /* Start from right outside the screen */
+    }
+
+    50% {
+        transform: translateX(-5%) scale(1);
+        /* Overshoot slightly to the left */
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        /* End at the center */
+    }
+}
+
 .form-check-input {
-    width: auto !important;
+    /* width: auto !important; */
     margin-right: 10px;
 }
 

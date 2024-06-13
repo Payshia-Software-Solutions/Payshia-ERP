@@ -2,7 +2,6 @@
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
 include '../../../../include/lms-functions.php';
-include '../../../../include/sms-API.php';
 
 $Products = GetProducts($link);
 
@@ -48,7 +47,10 @@ Ceylon Pharma College
 www.pharmacollege.lk';
 }
 
-SentSMS($phone_1, 'Pharma C.', $messageText);
+if ($orderStatus != 4) {
+    SentSMS($phone_1, 'Pharma C.', $messageText);
+}
+
 
 echo $queryResult;
 

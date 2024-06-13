@@ -64,6 +64,22 @@ function GetLmsStudents()
     return $ArrayResult;
 }
 
+
+function GetLmsStudentsByUserId()
+{
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT * FROM `user_full_details` ORDER BY `id` DESC";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['student_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
 function GetLmsStudentsByUserName($userName)
 {
     $ArrayResult = array();
@@ -88,6 +104,84 @@ function getAllUserEnrollments()
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $ArrayResult[] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function getAllUserEnrollmentsByCourse($courseCode)
+{
+    $ArrayResult = array();
+    global $lms_link;
+    $sql = "SELECT `id`, `course_code`, `student_id`, `enrollment_key`, `created_at` FROM `student_course` WHERE `course_code` LIKE '$courseCode' ORDER BY `id` DESC";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function CertificatePrintStatus()
+{
+
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT `id`, `student_number`, `certificate_id`, `print_date`, `print_status`, `print_by`, `type`, `course_code` FROM `user_certificate_print_status`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['certificate_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function CertificatePrintStatusByCourse($courseCode, $type)
+{
+
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT `id`, `student_number`, `certificate_id`, `print_date`, `print_status`, `print_by`, `type`, `course_code` FROM `user_certificate_print_status` WHERE `course_code` LIKE '$courseCode' AND `type` LIKE '$type'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['student_number']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function CertificatePrintStatusByCourseStudent($courseCode, $studentNumber)
+{
+
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT `id`, `student_number`, `certificate_id`, `print_date`, `print_status`, `print_by`, `type`, `course_code` FROM `user_certificate_print_status` WHERE `course_code` LIKE '$courseCode' AND `student_number` LIKE '$studentNumber'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['type']] = $row;
+        }
+    }
+    return  $ArrayResult;
+}
+
+
+function GetStudentEnrollCounts()
+{
+    $ArrayResult = array();
+    global $lms_link;
+    $sql = "SELECT COUNT(`id`) AS `studentCount`, `course_code`, `student_id`, `enrollment_key`, `created_at` FROM `student_course` GROUP BY `course_code` ORDER BY `id` DESC ";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['course_code']] = $row['studentCount'];
         }
     }
     return $ArrayResult;
@@ -213,7 +307,10 @@ function UpdateOrderStatus($refId, $trackingNumber, $orderStatus, $codAmount, $p
         $columnName = "packed_date";
     } else if ($orderStatus == 3) {
         $columnName = "send_date";
+    } else if ($orderStatus == 4) {
+        $columnName = 'removed_date';
     }
+
 
 
     // If the stock entry doesn't exist, insert a new one
@@ -735,4 +832,383 @@ function insertStudentPayment($courseCode, $studentNumber, $paymentMethod, $paym
     } catch (Exception $e) {
         return array('status' => 'error', 'message' => $e->getMessage());
     }
+}
+
+
+function GetCertificateTemplates()
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `certificate_template`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['template_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GetTemplateConfig($courseCode)
+{
+    global $lms_link;
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `certificate_course_end_date` WHERE `CourseCode` LIKE '$courseCode'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['CourseCode']] = $row;
+        }
+    }
+
+    return $ArrayResult;
+}
+
+function SaveOrUpdateTemplateConfig($courseCode, $completeDate, $defaultTemplate, $convocationDate, $convocationPlace, $transcriptBack)
+{
+    global $lms_link;
+
+    $error = array();
+    // Prepare SQL statement to check if the record exists
+    $sql_check = "SELECT `id` FROM `certificate_course_end_date` WHERE `CourseCode` = ?";
+    $stmt_check = $lms_link->prepare($sql_check);
+    $stmt_check->bind_param("s", $courseCode);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+
+
+    if ($result_check->num_rows > 0) {
+        // Update the existing record
+        $sql_update = "UPDATE `certificate_course_end_date` SET `CompleteDate` = ?, `defaultTemplate` = ?, `convocation_date` = ?, `convocation_place` = ?, `transcript_back` = ? WHERE `CourseCode` = ?";
+        $stmt_update = $lms_link->prepare($sql_update);
+        $stmt_update->bind_param("ssssss", $completeDate, $defaultTemplate, $convocationDate, $convocationPlace, $transcriptBack, $courseCode);
+        if ($stmt_update->execute()) {
+            $error = array('status' => 'success', 'message' => 'Record Updated successfully');
+        } else {
+            $error = array('status' => 'success', 'message' => "Error updating record: " . $stmt_update->error);
+        }
+    } else {
+        // Insert a new record
+        $sql_insert = "INSERT INTO `certificate_course_end_date` (`CourseCode`, `CompleteDate`, `defaultTemplate`, `convocation_date`, `convocation_place`, `transcript_back`) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt_insert = $lms_link->prepare($sql_insert);
+        $stmt_insert->bind_param("ssssss", $courseCode, $completeDate, $convocationDate, $convocationPlace, $transcriptBack, $defaultTemplate);
+        if ($stmt_insert->execute()) {
+            $error = array('status' => 'success', 'message' => 'Record saved successfully');
+        } else {
+            $error = array('status' => 'success', 'message' => "Error updating record: " . $stmt_insert->error);
+        }
+    }
+
+    return $error;
+}
+
+
+function GenerateCertificateId($type, $prefix)
+{
+
+    global $lms_link;
+
+    $sql = "SELECT COUNT(id) FROM user_certificate_print_status WHERE `type` LIKE '$type';";
+    $result = $lms_link->query($sql);
+    while ($row = $result->fetch_assoc()) {
+        $previous_code = $row["COUNT(id)"];
+        $previous_code = $previous_code + 1;
+    }
+
+    $certificateId = $prefix . $previous_code;
+
+    return $certificateId;
+}
+
+function GetCertificateID($certificateType, $studentNumber, $courseCode)
+{
+    global $lms_link;
+
+    $error = array();
+    // Prepare SQL statement to check if the record exists
+    $sql_check = "SELECT `certificate_id` FROM `user_certificate_print_status` WHERE `student_number` = ? AND `course_code` LIKE ? AND `type` LIKE ?";
+    $stmt_check = $lms_link->prepare($sql_check);
+    $stmt_check->bind_param("sss", $studentNumber,  $courseCode, $certificateType);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    if ($result_check->num_rows > 0) {
+        $row = $result_check->fetch_assoc();
+        return $row['certificate_id'];
+    } else {
+        return null;
+    }
+}
+
+
+
+function EnterCertificateEntry($printDate, $printStatus, $printedBy, $certificateType, $studentNumber, $courseCode)
+{
+    global $lms_link;
+
+    $error = array();
+    // Prepare SQL statement to check if the record exists
+    $sql_check = "SELECT `id` FROM `user_certificate_print_status` WHERE `student_number` = ? AND `course_code` LIKE ? AND `type` LIKE ?";
+    $stmt_check = $lms_link->prepare($sql_check);
+    $stmt_check->bind_param("sss", $studentNumber,  $courseCode, $certificateType);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+
+
+    if ($result_check->num_rows > 0) {
+        // Update the existing record
+        $sql_update = "UPDATE `user_certificate_print_status` SET `print_date` = ?, `print_status` = ?, `print_by` = ?, `type` = ? WHERE `student_number` = ? AND `course_code` LIKE ?";
+        $stmt_update = $lms_link->prepare($sql_update);
+        $stmt_update->bind_param("ssssss", $printDate, $printStatus, $printedBy, $certificateType, $studentNumber, $courseCode);
+        if ($stmt_update->execute()) {
+            $error = array('status' => 'success', 'message' => 'Record Updated successfully');
+        } else {
+            $error = array('status' => 'success', 'message' => "Error updating record: " . $stmt_update->error);
+        }
+    } else {
+        if ($certificateType == "Transcript") {
+            $certificateId = GenerateCertificateId('Transcript', 'CTR');
+        } else if ($certificateType == "Certificate") {
+            $certificateId = GenerateCertificateId('Certificate', 'CREF');
+        } else {
+            $certificateId = GenerateCertificateId('Workshop-Certificate', 'WC');
+        }
+        // Insert a new record
+        $sql_insert = "INSERT INTO `user_certificate_print_status` (`student_number`, `certificate_id`, `print_date`, `print_status`, `print_by`, `type`, `course_code`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt_insert = $lms_link->prepare($sql_insert);
+        $stmt_insert->bind_param("sssssss", $studentNumber, $certificateId, $printDate, $printStatus, $printedBy, $certificateType, $courseCode);
+        if ($stmt_insert->execute()) {
+            $error = array('status' => 'success', 'message' => 'Record saved successfully');
+        } else {
+            $error = array('status' => 'success', 'message' => "Error updating record: " . $stmt_insert->error);
+        }
+    }
+
+    return $error;
+}
+
+
+function GetTemplate($TemplateID)
+{
+    global $lms_link;
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `certificate_template` WHERE `template_id` LIKE '$TemplateID'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row["template_id"]] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function UpdateUserFullDetails($user_id, $first_name, $last_name, $gender, $user_name, $civil_status, $phone_number, $email_address, $address_l1, $address_l2, $city, $whatsapp_number, $nic_number, $district, $postalCode, $full_name, $name_with_initials, $name_on_certificate, $birth_day, $update_by)
+{
+    global $lms_link;
+    $error = array('status' => 'initial', 'message' => '', 'username' => "Not Set");
+
+
+    $sql = "UPDATE `user_full_details` SET `student_id` = ?, `civil_status` = ?, `first_name` = ?, `last_name` = ?, `gender`=?, `telephone_1` = ?, `e_mail` = ?,`username` = ?, `address_line_1` = ?, `address_line_2` = ?, `city` = ?, `telephone_2` = ?, `nic` = ?, `district` = ?, `postal_code`= ?, `full_name` = ?, `name_with_initials` = ?, `name_on_certificate` = ?, `birth_day`= ?, `updated_by`= ? WHERE `username` LIKE '$user_name'";
+
+
+    if ($stmt = mysqli_prepare($lms_link, $sql)) {
+
+        // Bind variables to the prepared statement as parameters
+        mysqli_stmt_bind_param($stmt, "ssssssssssssssssssss", $user_id, $civil_status, $first_name, $last_name, $gender, $phone_number, $email_address, $user_name, $address_l1,  $address_l2,  $city, $whatsapp_number, $nic_number, $district, $postalCode, $full_name, $name_with_initials, $name_on_certificate, $birth_day, $update_by);
+
+        // Execute the statement
+        if (mysqli_stmt_execute($stmt)) {
+            $affected_rows = mysqli_stmt_affected_rows($stmt);
+            $error = array('status' => 'success', 'message' => 'Full Details Updated successfully', 'affected_rows' => $affected_rows, 'username' => $user_name);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link), 'username' => "Not Set");
+        }
+        // Close statement
+        mysqli_stmt_close($stmt);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link), 'username' => "Not Set");
+    }
+
+    // Return the error as a JSON-encoded string
+    return json_encode($error);
+}
+
+
+function UpdateMainUser($first_name, $last_name, $civil_status, $phone_number, $email_address, $user_name)
+{
+    global $lms_link;
+    $error = array('status' => 'initial', 'message' => '');
+
+    $sql = "UPDATE users SET `fname` = ? , `lname` = ? , `status_id` = ? , `phone` = ? , `email` = ? WHERE `username` = ? ";
+
+
+    if ($stmt = mysqli_prepare($lms_link, $sql)) {
+        // Bind variables to the prepared statement as parameters
+        mysqli_stmt_bind_param($stmt, "ssssss", $first_name, $last_name, $civil_status, $phone_number, $email_address, $user_name);
+
+        // Execute the statement
+        if (mysqli_stmt_execute($stmt)) {
+            $affected_rows = mysqli_stmt_affected_rows($stmt);
+            $error = array('status' => 'success', 'message' => 'Account Updated successfully', 'affected_rows' => $affected_rows);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link));
+        }
+        // Close statement
+        mysqli_stmt_close($stmt);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link));
+    }
+
+    // Return the error as a JSON-encoded string
+    return json_encode($error);
+}
+
+
+function GetFinalGrade($UserName, $CourseCode)
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+    $final_percentage_value = 0;
+    $sql_inner = "SELECT `result` FROM `certificate_user_result` WHERE `index_number` LIKE '$UserName' AND `course_code` LIKE '$CourseCode' AND `title_id` LIKE 'OverRallGrade'";
+    $result_inner = $lms_link->query($sql_inner);
+    if ($result_inner->num_rows > 0) {
+        while ($row = $result_inner->fetch_assoc()) {
+            $final_percentage_value = $row['result'];
+        }
+    }
+
+    $ArrayResult["grade"] = $final_percentage_value;
+
+    if ($final_percentage_value == "Result Not Submitted") {
+        $finalGrade = "Result Not Submitted";
+    } elseif ($final_percentage_value >= 90) {
+        $finalGrade = "A+";
+    } elseif ($final_percentage_value >= 80) {
+        $finalGrade = "A";
+    } elseif ($final_percentage_value >= 75) {
+        $finalGrade = "A-";
+    } elseif ($final_percentage_value >= 70) {
+        $finalGrade = "B+";
+    } elseif ($final_percentage_value >= 65) {
+        $finalGrade = "B";
+    } elseif ($final_percentage_value >= 60) {
+        $finalGrade = "B-";
+    } elseif ($final_percentage_value >= 55) {
+        $finalGrade = "C+";
+    } elseif ($final_percentage_value >= 45) {
+        $finalGrade = "C";
+    } elseif ($final_percentage_value >= 40) {
+        $finalGrade = "C-";
+    } elseif ($final_percentage_value >= 35) {
+        $finalGrade = "D+";
+    } elseif ($final_percentage_value >= 30) {
+        $finalGrade = "D";
+    } elseif ($final_percentage_value >= 0) {
+        $finalGrade = "E";
+    }
+
+    $ArrayResult["final_grade"] = $finalGrade;
+
+    return $ArrayResult;
+}
+
+function GetCompanyDetails()
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `company_name`, `company_address`, `company_address2`, `company_city`, `company_postalcode`, `company_email`, `company_telephone`, `company_telephone2`, `job_position` , `owner_name` FROM `company`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['id']] = $row;
+        }
+    }
+
+    return $ArrayResult[1];
+}
+
+
+
+function GetAssignmentSubmissions()
+{
+    global $lms_link;
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `assignment_id`, `file_path`, `created_by`, `created_at`, `status`, `grade` FROM `assignment_submittion`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $assignmentId = $row["assignment_id"];
+            $submitBy = $row["created_by"];
+            $ArrayResult[$assignmentId . '-' . $submitBy] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+
+function GetAssignmentSubmissionsByUser($studentNumber)
+{
+    global $lms_link;
+    $ArrayResult = array();
+    $sql = "SELECT `id`, `assignment_id`, `file_path`, `created_by`, `created_at`, `status`, `grade` FROM `assignment_submittion` WHERE `created_by` = '$studentNumber'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $assignmentId = $row["assignment_id"];
+            $ArrayResult[$assignmentId] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+
+function GetAssignments($courseCode)
+{
+    global $lms_link;
+    $ArrayResult = array();
+    $sql = "SELECT * FROM `assignment` WHERE `course_code` LIKE '$courseCode'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row["assignment_id"]] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+
+function SaveEditedAssignmentGrade($assignmentId, $gradeValue, $studentNumber)
+{
+    global $lms_link;
+    $error = array('status' => 'initial', 'message' => '', 'username' => "Not Set");
+
+    $sql = "INSERT INTO `assignment_submittion` (`assignment_id`, `created_by`, `created_at`, `status`, `grade`) 
+        VALUES (?, ?, NOW(), 'Graded', ?)
+        ON DUPLICATE KEY UPDATE grade = VALUES(grade)";
+
+
+    if ($stmt = mysqli_prepare($lms_link, $sql)) {
+        mysqli_stmt_bind_param($stmt, "sss", $assignmentId, $studentNumber, $gradeValue);
+
+        if (mysqli_stmt_execute($stmt)) {
+            $affected_rows = mysqli_stmt_affected_rows($stmt);
+            $error = array('status' => 'success', 'message' => 'Grade updated successfully', 'affected_rows' => $affected_rows);
+        } else {
+            $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link));
+        }
+        mysqli_stmt_close($stmt);
+    } else {
+        $error = array('status' => 'error', 'message' => 'Something went wrong. Please try again later. ' . mysqli_error($lms_link));
+    }
+
+    return $error;
 }

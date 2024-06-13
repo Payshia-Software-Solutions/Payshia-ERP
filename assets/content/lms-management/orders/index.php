@@ -61,6 +61,9 @@ $InactiveCount = 0;
         <button type="button" onclick="GetUploadExcel()" class="btn btn-dark btn-sm">
             Download
         </button>
+        <button type="button" onclick="GetUploadExcelNew()" class="btn btn-dark btn-sm">
+            Download New
+        </button>
     </div>
 
 </div>
@@ -125,6 +128,7 @@ $InactiveCount = 0;
                                     if (!empty($deliveryOrders)) {
                                         $RowNumber = 0;
                                         foreach ($deliveryOrders as $selectedArray) {
+
                                             $active_status = "Initial";
                                             $color = "warning";
                                             $ref_id = $selectedArray['id'];
@@ -168,6 +172,10 @@ $InactiveCount = 0;
                                                 continue;
                                                 $active_status = "Delivered";
                                                 $color = "dark";
+                                            } else if ($current_status == 4) {
+                                                continue;
+                                                $active_status = "Removed";
+                                                $color = "danger";
                                             }
 
                                             $getStatusData = GetProductLinkStatus($delivery_id);
@@ -195,6 +203,7 @@ $InactiveCount = 0;
                                                             <button class="btn btn-sm btn-dark view-button" type="button" onclick="OpenOrder('<?= $ref_id ?>', '<?= $studentBatch ?>', '<?= $orderType ?>')">
                                                                 <i class="fa-solid fa-eye"></i> Open
                                                             </button>
+
                                                         <?php } else { ?>
                                                             <button class="btn btn-secondary btn-sm" type="button" onclick="ProductLinkERP('<?= $delivery_id ?>')"><i class="fa-solid fa-plus"></i> Product Link with ERP</button>
                                                         <?php  } ?>
@@ -266,6 +275,15 @@ $InactiveCount = 0;
                                             $received_date = $selectedArray['received_date'];
 
 
+                                            if ($studentBatch != $course_code && $studentBatch != '0') {
+                                                continue;
+                                            }
+
+                                            if ($orderType != $delivery_id && $orderType != '0') {
+                                                continue;
+                                            }
+
+
                                             if ($current_status == 3) {
                                                 $active_status = "Delivered";
                                                 $color = "success";
@@ -280,7 +298,7 @@ $InactiveCount = 0;
                                                     <p class="m-0"><?= $orderDate ?></p>
                                                     <p class="m-0"><span class="badge bg-<?= $color ?>"><?= $active_status ?></span></p>
                                                     <div class="text-start mt-1">
-                                                        <button class="btn btn-sm btn-dark view-button" type="button" onclick="OpenOrder('<?= $ref_id ?>')">
+                                                        <button class="btn btn-sm btn-dark view-button" type="button" onclick="OpenOrder('<?= $ref_id ?>', '<?= $studentBatch ?>', '<?= $orderType ?>')">
                                                             <i class="fa-solid fa-eye"></i> Open
                                                         </button>
                                                     </div>

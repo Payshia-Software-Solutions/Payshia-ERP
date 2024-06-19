@@ -52,11 +52,10 @@ function AddNewEmployee(employeeId = 0) {
     fetch_data()
 }
 
-
 function OpenMigrations() {
     function fetch_data() {
         $.ajax({
-            url: './assets/content/employee_management/migration/index.php',
+            url: './assets/content/employee_management/classes/index.php',
             method: 'POST',
             data: {
                 LoggedUser: LoggedUser,
@@ -176,7 +175,6 @@ function DisableEmployee(employee_id, is_active = 1) {
         }
     });
 }
-
 
 function AddNewPosition(positionId = 0) {
     var userTheme = $('#userTheme').val()
@@ -410,4 +408,97 @@ function SaveWorkLocation(work_location_id = 0) {
         OpenAlert('error', 'Error!', result)
         hideOverlay()
     }
+}
+
+function OpenEmployee(employee_id) {
+    var userTheme = $('#userTheme').val()
+    OpenPopupRight()
+    $('#loading-popup-right').html(InnerLoader)
+
+    function fetch_data() {
+        $.ajax({
+            url: './assets/content/employee_management/view/open-employee.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                employee_id: employee_id,
+                userTheme: userTheme
+            },
+            success: function(data) {
+                $('#loading-popup-right').html(data)
+            }
+        })
+    }
+    fetch_data()
+}
+
+function CreateUserLink(employee_id, user_type, is_active) {
+    var lms_user_id = document.getElementById('lms_user_id').value;
+    var user_id = document.getElementById('user_id').value;
+
+
+    function fetch_data() {
+        $.ajax({
+            url: './assets/content/employee_management/methods/saveAccountLink.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                employee_id: employee_id,
+                user_type: user_type,
+                lms_user_id: lms_user_id,
+                user_id: user_id,
+                is_active: is_active
+            },
+            success: function(data) {
+                var response = JSON.parse(data)
+                if (response.status === 'success') {
+                    var result = response.message
+                    OpenAlert('success', 'Done!', result)
+                    OpenEmployee(employee_id)
+                } else {
+                    var result = response.message
+                    OpenAlert('error', 'Error!', result)
+                }
+                hideOverlay()
+            }
+        })
+    }
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Create Link!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch_data()
+        }
+    });
+}
+
+
+function OpenMyDashboard() {
+    var userTheme = $('#userTheme').val()
+    OpenPopupRight()
+    $('#loading-popup-right').html(InnerLoader)
+
+    function fetch_data() {
+        $.ajax({
+            url: './assets/content/employee_management/my-dashboard.php',
+            method: 'POST',
+            data: {
+                LoggedUser: LoggedUser,
+                UserLevel: UserLevel,
+                userTheme: userTheme
+            },
+            success: function(data) {
+                $('#loading-popup-right').html(data)
+            }
+        })
+    }
+    fetch_data()
 }

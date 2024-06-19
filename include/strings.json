@@ -4,5 +4,6 @@
     "departmentList": ["IT", "Sales"],
     "genderList": ["Male", "Female"],
     "marriedList": ["Married", "Single"],
-    "statusValues": ["In-active", "Active", "Suspended"]
+    "statusValues": ["In-active", "Active", "Suspended"],
+    "userType": ["User", "LMS"]
 }

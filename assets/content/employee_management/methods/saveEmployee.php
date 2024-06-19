@@ -1,9 +1,9 @@
 <?php
 // Use the classes
 // Include the classes
-include_once '../migration/Database.php';
-include_once '../migration/Employee.php';
-include_once '../migration/ImageUpload.php';
+include_once '../classes/Database.php';
+include_once '../classes/Employee.php';
+include_once '../classes/ImageUpload.php';
 
 // Create a new Database object with the path to the configuration file
 $config_file = '../../../../include/env.txt';
@@ -50,6 +50,15 @@ $newEmployee['updated_at'] = date('Y-m-d');
 
 // Create an instance of the ImageUpload classCopy code
 // Check if the file input exists and a file is selected
+
+
+if ($_POST['employee_id'] == 0) {
+    $employee_id = $employee->generateNewEmployeeID();
+    $newEmployee['employee_id'] = $employee_id;
+} else {
+    $employee_id = $_POST['employee_id'];
+}
+
 $keyString = 'nic';
 if (isset($_FILES[$keyString]) && $_FILES[$keyString]['error'] != UPLOAD_ERR_NO_FILE) {
     $targetFolder = '../assets/images/employee/' . $employee_id . '/' . $keyString . '/';
@@ -57,6 +66,7 @@ if (isset($_FILES[$keyString]) && $_FILES[$keyString]['error'] != UPLOAD_ERR_NO_
 
     if ($fileName = $nic_upload->upload()) {
         $image_error = array('status' => 'success', 'message' => 'Image uploaded successfully: ' . $fileName);
+        $newEmployee[$keyString] = $fileName;
     } else {
         $image_error = array('status' => 'error', 'message' => 'Error uploading image: ' . $nic_upload->getError());
     }
@@ -71,6 +81,7 @@ if (isset($_FILES[$keyString]) && $_FILES[$keyString]['error'] != UPLOAD_ERR_NO_
 
     if ($fileName = $nic_upload->upload()) {
         $image_error = array('status' => 'success', 'message' => 'Image uploaded successfully: ' . $fileName);
+        $newEmployee[$keyString] = $fileName;
     } else {
         $image_error = array('status' => 'error', 'message' => 'Error uploading image: ' . $nic_upload->getError());
     }
@@ -82,8 +93,6 @@ if (isset($_FILES[$keyString]) && $_FILES[$keyString]['error'] != UPLOAD_ERR_NO_
 
 
 if ($_POST['employee_id'] == 0) {
-    $employee_id = $employee->generateNewEmployeeID();
-    $newEmployee['employee_id'] = $employee_id;
 
     // Insert a new employee
     if ($employee->addEmployee($newEmployee)) {
@@ -93,9 +102,7 @@ if ($_POST['employee_id'] == 0) {
         $error = array('status' => 'error', 'message' => 'Failed to add employee.' . $employee->getLastError());
     }
 } else {
-
-    // Update the Employee
-    $employee_id = $_POST['employee_id']; // Replace with the actual employee ID to update
+    // Replace with the actual employee ID to update
     if ($employee->updateEmployee($newEmployee, $employee_id)) {
         $error = array('status' => 'success', 'message' => 'Employee Updated successfully.');
     } else {

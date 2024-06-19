@@ -4,9 +4,9 @@ include '../../../include/function-update.php';
 include '../../../include/lms-functions.php';
 
 
-include_once 'migration/Database.php';
-include_once 'migration/Employee.php';
-include_once 'migration/Position.php';
+include_once 'classes/Database.php';
+include_once 'classes/Employee.php';
+include_once 'classes/Position.php';
 
 // Create a new Database object with the path to the configuration file
 $config_file = '../../../include/env.txt';
@@ -91,7 +91,7 @@ $statusList = convertSelectBox1DArrayValueOnly($arrays['statusValues']);
 
 <div class="row g-2">
 
-    <div class="col-md-8">
+    <div class="col-md-12">
         <div class="table-title font-weight-bold mt-0 mb-3 ">Employee List</div>
         <div class="card">
             <div class="card-body">
@@ -136,10 +136,10 @@ $statusList = convertSelectBox1DArrayValueOnly($arrays['statusValues']);
                                         <td><?= htmlspecialchars($employee['phone_number']) ?></td>
                                         <td><span class="badge bg-<?= $bgColor ?>"><?= $activeStatus ?></span></td>
                                         <td><?= $positionName ?></td>
-                                        <td>
+                                        <td class="text-end">
                                             <button onclick="AddNewEmployee('<?= $employee['employee_id'] ?>')" class="btn btn-success btn-sm" type="button"><i class="fa-solid fa-pencil-alt"></i> Edit</button>
                                             <button onclick="DisableEmployee('<?= $employee['employee_id'] ?>', '0')" class="btn btn-warning btn-sm" type="button"><i class="fa-solid fa-trash"></i> Disable</button>
-                                            <button class="btn btn-primary btn-sm" type="button"><i class="fa-solid fa-eye"></i> View</button>
+                                            <button onclick="OpenEmployee('<?= $employee['employee_id'] ?>')" class="btn btn-primary btn-sm" type="button"><i class="fa-solid fa-eye"></i> View</button>
 
                                         </td>
                                     </tr>

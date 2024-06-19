@@ -74,11 +74,16 @@ $SiteTitle = "Payshia ERP";
 $modeTheme = 'dark';
 $bodyColorClass = 'back_dark';
 
+// $modeTheme = 'light';
+// $bodyColorClass = 'back_light';
+
 $iconColor = 'text-dark';
 $bgColor = 'bg-dark';
-if ($modeTheme = 'dark') {
+
+if ($modeTheme == 'dark') {
     $iconColor = 'text-light';
 }
+
 if ($modeTheme == 'light') {
     $bgColor = 'bg-white';
 }

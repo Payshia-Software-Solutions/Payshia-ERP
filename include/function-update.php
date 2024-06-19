@@ -3932,14 +3932,26 @@ function renderForm($elementArray, $form_name)
 function convertSelectBox2DArray($inputArray, $keyValue, $valueName)
 {
     $resultArray = array();
+
     foreach ($inputArray as $data) {
-        $resultArray[] = array(
+        if (is_array($valueName)) {
+            $value = array();
+            foreach ($valueName as $name) {
+                $value[$name] = $data[$name];
+            }
+        } else {
+            $value = $data[$valueName];
+        }
+
+        $resultArray[$data[$keyValue]] = array(
             'id' => $data[$keyValue],
-            'value' => $data[$valueName],
+            'value' => $value,
         );
     }
+
     return $resultArray;
 }
+
 
 function convertSelectBox1DArray($inputArray)
 {
@@ -4037,7 +4049,15 @@ function ReturnSelectInput($elementName, $requiredStatus, $classList, $defaultVa
     <select <?= $requiredStatus ?> name="<?= $snakeCase ?>" id="<?= $snakeCase ?>" class="<?= $classList ?>">
         <option value="">Select <?= $elementName ?></option>
         <?php foreach ($dataList as $data) : ?>
-            <option value="<?= htmlspecialchars($data['id']) ?>" <?= ($data['id'] == $defaultValue) ? 'selected' : '' ?>><?= htmlspecialchars($data['value']) ?></option>
+            <option value="<?= htmlspecialchars($data['id']) ?>" <?= ($data['id'] == $defaultValue) ? 'selected' : '' ?>>
+                <?php if (is_array($data['value'])) : ?>
+                    <?php foreach ($data['value'] as $value) : ?>
+                        <?= htmlspecialchars($value) ?>
+                    <?php endforeach; ?>
+                <?php else : ?>
+                    <?= htmlspecialchars($data['value']) ?>
+                <?php endif ?>
+            </option>
         <?php endforeach; ?>
     </select>
 

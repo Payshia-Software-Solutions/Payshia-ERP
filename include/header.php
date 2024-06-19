@@ -731,6 +731,13 @@ if (isset($defaultLocation) && $defaultLocation != "") {
                                 Employees
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="employee-dashboard">
+                                <i class="fa-solid fa-table-columns menu-icon"></i>
+                                Employee Dashboard
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <i class="fa-solid fa-money-bill menu-icon"></i>

@@ -2,11 +2,11 @@
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
 
-include_once '../migration/Database.php';
-include_once '../migration/Employee.php';
-include_once '../migration/Position.php';
-include_once '../migration/Department.php';
-include_once '../migration/WorkLocation.php';
+include_once '../classes/Database.php';
+include_once '../classes/Employee.php';
+include_once '../classes/Position.php';
+include_once '../classes/Department.php';
+include_once '../classes/WorkLocation.php';
 // Create a new Database object with the path to the configuration file
 $config_file = '../../../../include/env.txt';
 $database = new Database($config_file);
@@ -35,12 +35,11 @@ $arrays = json_decode($jsonData, true);
 $employeeType = convertSelectBox1DArrayValueOnly($arrays['employeeType']);
 $workLocation = convertSelectBox2DArray($work_location->fetchAll(), 'id', 'work_location_name');
 $departmentList = convertSelectBox2DArray($department->fetchAll(), 'id', 'department_name');
-$positionList = $position->fetchAll();
+$positionListSelectValues = convertSelectBox2DArray($position->fetchAll(), 'id', 'position_name');
 $genderList = convertSelectBox1DArrayValueOnly($arrays['genderList']);
 $marriedList = convertSelectBox1DArrayValueOnly($arrays['marriedList']);
 
 // Get From Database
-$positionListSelectValues = convertSelectBox2DArray($positionList, 'id', 'position_name');
 $cityListSelectValues = convertSelectBox2DArray(GetCities($link), 'id', 'name_en');
 
 if ($employeeId != 0) {
@@ -97,6 +96,14 @@ if ($employeeId != 0) {
                     $ElementName = 'Phone Number';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
                     echo ReturnNumberInput($ElementName, 'required', 'form-control', $defaultValue)
+                    ?>
+                </div>
+
+                <div class="col-md-3">
+                    <?php
+                    $ElementName = 'Email';
+                    $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
+                    echo ReturnNumberInput($ElementName, '', 'form-control', $defaultValue)
                     ?>
                 </div>
 

@@ -33,7 +33,24 @@ function GetWinpharmaMarking($userName)
 
     $ArrayResult = array();
 
-    $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `date_time`, `attempt`, `course_code`, `reason`, `update_by`, `update_at`, `recorrection_count` FROM `win_pharma_submission` WHERE `update_by` LIKE '$userName'";
+    $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `date_time`, `attempt`, `course_code`, `reason`, `update_by`, `update_at`, `recorrection_count`, `payment_status` FROM `win_pharma_submission` WHERE `update_by` LIKE '$userName' ";
+
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['submission_id']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+function GetWinpharmaMarkingByPayment($userName, $paymentStatus = 'Not Paid')
+{
+    global $lms_link;
+
+    $ArrayResult = array();
+
+    $sql = "SELECT `submission_id`, `index_number`, `level_id`, `resource_id`, `submission`, `grade`, `grade_status`, `date_time`, `attempt`, `course_code`, `reason`, `update_by`, `update_at`, `recorrection_count`, `payment_status` FROM `win_pharma_submission` WHERE `update_by` LIKE '$userName' AND `payment_status` LIKE '$paymentStatus'";
 
     $result = $lms_link->query($sql);
     if ($result->num_rows > 0) {

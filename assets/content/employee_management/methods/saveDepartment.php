@@ -1,8 +1,8 @@
 <?php
 // Use the classes
 // Include the classes
-include_once '../migration/Database.php';
-include_once '../migration/Department.php';
+include_once '../classes/Database.php';
+include_once '../classes/Department.php';
 
 // Create a new Database object with the path to the configuration file
 $config_file = '../../../../include/env.txt';

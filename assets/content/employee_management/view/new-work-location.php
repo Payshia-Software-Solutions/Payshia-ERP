@@ -2,8 +2,8 @@
 require_once('../../../../include/config.php');
 include '../../../../include/function-update.php';
 
-include_once '../migration/Database.php';
-include_once '../migration/WorkLocation.php';
+include_once '../classes/Database.php';
+include_once '../classes/WorkLocation.php';
 
 // Get User Theme
 $userThemeInput = isset($_POST['userTheme']) ? $_POST['userTheme'] : null;

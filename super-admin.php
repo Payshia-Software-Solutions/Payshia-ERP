@@ -41,15 +41,12 @@ $SubPage = false;
         <div id="filler"></div>
     </div>
 
-    <div class="loading-popup" id="loading-popup"></div>
+
+    <?php include './include/popups.php' ?>
     <!-- Add Scripts -->
 
     <?php include './include/footer-scripts.php' ?>
-<<<<<<<< HEAD:super-admin.php
     <script src="./assets/content/super-admin/assets/js/super-admin-1.0.js"></script>
-========
-    <script src="./assets/js/lms-course-management-1.0.1.js"></script>
->>>>>>>> 4820cfea525a5afd6311ec61f7829f2439d6add6:lms-course-management.php
 </body>
 
 </html>

@@ -110,7 +110,7 @@ $Cities = GetCities($link);
                                         <td><?= $Student['user_name'] ?></td>
 
                                         <td class="text-center">
-                                            <i class="fa-solid fa-pencil menu-icon clickable" onclick="LoadUserPrivilege('<?= $Student['user_name'] ?>', 'pages')"></i>
+                                            <i class="fa-solid fa-pencil menu-icon clickable" onclick="LoadUserPrivilege('<?= $Student['user_name'] ?>', 'root')"></i>
                                         </td>
                                     </tr>
                                 <?php

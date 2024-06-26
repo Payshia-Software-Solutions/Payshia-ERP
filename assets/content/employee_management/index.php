@@ -90,7 +90,6 @@ $statusList = convertSelectBox1DArrayValueOnly($arrays['statusValues']);
 <div class="border-bottom my-3"></div>
 
 <div class="row g-2">
-
     <div class="col-md-12">
         <div class="table-title font-weight-bold mt-0 mb-3 ">Employee List</div>
         <div class="card">
@@ -147,124 +146,7 @@ $statusList = convertSelectBox1DArrayValueOnly($arrays['statusValues']);
                             </tbody>
                         </table>
                     </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="row g-3">
-            <div class="col-12">
-
-                <div class="table-title font-weight-bold mt-0 mb-3 ">
-                    Winpharma Earnings
-                    <div class="badge bg-success">Addon+</div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <?php
-                        if (!empty($specialAccounts)) {
-                            $loopCount = 1;
-                            foreach ($specialAccounts as $userAccount) {
-
-                                $paidMarkingCount = $NotPaidMarkingCount = $approvedPayments = $NonApprovedPayments = 0;
-                                $employeeUsername = $userAccount['username'];
-                                $winpharmaMarkings = GetWinpharmaMarking($employeeUsername);
-
-                                // Details of Payments
-                                $PaymentInfo = WinpharmaEmployeePaymentsSummary($employeeUsername);
-                                if (isset($PaymentInfo[0])) {
-                                    $paidMarkingCount = $PaymentInfo[0]['total_marking_count'];
-                                    $NonApprovedPayments = $PaymentInfo[0]['total_payment_count'];
-                                }
-
-                                if (isset($PaymentInfo[1])) {
-                                    $NotPaidMarkingCount = $PaymentInfo[1]['total_marking_count'];
-                                    $approvedPayments = $PaymentInfo[1]['total_payment_count'];
-                                }
-
-                                $paidMarkingCount =  $paidMarkingCount + $NotPaidMarkingCount;
-                                $payableMarkings = count($winpharmaMarkings) - $paidMarkingCount;
-                                $payableAmount = $payableMarkings * $earningPerMarking;
-
-                                $loopCount++;
-                        ?>
-                                <div class="clickable p-2 w-100 hover">
-                                    <div class="fw-bold pb-1"><?= $userAccount['username'] ?> - <?= $userAccount['fname'] ?> <?= $userAccount['lname'] ?></div>
-                                    <div class="badge bg-success"><?= $userAccount['userlevel'] ?></div>
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <p class="mb-0">Markings</p>
-                                            <h4><?= $payableMarkings ?> x <?= number_format($earningPerMarking, 2) ?> = <?= number_format($payableAmount, 2) ?></h4>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <?php
-                                if ($loopCount <= $userCount) {
-                                ?>
-                                    <div class="border-bottom my-1"></div>
-                                <?php
-                                }
-                                ?>
-                        <?php
-                            }
-                        }
-                        ?>
-
-                        <?php
-                        if (empty($userAccounts)) {
-                            $loopCount = 1;
-                            foreach ($userAccounts as $userAccount) {
-
-                                $paidMarkingCount = $NotPaidMarkingCount = $approvedPayments = $NonApprovedPayments = 0;
-                                $employeeUsername = $userAccount['user_name'];
-                                $winpharmaMarkings = GetWinpharmaMarking($employeeUsername);
-
-                                // Details of Payments
-                                $PaymentInfo = WinpharmaEmployeePaymentsSummary($employeeUsername);
-                                if (isset($PaymentInfo[0])) {
-                                    $paidMarkingCount = $PaymentInfo[0]['total_marking_count'];
-                                    $NonApprovedPayments = $PaymentInfo[0]['total_payment_count'];
-                                }
-
-                                if (isset($PaymentInfo[1])) {
-                                    $NotPaidMarkingCount = $PaymentInfo[1]['total_marking_count'];
-                                    $approvedPayments = $PaymentInfo[1]['total_payment_count'];
-                                }
-
-                                $paidMarkingCount =  $paidMarkingCount + $NotPaidMarkingCount;
-                                $payableMarkings = count($winpharmaMarkings) - $paidMarkingCount;
-                                $payableAmount = $payableMarkings * $earningPerMarking;
-
-                                $loopCount++;
-                        ?>
-                                <div class="clickable p-2 w-100 hover">
-                                    <div class="fw-bold pb-1"><?= $userAccount['user_name'] ?> - <?= $userAccount['first_name'] ?> <?= $userAccount['last_name'] ?></div>
-
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <p class="mb-0">Markings</p>
-                                            <h4><?= count($winpharmaMarkings) ?> x <?= number_format($earningPerMarking, 2) ?> = <?= number_format($payableAmount, 2) ?></h4>
-                                        </div>
-                                    </div>
-
-                                </div>
-                                <?php
-                                if ($loopCount <= $userCount) {
-                                ?>
-                                    <div class="border-bottom my-1"></div>
-                                <?php
-                                }
-                                ?>
-                        <?php
-                            }
-                        }
-                        ?>
-
-                    </div>
-                </div>
+                <?php endif ?>
             </div>
         </div>
     </div>
@@ -278,10 +160,7 @@ $statusList = convertSelectBox1DArrayValueOnly($arrays['statusValues']);
                 'copy', 'csv', 'excel', 'pdf'
                 // 'colvis'
             ],
-            order: [
-                [1, 'desc'],
-                [0, 'asc']
-            ]
+
         });
 
     });

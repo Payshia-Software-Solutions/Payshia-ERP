@@ -110,6 +110,38 @@ function getAllUserEnrollments()
 }
 
 
+function GetLmsSpecialAccounts()
+{
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT `id`, `status_id`, `userid`, `fname`, `lname`, `batch_id`, `username`, `phone`, `email`, `password`, `userlevel`, `status`, `created_by`, `created_at`, `batch_lock` FROM `users` WHERE `userlevel` LIKE 'sp-winpharma' OR `userlevel` LIKE 'Admin'";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['username']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
+function GetLmsAccounts()
+{
+    $ArrayResult = array();
+    global $lms_link;
+
+    $sql = "SELECT `id`, `status_id`, `userid`, `fname`, `lname`, `batch_id`, `username`, `phone`, `email`, `password`, `userlevel`, `status`, `created_by`, `created_at`, `batch_lock` FROM `users`";
+    $result = $lms_link->query($sql);
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $ArrayResult[$row['username']] = $row;
+        }
+    }
+    return $ArrayResult;
+}
+
+
 function getAllUserEnrollmentsByCourse($courseCode)
 {
     $ArrayResult = array();

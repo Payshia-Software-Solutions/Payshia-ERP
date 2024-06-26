@@ -64,7 +64,7 @@ $InactiveProductsCount = 0;
     ?>
 </div>
 
-<div class="row mt-5">
+<div class="row mt-5 g-2">
     <div class="col-12">
         <div class="table-title font-weight-bold mb-4 mt-0">Products</div>
     </div>

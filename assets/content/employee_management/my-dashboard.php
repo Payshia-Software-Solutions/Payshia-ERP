@@ -3,7 +3,6 @@ require_once('../../../include/config.php');
 include '../../../include/function-update.php';
 include '../../../include/lms-functions.php';
 
-
 include_once './classes/Database.php';
 include_once './classes/Employee.php';
 include_once './classes/Position.php';
@@ -37,7 +36,6 @@ $specialAccounts = GetLmsSpecialAccounts();
 
 $adminAccounts = GetAccountsByType('Admin');
 $earningPerMarking = 2;
-
 
 // Read JSON file
 $jsonData = file_get_contents('../../../include/strings.json');
@@ -84,11 +82,29 @@ $employeeInfo = $employee->fetchEmployeeById($employeeId);
 
     <div class="col-5">
         <div class="table-title font-weight-bold mt-0 mb-3 ">
+            <i class="fa-solid fa-user"></i> User Manager
+        </div>
+        <?php if (!empty($userAccountLink) && $userAccountLink['is_active'] == 1) :
+            $linkedAccount = $userAccountLink['user_id'];
+            if (isset($specialAccounts[$linkedAccount])) {
+                $accountInfo = $userAccounts[$userAccountLink['user_id']];
+            }
+        ?>
+            <div class="card">
+                <div class="card-body">
+                    <i class="fa-solid fa-circle-check"></i> Account Link to <?= $linkedAccount ?>
+                    <?php if (isset($specialAccounts[$linkedAccount])) : ?>
+                        <h4 class="mb-0"><?= $accountInfo['user_name'] ?> - <?= $accountInfo['first_name'] ?> <?= $accountInfo['last_name'] ?></h4>
+                    <?php endif ?>
+                </div>
+            </div>
+        <?php endif ?>
+
+        <div class="table-title font-weight-bold my-3 ">
             <i class="fa-solid fa-graduation-cap"></i> LMS Manager
         </div>
-        <?php
 
-        if (!empty($lmsAccountLink) && $lmsAccountLink['is_active'] == 1) :
+        <?php if (!empty($lmsAccountLink) && $lmsAccountLink['is_active'] == 1) :
             $linkedAccount = $lmsAccountLink['user_id'];
             if (isset($specialAccounts[$linkedAccount])) {
                 $accountInfo = $specialAccounts[$linkedAccount];
@@ -99,7 +115,7 @@ $employeeInfo = $employee->fetchEmployeeById($employeeId);
                     <i class="fa-solid fa-circle-check"></i> Account Link to <?= $linkedAccount ?>
                     <?php if (isset($specialAccounts[$linkedAccount])) : ?>
                         <h4 class="mb-0"><?= $accountInfo['username'] ?> - <?= $accountInfo['fname'] ?> <?= $accountInfo['lname'] ?></h4>
-                        <p class="mb-0">User Level : <span class="badge bg-success"><?= $accountInfo['userlevel'] ?></span></p>
+                        <p class="mb-0 mt-2">User Level : <span class="badge bg-success"><?= $accountInfo['userlevel'] ?></span></p>
                     <?php endif ?>
                 </div>
             </div>
@@ -131,7 +147,7 @@ $employeeInfo = $employee->fetchEmployeeById($employeeId);
 
                                 <div class="card clickable">
                                     <div class="card-body">
-                                        <h4 class="mb-0"><?= $payableMarkings ?> x <?= number_format($earningPerMarking, 2) ?> = <?= number_format($payableAmount, 2) ?></h4>
+                                        <h4 class="mb-0"><?= $payableMarkings ?></h4>
                                         <p class="mb-0 text-muted">Unpaid Markings</p>
                                     </div>
                                 </div>
@@ -196,5 +212,8 @@ $employeeInfo = $employee->fetchEmployeeById($employeeId);
                 </div>
             </div>
         <?php endif ?>
+
+
+
     </div>
 </div>

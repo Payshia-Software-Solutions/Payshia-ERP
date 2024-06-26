@@ -10,7 +10,7 @@
     }
 </style>
 
-<div class="site-footer text-center shadow-sm">
+<div class="site-footer text-center shadow-lg">
     <div class="row">
         <div class="col">
             <p class="p-0 m-0 text-secondary">Powered by <a class="text-success" href="#">InspireLK</a> © <?= date('Y') ?></p>

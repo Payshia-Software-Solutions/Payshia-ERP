@@ -3,7 +3,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item">
-                    <a href="./"><i class="fa-solid fa-home top-icon text-light"></i></a>
+                    <a href="./"><i class="fa-solid fa-home top-icon <?= $iconColor ?>"></i></a>
                 </li>
                 <?php if ($SubPage) { ?>
                     <li class="breadcrumb-item">
@@ -24,7 +24,7 @@
     <div class="col-6 text-end">
         <!-- <input type="text" class="d-none d-md-inline top-search" placeholder="Search Here.."> -->
         <button class="btn top-buttons" type="button" onclick="OpenIndex()">
-            <i class="fa-solid fa-arrow-left top-icon text-light"></i>
+            <i class="fa-solid fa-arrow-left top-icon <?= $iconColor ?>"></i>
         </button>
         <!-- <button class="btn top-buttons" type="button" onclick="OpenInnerPage()">
             <i class="fa-solid fa-rotate top-icon"></i>
@@ -34,10 +34,10 @@
         </button> -->
 
         <button class="btn top-buttons" type="button">
-            <i class="fa-solid fa-user top-icon text-light"></i>
+            <i class="fa-solid fa-user top-icon <?= $iconColor ?>"></i>
         </button>
         <button class="d-md-inline  d-md-none top-buttons navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <i class="fa-solid fa-bars top-icon text-light"></i>
+            <i class="fa-solid fa-bars top-icon <?= $iconColor ?>"></i>
         </button>
     </div>
 

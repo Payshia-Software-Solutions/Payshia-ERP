@@ -7,3 +7,4 @@ $accessMode = $_POST['accessMode'];
 $LoggedUser = $_POST['LoggedUser'];
 
 $result = updatePrivilege($link, $userName, $pageID, $accessMode, $LoggedUser);
+echo $result;

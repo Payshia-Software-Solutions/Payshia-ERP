@@ -138,7 +138,7 @@ function SaveUserAccount($link, $status, $first_name, $last_name, $nic, $student
         if ($updateKey === '0') {
             // echo $updateKey;
             $updateKey = GenerateIndexNumber($link, $user_type);
-            $sql = "INSERT INTO `user_accounts` (`email`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by`, `civil_status`, `nic_number`, `user_name`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO `user_accounts` (`email`, `pass`, `first_name`, `last_name`, `sex`, `addressl1`, `addressl2`, `city`, `PNumber`, `WPNumber`, `created_at`, `user_status`, `acc_type`, `img_path`, `update_by`, `civil_status`, `nic_number`, `user_name`) VALUES  (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         } else {
             $Student = GetAccounts($link)[$updateKey];
             $student_number = $Student['user_name'];
@@ -4035,7 +4035,7 @@ function ReturnDateInput($elementName, $requiredStatus, $classList, $defaultValu
 }
 
 
-function ReturnSelectInput($elementName, $requiredStatus, $classList, $defaultValue = 0, $dataList)
+function ReturnSelectInput($elementName, $requiredStatus, $classList, $dataList, $defaultValue = 0,)
 {
     $elementName = htmlspecialchars($elementName);
     $camelCase = convertToCamelCase($elementName);

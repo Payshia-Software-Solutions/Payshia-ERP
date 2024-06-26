@@ -5,5 +5,21 @@
     "genderList": ["Male", "Female"],
     "marriedList": ["Married", "Single"],
     "statusValues": ["In-active", "Active", "Suspended"],
-    "userType": ["User", "LMS"]
+    "openTypes": ["_self", "_blank"],
+    "userType": ["User", "LMS"],
+    "commonMenuRoots": [
+        ["Master", "chalkboard"],
+        ["Transaction", "list-check"],
+        ["Accounts", "landmark"],
+        ["Promotions", "percent"],
+        ["Reports", "file-lines"],
+        ["Administration", "gear"],
+        ["User", "users-gear"],
+        ["CRM", "user"],
+        ["HRM", "building-user"]
+    ],
+    "organizationRoots": [
+        ["LMS Management", "graduation-cap"],
+        ["Ticket Management", "ticket"]
+    ]
 }

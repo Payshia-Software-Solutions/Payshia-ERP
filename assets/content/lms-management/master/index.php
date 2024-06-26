@@ -31,21 +31,42 @@ $studentCount = count($accountDetails);
             <i class="fa-solid fa-magnifying-glass"></i> Search
         </button>
     </div>
-
-
 </div>
 
 <div class="row g-3">
-    <div class="col-12 mb-4">
-        <h5 class="table-title">Master Operations</h5>
+    <div class="col-12">
+        <h5 class="table-title">Control Center</h5>
     </div>
 
     <div class="col-md-3 col-6 col-xxl-2">
-        <div class="card clickable">
-            <div class="card-body text-center">
-                <i class="fa-solid fa-certificate icon-card"></i>
-                <h5 class="mb-0">Certificate Print</h5>
+        <a href="#" rel="noopener noreferrer">
+            <div class="card clickable">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-certificate icon-card"></i>
+                    <h5 class="mb-0">Certificate Print</h5>
+                </div>
             </div>
-        </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 col-xxl-2">
+        <a href="./lms-winpharma-grading" rel="noopener noreferrer">
+            <div class="card clickable">
+                <div class="card-body text-center">
+                    <i class="fa-solid fa-prescription-bottle-medical icon-card"></i>
+                    <h5 class="mb-0">Winpharma Grading</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 col-xxl-2">
+        <a href="./lms-pharma-hunter" rel="noopener noreferrer">
+            <div class="card clickable">
+                <div class="card-body text-center">
+
+                    <i class="fa-solid fa-boxes-packing icon-card"></i>
+                    <h5 class="mb-0">Pharma Hunter</h5>
+                </div>
+            </div>
+        </a>
     </div>
 </div>

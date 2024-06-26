@@ -18,12 +18,10 @@ $position = new Position($db);
 $department = new Department($db);
 $work_location = new WorkLocation($db);
 
-
 // Get User Theme
 $userThemeInput = isset($_POST['userTheme']) ? $_POST['userTheme'] : null;
 $userTheme = getUserTheme($userThemeInput);
 $employeeId = isset($_POST['employeeId']) ? $_POST['employeeId'] : null;
-
 
 // Read JSON file
 $jsonData = file_get_contents('../../../../include/strings.json');
@@ -46,7 +44,6 @@ if ($employeeId != 0) {
     // Fetch all employees
     $employeeInfo = $employee->fetchEmployeeById($employeeId);
 }
-
 ?>
 
 <div class="loading-popup-content-right <?= htmlspecialchars($userTheme) ?>">
@@ -127,7 +124,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Gender';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $genderList)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $genderList, $defaultValue)
                     ?>
                 </div>
 
@@ -135,7 +132,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Married Status';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $marriedList)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $marriedList, $defaultValue)
                     ?>
                 </div>
 
@@ -161,7 +158,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'City';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $cityListSelectValues)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $cityListSelectValues, $defaultValue)
                     ?>
                 </div>
 
@@ -187,7 +184,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Permanent City';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $cityListSelectValues)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $cityListSelectValues, $defaultValue)
                     ?>
                 </div>
 
@@ -215,7 +212,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Employee Type';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $employeeType)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $employeeType, $defaultValue)
                     ?>
                 </div>
 
@@ -223,7 +220,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Work Location';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $workLocation)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $workLocation, $defaultValue)
                     ?>
                 </div>
 
@@ -231,7 +228,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Department';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $departmentList)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $departmentList, $defaultValue)
                     ?>
                 </div>
 
@@ -239,7 +236,7 @@ if ($employeeId != 0) {
                     <?php
                     $ElementName = 'Position';
                     $defaultValue = ($employeeId != 0) ? $employeeInfo[convertToSnakeCase($ElementName)] : '';
-                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $defaultValue, $positionListSelectValues)
+                    echo ReturnSelectInput($ElementName, 'required', 'form-control', $positionListSelectValues, $defaultValue)
                     ?>
                 </div>
 

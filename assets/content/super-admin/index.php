@@ -6,11 +6,21 @@ include '../../../include/lms-functions.php';
 include './methods/functions.php'; //Ticket Methods
 
 $LoggedUser = $_POST['LoggedUser'];
+
 ?>
 <div class="row">
     <div class="col-md-4">
+        <div class="card shadow mt-5">
+            <div class="card-body">
+                <h1 class="mb-0 border-bottom pb-2 mb-2">Tasks</h1>
+                <p class="clickable mb-1 fw-bold" id="create-page">1. Create Pages</p>
+                <p class="clickable mb-1 fw-bold">2. Create Module</p>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-md-4">
 
-        <div class="card mt-5">
+        <div class="card shadow mt-5">
             <div class="card-body">
 
                 <h1 class="mb-0 border-bottom pb-2 mb-2">Module Create</h1>
@@ -30,5 +40,15 @@ $LoggedUser = $_POST['LoggedUser'];
             </div>
         </div>
 
-    </div>
+    </div> -->
 </div>
+
+<script>
+    // Get the <p> element by its id
+    var paragraph = document.getElementById("create-page");
+
+    // Add onclick event listener
+    paragraph.addEventListener("click", function() {
+        OpenPages()
+    });
+</script>

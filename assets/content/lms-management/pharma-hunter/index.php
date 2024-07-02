@@ -29,7 +29,7 @@ $category_list = $categories->fetchAll();
 
 <div class="row">
     <div class="col-12 text-end">
-        <button type="button" class="btn btn-dark btn-sm">Add New Medicine</button>
+        <button onclick="CreateMedicine()" type="button" class="btn btn-dark btn-sm">Add New Medicine</button>
     </div>
 </div>
 

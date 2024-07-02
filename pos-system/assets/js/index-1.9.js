@@ -303,6 +303,7 @@ function AddToCart(ProductID) {
     var close_type = document.getElementById("close_type").value;
     var tendered_amount = document.getElementById("tendered_amount").value;
     var invoice_number = document.getElementById("invoice_number").value;
+    var item_remark = document.getElementById("item_remark").value;
 
     function fetch_data() {
         document.getElementById("pop-content").innerHTML = InnerLoader;
@@ -320,6 +321,7 @@ function AddToCart(ProductID) {
                 ItemQty: ItemQty,
                 TableID: TableID,
                 LocationID: LocationID,
+                item_remark: item_remark
             },
             success: function(data) {
                 var response = JSON.parse(data);

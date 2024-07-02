@@ -62,12 +62,13 @@ if ($invoice_number) {
             $item_discount = $SelectRecord['item_discount'];
             $product_id = $SelectRecord['product_id'];
             $printed_status = $SelectRecord['printed_status'];
+            $item_remark = $SelectRecord['item_remark'];
             $total_cost += GetCostPrice($link, $product_id) * $item_quantity;
 
             $line_total = ($selling_price - $item_discount) * $item_quantity;
             $sub_total += $line_total;
 
-            $insert_result = AddToInvoice($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $invoice_number, $printed_status);
+            $insert_result = AddToInvoice($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $invoice_number, $printed_status, $item_remark);
 
             if ($invoice_status == 2) {
                 $recipe_type = $Products[$product_id]['recipe_type'];

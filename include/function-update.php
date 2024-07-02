@@ -852,7 +852,7 @@ function UpdateTableStatus($link, $is_active, $created_by, $UpdateKey)
 function GetCart($link, $UserName)
 {
     $ArrayResult = array();
-    $sql = "SELECT t.`id`, t.`user_id`, t.`product_id`, t.`item_price`, t.`item_discount`, t.`quantity`, t.`added_date`, t.`is_active`, t.`customer_id`, t.`hold_status`, t.`printed_status`, mp.`display_name`
+    $sql = "SELECT t.`id`, t.`user_id`, t.`product_id`, t.`item_price`, t.`item_discount`, t.`quantity`, t.`added_date`, t.`is_active`, t.`customer_id`, t.`hold_status`, t.`printed_status`, mp.`display_name`, t.`item_remark`
     FROM `temp_order` t
     JOIN `master_product` mp ON t.`product_id` = mp.`product_id` WHERE t.`user_id` LIKE '$UserName' AND t.`hold_status` = 0 ORDER BY `id`";
 
@@ -973,7 +973,7 @@ function GetHoldCart($link, $LoggedUser, $invoice_number)
     return $ArrayResult;
 }
 
-function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $locationId)
+function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $locationId, $item_remark)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
@@ -989,10 +989,10 @@ function AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemD
     //     $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `printed_status` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     // }
 
-    $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `printed_status`, `location_id` ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO `temp_order` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `printed_status`, `location_id`, `item_remark`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "sssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $printedStatus, $locationId);
+        mysqli_stmt_bind_param($stmt_sql, "ssssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $printedStatus, $locationId, $item_remark);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Cart Updated successfully');
         } else {
@@ -1057,7 +1057,7 @@ function DeleteCurrentInvoiceProducts($link, $invoice_number)
     return json_encode($error);
 }
 
-function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $invoice_number, $printed_status)
+function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $invoice_number, $printed_status, $item_remark)
 {
     $error = array();
     $current_time = date("Y-m-d H:i:s");
@@ -1074,10 +1074,10 @@ function AddToInvoice($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $It
     //     $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`, `printed_status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     // }
 
-    $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`, `printed_status`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO `transaction_invoice_items` (`user_id`, `product_id`, `item_price`, `item_discount`, `quantity`, `added_date`, `is_active`, `customer_id`, `table_id`, `invoice_number`, `cost_price`, `printed_status`, `item_remark`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     if ($stmt_sql = mysqli_prepare($link, $sql)) {
-        mysqli_stmt_bind_param($stmt_sql, "ssssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $invoice_number, $cost_price, $printed_status);
+        mysqli_stmt_bind_param($stmt_sql, "sssssssssssss", $UserName, $ProductID, $ItemPrice, $ItemDiscount, $Quantity, $current_time, $is_active, $CustomerID, $TableID, $invoice_number, $cost_price, $printed_status, $item_remark);
         if (mysqli_stmt_execute($stmt_sql)) {
             $error = array('status' => 'success', 'message' => 'Invoice Updated successfully');
         } else {
@@ -1306,7 +1306,7 @@ function GetInvoiceItems($link, $invoice_number)
 function GetInvoiceItemsPrint($link, $invoice_number)
 {
     $ArrayResult = array();
-    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, SUM(`quantity`) AS `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status`, `table_id`, `invoice_number`, `cost_price`, `printed_status` FROM `transaction_invoice_items` WHERE `invoice_number`  LIKE '$invoice_number' GROUP BY `product_id`, `item_discount` ORDER BY `id`";
+    $sql = "SELECT `id`, `user_id`, `product_id`, `item_price`, `item_discount`, SUM(`quantity`) AS `quantity`, `added_date`, `is_active`, `customer_id`, `hold_status`, `table_id`, `invoice_number`, `cost_price`, `printed_status`, `item_remark` FROM `transaction_invoice_items` WHERE `invoice_number`  LIKE '$invoice_number' GROUP BY `product_id`, `item_discount` ORDER BY `id`";
 
     $result = $link->query($sql);
     if ($result->num_rows > 0) {

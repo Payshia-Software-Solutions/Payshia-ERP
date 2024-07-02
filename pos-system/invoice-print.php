@@ -20,7 +20,7 @@ $InvProducts = GetInvoiceItemsPrint($link, $invoice_number);
 $Products = GetProducts($link);
 $Units = GetUnit($link);
 
-$barcode = GenerateHighResolutionBarcode($invoice_number);
+// $barcode = GenerateHighResolutionBarcode($invoice_number);
 $textArray = [
     "invoice" => ["EN" => "Invoice", "SI" => "ඉන්වොයිසිය"],
     "invoice_number" => ["EN" => "Invoice #", "SI" => "ඉන්වොයිසි අංකය"],
@@ -215,6 +215,7 @@ if ($invoiceLogoStatus == 1) {
                         $item_quantity = $SelectRecord['quantity'];
                         $item_discount = $SelectRecord['item_discount'];
                         $product_id = $SelectRecord['product_id'];
+                        $item_remark = $SelectRecord['item_remark'];
 
                         $line_total = ($selling_price - $item_discount) * $item_quantity;
                         $totalItemDiscount = $item_discount * $item_quantity;
@@ -225,7 +226,10 @@ if ($invoiceLogoStatus == 1) {
                         }
                 ?>
                         <tr>
-                            <td colspan="4" <?= $fontClass ?>><?= $print_name; ?> - <?php echo number_format($selling_price, 2); ?></td>
+                            <td colspan="4" <?= $fontClass ?>>
+                                <?= $print_name; ?> - <?php echo number_format($selling_price, 2); ?>
+                                <?= ($item_remark != "") ? "<br>(" . $item_remark . ")" : '' ?>
+                            </td>
                         </tr>
                         <tr class="selected" <?= $fontClass ?>>
                             <td <?= $fontClass ?>><?php echo $item_quantity; ?></td>
@@ -310,7 +314,7 @@ if ($invoiceLogoStatus == 1) {
                 $item_unit = $Units[$Products[$SelectRecord['product_id']]['measurement']]['unit_name'];
                 $item_quantity = $SelectRecord['item_quantity'];
         ?>
-               <p class="mb-0" style="margin: 0px !important;"><?= $print_name; ?>  - <?= $item_quantity ?></p>
+                <p class="mb-0" style="margin: 0px !important;"><?= $print_name; ?> - <?= $item_quantity ?></p>
         <?php
             }
         }

@@ -36,7 +36,7 @@ $CourseBatches = getLmsBatches();
             <h5 class="table-title mb-4">Please Choose Batch to open Winpharma Submissions</h5>
             <div class="row g-3">
                 <?php foreach ($CourseBatches as $batch) : ?>
-                    <div class="col-3 d-flex">
+                    <div class="col-md-3 d-flex">
                         <div class="card clickable flex-fill" onclick="GetWinpharmaSubmissions('<?= $batch['course_code'] ?>', 'Pending')">
                             <div class="card-body">
                                 <h6 class="mb-0"><?= $batch['course_name'] ?></h6>

@@ -141,12 +141,15 @@ if ($guestReceiptLogoStatus == 1) {
                         $item_quantity = $SelectRecord['quantity'];
                         $item_discount = $SelectRecord['item_discount'];
                         $product_id = $SelectRecord['product_id'];
+                        $item_remark = $SelectRecord['item_remark'];
 
                         $line_total = ($selling_price - $item_discount) * $item_quantity;
                         $total += $line_total;
                 ?>
                         <tr>
-                            <td colspan="4"><?php echo $print_name; ?></td>
+                            <td colspan="4">
+                                <?php echo $print_name; ?><?= ($item_remark != "") ? "<br>(" . $item_remark . ")" : '' ?>
+                            </td>
                         </tr>
                         <tr class="selected">
                             <td><?php echo $item_quantity; ?></td>

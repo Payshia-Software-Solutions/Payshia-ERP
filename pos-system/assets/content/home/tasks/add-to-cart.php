@@ -13,6 +13,7 @@ $ItemDiscount = $_POST['ItemDiscount'];
 $Quantity = $_POST['ItemQty'];
 $TableID = $_POST['TableID'];
 $LocationID = $_POST['LocationID'];
+$itemRemark = $_POST['item_remark'];
 $printedStatus = $rawStockStatus = $holdMaterialsQty = $getHoldQty = $currentCartQty = $totalOrderQty = $getHoldQtyValue = 0;
 
 $Product = $Products[$ProductID];
@@ -127,7 +128,7 @@ if ($recipeType == '0') {
 
 
 if ($rawStockStatus == 0) {
-    $result = AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $LocationID);
+    $result = AddToCart($link, $ProductID, $UserName, $CustomerID, $ItemPrice, $ItemDiscount, $Quantity, $TableID, $printedStatus, $LocationID, $itemRemark);
 } else {
 
     if ($recipeType == '0') {

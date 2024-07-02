@@ -103,6 +103,10 @@ $barcode = "";
         </div>
         <hr>
         <div class="row mb-2">
+            <div class="col-12">
+                <label for="remark">Remark</label>
+                <input type="text" class="form-control p-3" name="item_remark" id="item_remark" placeholder="Enter Remark/Addon Here">
+            </div>
             <div class="col-12 text-end mb-2">
                 <?php
 

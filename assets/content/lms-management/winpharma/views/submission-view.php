@@ -62,7 +62,7 @@ $file_extension = strtolower(pathinfo($submit_file, PATHINFO_EXTENSION));
 
     <div class="row g-3">
 
-        <div class="col-8">
+        <div class="col-md-8">
 
 
             <?php
@@ -92,9 +92,8 @@ $file_extension = strtolower(pathinfo($submit_file, PATHINFO_EXTENSION));
             ?>
         </div>
 
-        <div class="col-4">
+        <div class="col-md-4">
             <h5 class="">Submission for <?= $levelInfo["level_name"] ?> & <?= $taskInfo["resource_title"] ?> of <?= $submission["index_number"] ?></h5>
-
 
             <form id="grade-form" method="post">
                 <h4 class="card-title border-bottom pb-2 mb-2">Grading</h4>
@@ -113,8 +112,8 @@ $file_extension = strtolower(pathinfo($submit_file, PATHINFO_EXTENSION));
                     <div class="col-md-6">
                         <label>Grade Status</label>
                         <select onchange="ChangeGradeValue()" name="grade_status" id="grade_status" class="form-control form-control-sm" required>
-                            <option <?= ($submission["grade_status"] == "Pending") ? 'selected' : '' ?> value="Pending">Pending</option>
                             <option <?= ($submission["grade_status"] == "Completed") ? 'selected' : '' ?> value="Completed">Completed</option>
+                            <option <?= ($submission["grade_status"] == "Pending") ? '' : '' ?> value="Pending">Pending</option>
                             <option <?= ($submission["grade_status"] == "Sp-Pending") ? 'selected' : '' ?> value="Sp-Pending">Sp-Pending</option>
                             <option <?= ($submission["grade_status"] == "Try Again") ? 'selected' : '' ?> value="Try Again">Try Again</option>
                             <option <?= ($submission["grade_status"] == "Re-Correction") ? 'selected' : '' ?> value="Re-Correction">Re-Correction</option>
@@ -139,7 +138,6 @@ $file_extension = strtolower(pathinfo($submit_file, PATHINFO_EXTENSION));
 
                     </div>
 
-
                     <div class="col-md-12">
                         <label>Reason</label>
                         <input name="reason" id="reason" type="text" class="form-control form-control-sm" placeholder="Reason" value="<?= $submission["reason"] ?>">
@@ -151,7 +149,6 @@ $file_extension = strtolower(pathinfo($submit_file, PATHINFO_EXTENSION));
                     <div class="col-6 text-end mt-3 d-flex">
                         <button type="button" class="btn btn-lg btn-dark rounded-2 text-white flex-fill w-100" onclick="SaveGrade('<?= $submissionId ?>', '<?= $defaultCourse ?>', '<?= $requestStatus ?>') "><i class="fa-solid fa-floppy-disk"></i> Save Grade</button>
                     </div>
-
 
                 </div>
             </form>

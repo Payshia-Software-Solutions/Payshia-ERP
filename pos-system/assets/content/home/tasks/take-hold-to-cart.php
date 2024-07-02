@@ -20,8 +20,9 @@ if (!empty($CartProducts)) {
         $item_discount = $SelectRecord['item_discount'];
         $product_id = $SelectRecord['product_id'];
         $printedStatus =  $SelectRecord['printed_status'];
+        $item_remark =  $SelectRecord['item_remark'];
 
-        $result = AddToCart($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $printedStatus, $LocationID);
+        $result = AddToCart($link, $product_id, $LoggedUser, $CustomerID, $selling_price, $item_discount, $item_quantity, $TableID, $printedStatus, $LocationID, $item_remark);
     }
 }
 echo $result;

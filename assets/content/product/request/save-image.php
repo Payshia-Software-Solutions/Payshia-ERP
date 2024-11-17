@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 require_once '../../../../vendor/autoload.php';
 
 use Symfony\Component\HttpClient\HttpClient;
-
+// test
 // Handle file upload
 $image = $_FILES['product_image'];
 

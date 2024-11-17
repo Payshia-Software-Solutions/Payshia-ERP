@@ -41,6 +41,9 @@ $SubPage = false;
     </div>
     <!-- Add Scripts -->
 
+
+    <?php include './include/popups.php' ?>
+
     <?php include './include/footer-scripts.php' ?>
     <script src="./assets/js/product-1.1.js"></script>
 </body>

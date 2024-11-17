@@ -4035,7 +4035,7 @@ function ReturnDateInput($elementName, $requiredStatus, $classList, $defaultValu
 }
 
 
-function ReturnSelectInput($elementName, $requiredStatus, $classList, $dataList, $defaultValue = 0,)
+function ReturnSelectInput($elementName, $requiredStatus, $classList, $dataList, $defaultValue = 0)
 {
     $elementName = htmlspecialchars($elementName);
     $camelCase = convertToCamelCase($elementName);

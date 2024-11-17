@@ -2,7 +2,7 @@
 $server = "localhost";
 $username = "root";
 $password = "";
-$database = "payshia_erp";
+$database = "tea_jar";
 $database_error = "";
 
 

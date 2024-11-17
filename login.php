@@ -70,7 +70,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $_SESSION["user_name"] = $email_address;
 
                                 // Login to Index
-                                header("location: index?user=$email_address");
+                                if (isset($_GET['return_url'])) {
+                                    // Redirect to the return URL after successful login
+                                    header("location: " . urldecode($_GET['return_url']));
+                                } else {
+                                    // Default redirect if no return URL is available
+                                    header("location: index?user=$email_address");
+                                }
                             } else {
                                 // Display an error message if password is not valid
                                 $error = "You are not Authorized";

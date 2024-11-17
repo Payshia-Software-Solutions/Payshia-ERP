@@ -39,7 +39,10 @@ $arrays = json_decode($jsonData, true);
 $commonModules = $arrays['commonMenuRoots'];
 $organizationRoots = $arrays['organizationRoots'];
 
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+$current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 ?>
+
 <input type="hidden" value="<?php echo $session_student_number; ?>" id="LoggedUser" name="LoggedUser">
 <input type="hidden" value="<?php echo $session_user_level; ?>" id="UserLevel" name="UserLevel">
 <input type="hidden" value="<?php echo $company_id; ?>" id="company_id" name="company_id">
@@ -80,7 +83,7 @@ $organizationRoots = $arrays['organizationRoots'];
                 <p class="class-fee text-light"><?= $LoggedName ?></p>
                 <a href="./"><i class="fa-solid fa-home text-white clickable"></i></a>
                 <a href="./pos-system" target="_blank" class="mx-1"><i class="fa-solid fa-cash-register text-white clickable"></i></a>
-                <a href="./logout.php" class="mx-1"><i class="fa-solid text-white fa-right-from-bracket"></i></a>
+                <a href="./logout?return_url=<?= urlencode($current_url) ?>" class="mx-1"><i class="fa-solid text-white fa-right-from-bracket"></i></a>
                 <span class="badge bg-danger mt-2"><?= $UserLevel ?></span>
                 <i class="fa-solid fa-circle-half-stroke clickable text-light" onclick="toggleDarkMode()"></i>
             </div>

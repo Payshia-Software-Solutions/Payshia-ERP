@@ -428,7 +428,7 @@ function GetStudentBalance($userName)
     if (!empty($paymentRecords)) {
         foreach ($paymentRecords as $selectedArray) {
             $paymentRecord = 0;
-            $paymentRecord = ($selectedArray['paid_amount'] - $selectedArray['discount_amount']);
+            $paymentRecord = ($selectedArray['paid_amount'] + $selectedArray['discount_amount']);
             $TotalStudentPaymentRecords += $paymentRecord;
         }
     }

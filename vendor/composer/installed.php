@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '96ffa44ae715387a969aa9c1103f59ce78a42e95',
+        'reference' => '0a0a3dbf45c92ae5d7d47011d8a70a6fb2c2b835',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '96ffa44ae715387a969aa9c1103f59ce78a42e95',
+            'reference' => '0a0a3dbf45c92ae5d7d47011d8a70a6fb2c2b835',
             'dev_requirement' => false,
         ),
         'bacon/bacon-qr-code' => array(
@@ -82,6 +82,18 @@
             'reference' => '728434227fe21be27ff6d86621a1b13107a2562c',
             'dev_requirement' => false,
         ),
+        'php-http/async-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '*',
+            ),
+        ),
+        'php-http/client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '*',
+            ),
+        ),
         'phpoffice/phpspreadsheet' => array(
             'pretty_version' => '2.0.0',
             'version' => '2.0.0.0',
@@ -100,6 +112,30 @@
             'reference' => '2e4d5b1f7f04fdb348d0721ada65963dac6f0c0c',
             'dev_requirement' => false,
         ),
+        'psr/cache' => array(
+            'pretty_version' => '3.0.0',
+            'version' => '3.0.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/cache',
+            'aliases' => array(),
+            'reference' => 'aa5030cfa5405eccfdcb1083ce040c2cb8d253bf',
+            'dev_requirement' => false,
+        ),
+        'psr/cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '2.0|3.0',
+            ),
+        ),
+        'psr/container' => array(
+            'pretty_version' => '2.0.2',
+            'version' => '2.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/container',
+            'aliases' => array(),
+            'reference' => 'c71ecc56dfe541dbd90c5360474fbc405f8d5963',
+            'dev_requirement' => false,
+        ),
         'psr/http-client' => array(
             'pretty_version' => '1.0.3',
             'version' => '1.0.3.0',
@@ -108,6 +144,12 @@
             'aliases' => array(),
             'reference' => 'bb5906edc1c324c9a05aa0873d40117941e5fa90',
             'dev_requirement' => false,
+        ),
+        'psr/http-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
         ),
         'psr/http-factory' => array(
             'pretty_version' => '1.0.2',
@@ -127,6 +169,15 @@
             'reference' => '402d35bcb92c70c026d1a6a9883f06b2ead23d71',
             'dev_requirement' => false,
         ),
+        'psr/log' => array(
+            'pretty_version' => '3.0.2',
+            'version' => '3.0.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../psr/log',
+            'aliases' => array(),
+            'reference' => 'f16e1d5863e37f8d8c2a01719f5b34baa2b714d3',
+            'dev_requirement' => false,
+        ),
         'psr/simple-cache' => array(
             'pretty_version' => '3.0.0',
             'version' => '3.0.0.0',
@@ -135,6 +186,69 @@
             'aliases' => array(),
             'reference' => '764e0b3939f5ca87cb904f570ef9be2d78a07865',
             'dev_requirement' => false,
+        ),
+        'psr/simple-cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0|2.0|3.0',
+            ),
+        ),
+        'symfony/cache' => array(
+            'pretty_version' => 'v7.1.4',
+            'version' => '7.1.4.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/cache',
+            'aliases' => array(),
+            'reference' => 'b61e464d7687bb7e8f677d5031c632bf3820df18',
+            'dev_requirement' => false,
+        ),
+        'symfony/cache-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/cache-contracts',
+            'aliases' => array(),
+            'reference' => 'df6a1a44c890faded49a5fca33c2d5c5fd3c2197',
+            'dev_requirement' => false,
+        ),
+        'symfony/cache-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.1|2.0|3.0',
+            ),
+        ),
+        'symfony/deprecation-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/deprecation-contracts',
+            'aliases' => array(),
+            'reference' => '0e0d29ce1f20deffb4ab1b016a7257c4f1e789a1',
+            'dev_requirement' => false,
+        ),
+        'symfony/http-client' => array(
+            'pretty_version' => 'v7.1.4',
+            'version' => '7.1.4.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/http-client',
+            'aliases' => array(),
+            'reference' => 'a8f8d60b30b331cf4b743b3632e5acdba3f8285c',
+            'dev_requirement' => false,
+        ),
+        'symfony/http-client-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/http-client-contracts',
+            'aliases' => array(),
+            'reference' => '20414d96f391677bf80078aa55baece78b82647d',
+            'dev_requirement' => false,
+        ),
+        'symfony/http-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '3.0',
+            ),
         ),
         'symfony/polyfill-iconv' => array(
             'pretty_version' => 'v1.29.0',
@@ -179,6 +293,24 @@
             'install_path' => __DIR__ . '/../symfony/polyfill-php72',
             'aliases' => array(),
             'reference' => '861391a8da9a04cbad2d232ddd9e4893220d6e25',
+            'dev_requirement' => false,
+        ),
+        'symfony/service-contracts' => array(
+            'pretty_version' => 'v3.5.0',
+            'version' => '3.5.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/service-contracts',
+            'aliases' => array(),
+            'reference' => 'bd1d9e59a81d8fa4acdcea3f617c581f7475a80f',
+            'dev_requirement' => false,
+        ),
+        'symfony/var-exporter' => array(
+            'pretty_version' => 'v7.1.2',
+            'version' => '7.1.2.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/var-exporter',
+            'aliases' => array(),
+            'reference' => 'b80a669a2264609f07f1667f891dbfca25eba44c',
             'dev_requirement' => false,
         ),
         'tecnickcom/tcpdf' => array(

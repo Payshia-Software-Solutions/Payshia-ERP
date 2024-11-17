@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL);
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING);
 ini_set('display_errors', 1);
 
 // Include the qrlib file
@@ -18,7 +18,7 @@ $text = 'Gamage Thilina Ruwan Kumara Doloswala';
 $pvNumber = 'PV00253555';
 $CourseCode = 'CS0001';
 $certificateId = 11540;
-$s_user_name = 'Admin';
+$s_user_name = 'PA18513';
 $dateText = 'Date : ' . date('Y-m-d');
 $indexNumberText = 'Index Number: ' . $s_user_name;
 $certificateIdText = 'Certificate ID: ' . $certificateId;

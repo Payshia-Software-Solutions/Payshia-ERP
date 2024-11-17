@@ -21,7 +21,7 @@ $InvProducts = GetInvoiceItemsPrint($link, $invoice_number);
 $Products = GetProducts($link);
 $Units = GetUnit($link);
 
-$barcode = GenerateHighResolutionBarcode($invoice_number);
+// $barcode = GenerateHighResolutionBarcode($invoice_number);
 $textArray = [
     "invoice" => ["EN" => "Guest Receipt", "SI" => "ආගන්තුක රිසිට්පත"],
     "invoice_number" => ["EN" => "Invoice #", "SI" => "ඉන්වොයිසි අංකය"],
@@ -58,6 +58,9 @@ if ($TableID == 0) {
 }
 
 $service_charge = $SelectedArray['service_charge'];
+if ($_GET['serviceCharge'] == 0) {
+    $service_charge = 0;
+}
 $discountPercentage = $SelectedArray['discount_percentage'];
 $close_type = $SelectedArray['close_type'];
 $tendered_amount = $SelectedArray['tendered_amount'];

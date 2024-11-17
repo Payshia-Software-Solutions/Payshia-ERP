@@ -1,0 +1,186 @@
+<!XLSTYPE html>
+<html>
+  <head>
+    <title>JSPrintManager</title>
+    <meta charset="utf-8" />
+  </head>
+
+  <body>
+    <div style="text-align: center">
+      <h1>Advanced Image Printing from Javascript</h1>
+      <hr />
+      <fieldset>
+        <legend><strong>Image File to print</strong></legend>
+
+        <label>
+          Local Image file:
+          <input id="input-local-img-file" type="file" />
+        </label>
+        <br /><br />
+        <strong>OR...</strong>
+        <br /><br />
+        <label>
+          Image File from URL
+          <span>
+            (e.g.
+            <a
+              href="https://neodynamic.com/temp/penguins300dpi.jpg"
+              target="_blank"
+            >
+              https://neodynamic.com/temp/penguins300dpi.jpg </a
+            >)
+          </span>
+          <input id="input-file-url" />
+        </label>
+      </fieldset>
+      <br /><br />
+      <fieldset>
+        <legend><strong>Target Printer</strong></legend>
+        <label>Printer:</label>
+        <select id="printerName"></select>
+      </fieldset>
+      <br /><br />
+      <fieldset>
+        <legend><strong>Custom Image Printing Settings</strong></legend>
+        <label>Print X Pos (INCH unit):</label>
+        <input type="text" id="printX" />
+        <label>Print Y Pos (INCH unit):</label>
+        <input type="text" id="printY" />
+        <label>Print Width (INCH unit):</label>
+        <input type="text" id="printW" />
+        <label>Print Height (INCH unit):</label>
+        <input type="text" id="printH" />
+        <label>Print Orientation:</label>
+        <select id="printO">
+          <option value="P" selected>Portrait</option>
+          <option value="L">Landscape</option>
+        </select>
+      </fieldset>
+      <br />
+      <button onclick="doPrinting();"><h2>Print Image Now...</h2></button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script src="./node_modules/jsprintmanager/JSPrintManager.js"></script>
+
+    <script>
+      var clientPrinters = null;
+      var _this = this;
+
+      
+
+      //WebSocket settings
+      JSPM.JSPrintManager.auto_reconnect = true;
+      JSPM.JSPrintManager.start();
+      JSPM.JSPrintManager.WS.onStatusChanged = function () {
+        if (jspmWSStatus()) {
+          //get client installed printers
+          JSPM.JSPrintManager.getPrinters().then(function (printersList) {
+            clientPrinters = printersList;
+            var options = "";
+            for (var i = 0; i < clientPrinters.length; i++) {
+              options += "<option>" + clientPrinters[i] + "</option>";
+            }
+            $("#printerName").html(options);
+          });
+        }
+      };
+      
+
+      //Check JSPM WebSocket status
+      function jspmWSStatus() {
+        if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Open)
+          return true;
+        else if (JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Closed) {
+          console.warn(
+            "JSPrintManager (JSPM) is not installed or not running! Download JSPM Client App from https://neodynamic.com/downloads/jspm"
+          );
+          return false;
+        } else if (
+          JSPM.JSPrintManager.websocket_status == JSPM.WSStatus.Blocked
+        ) {
+          alert("JSPM has blocked this website!");
+          return false;
+        }
+      }
+
+      //Do printing...
+      function doPrinting() {
+        if (jspmWSStatus()) {
+          //create ClientPrintJob
+          var cpj = new JSPM.ClientPrintJob();
+
+          //Set Printer info
+          var myPrinter = new JSPM.InstalledPrinter($("#printerName").val());
+          cpj.clientPrinter = myPrinter;
+
+          //create image printing settings...
+          var print_settings = "";
+          if (parseFloat($("#printX").val()))
+            print_settings +=
+              "-PX=" + parseFloat($("#printX").val()).toString();
+          if (parseFloat($("#printY").val()))
+            print_settings +=
+              "-PY=" + parseFloat($("#printY").val()).toString();
+          if (parseFloat($("#printW").val()))
+            print_settings +=
+              "-PW=" + parseFloat($("#printW").val()).toString();
+          if (parseFloat($("#printH").val()))
+            print_settings +=
+              "-PH=" + parseFloat($("#printH").val()).toString();
+          print_settings += "-PO=" + $("#printO").val();
+
+          //Set Image file
+          var local_file = $("#input-local-img-file").prop("files");
+          var my_file = null;
+          var file_name;
+          var file_ext;
+
+          if (local_file && local_file.length > 0) {
+            file_ext = local_file[0].name.substring(
+              local_file[0].name.lastIndexOf(".")
+            );
+            file_name = local_file[0].name.substring(
+              0,
+              local_file[0].name.lastIndexOf(".")
+            );
+            file_name += print_settings + file_ext;
+
+            my_file = new JSPM.PrintFile(
+              local_file[0],
+              JSPM.FileSourceType.BLOB,
+              file_name,
+              1
+            );
+          } else if ($("#input-file-url").val().length > 0) {
+            var file_url = $("#input-file-url").val();
+            file_ext = file_url.substring(file_url.lastIndexOf("."));
+            file_name = file_url.substring(
+              file_url.lastIndexOf("/") + 1,
+              file_url.lastIndexOf(".")
+            );
+            file_name += print_settings + file_ext;
+
+            my_file = new JSPM.PrintFile(
+              $("#input-file-url").val(),
+              JSPM.FileSourceType.URL,
+              file_name,
+              1
+            );
+          } else {
+            alert("Must specify a local file or a URL!");
+            return;
+          }
+
+          //add file to ClientPrintJob
+          cpj.files.push(my_file);
+
+          //Send print job to printer!
+          cpj.sendToClient();
+        }
+      }
+    </script>
+  </body>
+</html>

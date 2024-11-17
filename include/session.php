@@ -45,16 +45,15 @@ if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION["user_name"])) {
     $session_user_level = $row['acc_type'];
     $session_user_id = $row['id'];
   }
-
-  // Check if the user is logged in, if not then redirect him to login page
-  if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    // header("location: ./login");
-    // exit;
-  }
 } else {
-  // Redirect to logout.php
-  header("Location: logout");
-  exit(); // Make sure to stop the script after the redirect
+  // Redirect to logout.php if session is not active
+  // Capture the current URL
+  $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+  $current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+  // Redirect to logout.php with the current URL as a query parameter
+  header("Location: logout?return_url=" . urlencode($current_url));
+  exit;
 }
 
 // Check if the user is logged in, if not then redirect him to login page

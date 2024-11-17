@@ -84,7 +84,6 @@ $message = 'Hi ' . $IndexNumber . ',
 
 Winpharama Submission is graded. Check Now!
 Grade - ' . $grade_status . '
-' . $reasonMsg . '
 
 Ceylon Pharma College
 www.pharamacollege.lk';

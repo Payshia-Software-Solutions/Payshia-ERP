@@ -208,7 +208,7 @@ if (isset($_GET['last_invoice']) && $_GET['last_invoice'] === 'true') {
             </div>
         </div>
     </div>
-
+    <?php include './include/payment-reminder.php' ?>
 
     <script src="../vendor/select2/dist/js/select2.min.js"></script>
 </body>

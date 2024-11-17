@@ -1,3 +1,8 @@
+<?php
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+$current_url = $protocol . "://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+?>
+
 <div class="row">
     <div class="col-6">
         <nav aria-label="breadcrumb">
@@ -45,7 +50,7 @@
         <ul class="nav-links">
             <!-- <li class="nav-item"><a href="./profile"><i class="fa-solid fa-circle-user top-icon"></i>Profile</a></li> -->
             <li class="nav-item" onclick="ChoiceUserLocation('<?= $StudentNumber ?>', 1)"><a href="#"><i class="fa-solid fa-location-dot top-icon"></i>Change Location</a></li>
-            <li class="nav-item"><a href="./logout"><i class="fa-solid fa-right-from-bracket top-icon"></i>Sign Out</a></li>
+            <li class="nav-item"><a href="./logout?return_url=<?= urlencode($current_url) ?>"><i class="fa-solid fa-right-from-bracket top-icon"></i>Sign Out</a></li>
         </ul>
     </div>
 

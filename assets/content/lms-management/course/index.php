@@ -170,6 +170,8 @@ $ActiveCount = $ArrayCount;
 
                                     <div class="col-md-12">
                                         <button class="mt-0 mb-1 btn btn-sm btn-dark view-button w-100" type="button" onclick="EditGradesByCourse ('<?= $studentBatch ?>')"><i class="fa-solid fa-pen-to-square"></i> Edit Grading</button>
+
+                                        <button class="mt-0 mb-1 btn btn-sm btn-dark view-button w-100" type="button" onclick="ViewGradesByCourse ('<?= $studentBatch ?>')"><i class="fa-solid fa-pen-to-square"></i> View Grading</button>
                                     </div>
                                 </div>
 

@@ -69,4 +69,26 @@ $studentCount = count($accountDetails);
             </div>
         </a>
     </div>
+    <div class="col-md-3 col-6 col-xxl-2">
+        <a href="./lms-assignments" rel="noopener noreferrer">
+            <div class="card clickable">
+                <div class="card-body text-center">
+
+                    <i class="fa-solid fa-book-open-reader icon-card"></i>
+                    <h5 class="mb-0">Assignments</h5>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6 col-xxl-2">
+        <a href="#" rel="noopener noreferrer">
+            <div class="card clickable">
+                <div class="card-body text-center">
+
+                    <i class="fa-solid fa-calendar-check icon-card"></i>
+                    <h5 class="mb-0">Setup Appointments</h5>
+                </div>
+            </div>
+        </a>
+    </div>
 </div>

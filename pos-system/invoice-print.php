@@ -301,13 +301,16 @@ if ($invoiceLogoStatus == 1) {
         </table>
         <hr />
         <?php
-        $removedItems = RemovedItemsByInvoice($link, $ref_hold);
-
+        $removedItems = [];
+        if ($ref_hold != 0) {
+            $removedItems = RemovedItemsByInvoice($link, $ref_hold);
+        }
         // Force Display
         $displayStatus = 1;
         if (!empty($removedItems)) {
             echo '<h4 style="margin: 0px; margin-bottom: 5px">Removed Items</h4>';
             foreach ($removedItems as $SelectRecord) {
+                // var_dump($SelectRecord);
                 $display_name = $Products[$SelectRecord['product_id']]['display_name'];
                 $print_name = $Products[$SelectRecord['product_id']]['print_name'];
                 $name_si = $Products[$SelectRecord['product_id']]['name_si'];

@@ -1,0 +1,54 @@
+<?php
+require_once './models/TransactionGoodReceiveNoteItems.php';
+
+class TransactionGoodReceiveNoteItemsController
+{
+    private $model;
+
+    public function __construct($pdo)
+    {
+        $this->model = new TransactionGoodReceiveNoteItems($pdo);
+    }
+
+    public function getAll()
+    {
+        echo json_encode($this->model->getAll());
+    }
+
+    public function getById($id)
+    {
+        $data = $this->model->getById($id);
+        if ($data) {
+            echo json_encode($data);
+        } else {
+            http_response_code(404);
+            echo json_encode(["error" => "Not found"]);
+        }
+    }
+
+    public function create()
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+        if (isset($data['product_id'], $data['grn_number'])) {
+            $this->model->create($data);
+            http_response_code(201);
+            echo json_encode(["message" => "Transaction Good Receive Note Item Created"]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing required fields"]);
+        }
+    }
+
+    public function update($id)
+    {
+        $data = json_decode(file_get_contents("php://input"), true);
+        $this->model->update($id, $data);
+        echo json_encode(["message" => "Transaction Good Receive Note Items Updated"]);
+    }
+
+    public function delete($id)
+    {
+        $this->model->delete($id);
+        echo json_encode(["message" => "Transaction Good Receive Note Items Deleted"]);
+    }
+}
